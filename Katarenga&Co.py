@@ -43,7 +43,7 @@ class Board:
             for j in range(3, -1, -1):
                 l[i].append(quart[j][i])
         return l
-    
+
     def degres_180(self, quart):
         l = [[], [], [], []]
         k = 0
@@ -68,8 +68,20 @@ class Board:
             l.append(ligne[::-1])
         return l
 
-    def plateau(self, quart_1, quart_2, quart_3, quart_4):
-        None
+    def board(self):
+        liste = self.quart1
+        k = 0
+        for lignes in liste:
+            for i in range(4):
+                lignes.append(int(self.quart2[k][i]))
+            k+=1
+        liste_bis = self.quart3
+        k = 0
+        for lignes in liste_bis:
+            for i in range(4):
+                lignes.append(int(self.quart4[k][i]))
+            k+=1
+        return liste + liste_bis
 
 # regions de test 
 q1 = [[1, 2, 3, 4],
