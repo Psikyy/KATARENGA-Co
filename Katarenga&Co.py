@@ -1,3 +1,5 @@
+import random
+
 class Case:
     
     def __init__(self, couleur, x, y):
@@ -24,6 +26,12 @@ class Case:
         return self.deplacement
 
 
+def init_region():
+    couleurs = ["blue", "green", "red", "yellow"]
+    couleurs_reparties = 4*couleurs
+    random.shuffle(couleurs_reparties)
+    grille = [couleurs_reparties[i:i+4] for i in range(0, 16, 4)]
+    return grille
 
 
 class Init_Board:
@@ -117,5 +125,3 @@ q4 = [[37, 38, 39, 40],
       [53, 54, 55, 56],
       [61, 62, 63, 64]
      ]
-
-zizi
