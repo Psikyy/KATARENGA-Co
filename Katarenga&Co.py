@@ -4,17 +4,17 @@ class Case:
         self.color = couleur
         self.x = x
         self.y = y
-        if self.couleur == 'blue':
+        if self.color == 'blue':
             self.deplacement = [(self.x-1, self.y-1), (self.x-1, self.y), (self.x-1, self.y+1), (self.x, self.y+1), (self.x+1, self.y+1), (self.x+1, self.y), (self.x+1, self.y-1), (self.x, self.y-1)]
-        elif self.couleur == 'green':
+        elif self.color == 'green':
             self.deplacement = [(self.x-2, self.y-1), (self.x-2, self.y-1), (self.x-1, self.y+2), (self.x+1, self.y+2), (self.x+2, self.y+1), (self.x+2, self.y-1), (self.x+1, self.y-2), (self.x-1, self.y-2)]
-        elif self.couleur == 'red':
+        elif self.color == 'red':
             self.deplacement = [(-1, 0), (0, 1), (1, 0), (0, -1)]
-        elif self.couleur == 'yellow':
+        elif self.color == 'yellow':
             self.deplacement = [(-1, -1), (-1, 1), (1, 1), (1, -1)]
     
     def getColor(self):
-        return self.couleur
+        return self.color
     
     def getX(self):
         return self.x
@@ -24,6 +24,9 @@ class Case:
     
     def getMoves(self):
         return self.deplacement
+
+
+
 
 
 class Board:
@@ -36,3 +39,8 @@ class Board:
         for ligne in liste:
             l.append(ligne[::-1])
         return l
+    
+    def plateau(quart_1, quart_2, quart_3, quart_4):
+        liste_plate = quart_1
+        for i in range(4):
+            None
