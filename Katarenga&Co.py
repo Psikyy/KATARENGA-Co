@@ -26,7 +26,7 @@ class Case:
 
 
 
-class Board:
+class Init_Board:
     
     def __init__(self, quart_1, quart_2, quart_3, quart_4):
         self.q1 = quart_1
@@ -36,7 +36,7 @@ class Board:
         self.board = None
     
     
-    
+
     def degres_90(self, quart):
         l = [[], [], [], []]
         for i in range(4):
@@ -83,6 +83,16 @@ class Board:
             k+=1
         return liste + liste_bis
 
+
+
+
+class Board:
+
+    def __init__(self, plateau, board):
+        self.plateau = plateau
+        self.board = board
+
+
 # regions de test 
 q1 = [[1, 2, 3, 4],
       [9, 10, 11, 12],
@@ -107,3 +117,4 @@ q4 = [[37, 38, 39, 40],
       [53, 54, 55, 56],
       [61, 62, 63, 64]
      ]
+
