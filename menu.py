@@ -22,7 +22,7 @@ def get_unique_names(names):
 def start_game():
     clear_window()
 
-    tk.Label(fenetre, text="Katarenga", font=("Helvetica", 24)).pack(pady=20)
+    tk.Label(fenetre, text="Katarenga", font=("Helvetica", 25)).pack(pady=20)
 
     game_buttons = [
         ("Katarenga", katarenga),
