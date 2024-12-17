@@ -1,3 +1,5 @@
+import random
+
 class Case:
     
     def __init__(self, couleur, x, y):
@@ -24,9 +26,15 @@ class Case:
         return self.deplacement
 
 
+def init_region():
+    couleurs = ["blue", "green", "red", "yellow"]
+    couleurs_reparties = 4*couleurs
+    random.shuffle(couleurs_reparties)
+    grille = [couleurs_reparties[i:i+4] for i in range(0, 16, 4)]
+    return grille
 
 
-class Board:
+class Init_Board:
     
     def __init__(self, quart_1, quart_2, quart_3, quart_4):
         self.q1 = quart_1
@@ -36,7 +44,7 @@ class Board:
         self.board = None
     
     
-    
+
     def degres_90(self, quart):
         l = [[], [], [], []]
         for i in range(4):
@@ -82,6 +90,16 @@ class Board:
                 lignes.append(int(self.quart4[k][i]))
             k+=1
         return liste + liste_bis
+
+
+
+
+class Board:
+
+    def __init__(self, plateau, board):
+        self.plateau = plateau
+        self.board = board
+
 
 # regions de test 
 q1 = [[1, 2, 3, 4],
