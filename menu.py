@@ -1,133 +1,81 @@
-import tkinter as tk
-from tkinter import messagebox
+import pygame
+import sys
 import re
 
-def validate_entry(entry_text):
-    return re.match("^[a-zA-Z0-9]{0,15}$", entry_text) is not None
+# Initialisation de Pygame
+pygame.init()
 
-def get_unique_names(names):
-    unique_names = []
-    name_count = {}
-    for name in names:
-        if not name:
-            continue
-        if name in name_count:
-            name_count[name] += 1
-            unique_names.append(f"{name}({name_count[name]})")
-        else:
-            name_count[name] = 0
-            unique_names.append(name)
-    return unique_names
+# Définir les dimensions de l'écran
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
+screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.set_caption("Menu Principal")
 
+# Couleurs
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BLUE = (0, 0, 255)
+GREEN = (0, 255, 0)
+RED = (255, 0, 0)
+
+# Polices
+font = pygame.font.Font(None, 40)
+button_font = pygame.font.Font(None, 30)
+
+# Définir les boutons
+def draw_button(text, x, y, width, height, color, hover_color, action=None):
+    mouse_x, mouse_y = pygame.mouse.get_pos()
+    button_rect = pygame.Rect(x, y, width, height)
+    
+    if button_rect.collidepoint((mouse_x, mouse_y)):
+        pygame.draw.rect(screen, hover_color, button_rect)
+    else:
+        pygame.draw.rect(screen, color, button_rect)
+    
+    text_surface = button_font.render(text, True, WHITE)
+    screen.blit(text_surface, (x + (width - text_surface.get_width()) // 2, y + (height - text_surface.get_height()) // 2))
+    
+    return button_rect
+
+# Fonction principale
+def main_menu():
+    running = True
+    while running:
+        screen.fill(BLUE)  # Fond d'écran
+
+        # Afficher le titre
+        title_text = font.render("Katarenga", True, WHITE)
+        screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 50))
+
+        # Afficher les boutons
+        start_button = draw_button("Start Game", 300, 200, 200, 50, GREEN, RED)
+        load_button = draw_button("Load Game", 300, 300, 200, 50, GREEN, RED)
+        quit_button = draw_button("Quit", 300, 400, 200, 50, GREEN, RED)
+
+        # Gérer les événements
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if start_button.collidepoint(event.pos):
+                    start_game()  # Fonction à implémenter pour démarrer le jeu
+                if load_button.collidepoint(event.pos):
+                    load_game()  # Fonction à implémenter pour charger le jeu
+                if quit_button.collidepoint(event.pos):
+                    running = False
+
+        pygame.display.flip()
+
+# Fonction pour démarrer un jeu
 def start_game():
-    clear_window()
+    print("Démarrer le jeu")  # Implémenter le démarrage du jeu
 
-    tk.Label(fenetre, text="Katarenga", font=("Helvetica", 25)).pack(pady=20)
-
-    game_buttons = [
-        ("Katarenga", katarenga),
-        ("Congress", congress),
-        ("Isolation", isolation)
-    ]
-
-    for text, command in game_buttons:
-        tk.Button(fenetre, text=text, command=command, width=20, height=2).pack(pady=10)
-
-    add_home_and_back_buttons()
-
-def katarenga():
-    setup_game_screen("Katarenga", show_rules_katarenga, start_game)
-
-def congress():
-    setup_game_screen("Congress", show_rules_congress, start_game)
-
-def isolation():
-    setup_game_screen("Isolation", show_rules_isolation, start_game)
-
-def setup_game_screen(title, rules_command, back_command):
-    clear_window()
-
-    tk.Label(fenetre, text=title, font=("Helvetica", 24)).pack(pady=20)
-    tk.Label(fenetre, text="Jouer", font=("Helvetica", 18)).pack(pady=10)
-    tk.Label(fenetre, text="Pseudos", font=("Helvetica", 18)).pack(pady=10)
-
-    pseudo_entry1 = tk.Entry(fenetre, width=30)
-    pseudo_entry1.pack(pady=10)
-    pseudo_entry1.insert(0, "")
-
-    pseudo_entry2 = tk.Entry(fenetre, width=30)
-    pseudo_entry2.pack(pady=10)
-    pseudo_entry2.insert(0, "")
-
-    def on_start():
-        pseudo1 = pseudo_entry1.get().strip()
-        pseudo2 = pseudo_entry2.get().strip()
-
-        if not validate_entry(pseudo1) or not pseudo1:
-            pseudo1 = "Player 1"
-        if not validate_entry(pseudo2) or not pseudo2:
-            pseudo2 = "Player 2"
-
-        unique_names = get_unique_names([pseudo1, pseudo2])
-        messagebox.showinfo("Starting Game", f"Players: {unique_names[0]}, {unique_names[1]}")
-
-    tk.Button(fenetre, text="Start", command=on_start, width=20, height=2).pack(pady=10)
-    add_home_and_back_buttons(rules_command, back_command)
-
-def show_rules_katarenga():
-    show_rules("Katarenga", katarenga)
-
-def show_rules_congress():
-    show_rules("Congress", congress)
-
-def show_rules_isolation():
-    show_rules("Isolation", isolation)
-
-def show_rules(title, back_command):
-    clear_window()
-
-    tk.Label(fenetre, text=title, font=("Helvetica", 24)).pack(pady=20)
-    tk.Label(fenetre, text="Lorem ipsum dolor sit amet, consectetur adipiscing elit.", wraplength=600, justify="center").pack(pady=10)
-    add_home_and_back_buttons(back_command=back_command)
-
+# Fonction pour charger un jeu
 def load_game():
-    messagebox.showinfo("Load Game", "Loading the game...")
+    print("Charger le jeu")  # Implémenter le chargement du jeu
 
-def settings():
-    messagebox.showinfo("Settings", "Opening settings...")
-
-def quit_game():
-    fenetre.quit()
-
-def show_main_menu():
-    clear_window()
-
-    tk.Label(fenetre, text="Katarenga", font=("Helvetica", 24)).pack(pady=20)
-
-    main_menu_buttons = [
-        ("Start Game", start_game),
-        ("Load Game", load_game),
-        ("Settings", settings),
-        ("Quit", quit_game)
-    ]
-
-    for text, command in main_menu_buttons:
-        tk.Button(fenetre, text=text, command=command, width=20, height=2).pack(pady=10)
-
-def clear_window():
-    for widget in fenetre.winfo_children():
-        widget.destroy()
-
-def add_home_and_back_buttons(rules_command=None, back_command=None):
-    if rules_command:
-        tk.Button(fenetre, text="Règles", command=rules_command, width=20, height=2).pack(side=tk.RIGHT, padx=10, pady=10, anchor=tk.SE)
-    tk.Button(fenetre, text="Retour", command=back_command, width=20, height=2).pack(pady=10, anchor=tk.S)
-    tk.Button(fenetre, text="Accueil", command=show_main_menu, width=20, height=2).pack(side=tk.LEFT, padx=10, pady=10, anchor=tk.SW)
-
-fenetre = tk.Tk()
-fenetre.geometry("800x600")
-fenetre.title("Menu Principal")
-fenetre.resizable(width=False, height=False)
-
-show_main_menu()
-fenetre.mainloop()
+# Lancer le menu principal
+if __name__ == "__main__":
+    main_menu()
+    pygame.quit()
+    sys.exit()
