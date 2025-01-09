@@ -229,11 +229,18 @@ def player_names(game_name):
                     if event.key == pygame.K_BACKSPACE:
                         player2_name = player2_name[:-1]
                     elif event.key == pygame.K_RETURN:
-                        # Les deux noms sont saisis, on peut afficher dans la console
+                        # Validation des noms
                         if not player1_name:
                             player1_name = "Joueur 1"
                         if not player2_name:
                             player2_name = "Joueur 2"
+                        
+                        # Ajouter des suffixes si les noms sont identiques
+                        if player1_name == player2_name:
+                            player1_name += "(1)"
+                            player2_name += "(2)"
+                        
+                        # Afficher les noms dans la console
                         print(f"Jeu sélectionné : {game_name}")
                         print(f"Joueur 1 : {player1_name}")
                         print(f"Joueur 2 : {player2_name}")
