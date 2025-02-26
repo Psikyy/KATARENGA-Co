@@ -25,20 +25,28 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Katarenga")
+# Charger et redimensionner l'image de fond
+background_image = pygame.image.load("./img/Image_du_jeu.png")
+background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+#screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN) mettre en pleine écran automatiquement
+
 
 # Couleurs
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
-BLUE = (0, 0, 255)
-GREEN = (0, 255, 0)
-RED = (255, 0, 0)
+BLUE = (52, 152, 219)
+HOVER_BLUE = (41, 128, 185)
+GREEN = (46, 204, 113)
+HOVER_GREEN = (39, 174, 96)
+RED = (231, 76, 60)
+HOVER_RED = (192, 57, 43)
 GRAY = (200, 200, 200)
-DARK_GRAY = (100, 100, 100)
+
 
 # Polices
-font = pygame.font.Font(None, 40)
-button_font = pygame.font.Font(None, 30)
-small_font = pygame.font.Font(None, 20)
+font = pygame.font.Font(None, 80)  # Grande police pour le titre
+button_font = pygame.font.Font(None, 40)  # Police pour les boutons
+small_font = pygame.font.Font(None, 30)  # Police plus petite pour les textes secondaires
 
 # État global des paramètres
 settings = {
@@ -47,25 +55,65 @@ settings = {
     "fullscreen": False
 }
 
+# Charger la musique
+def play_background_music():
+    pygame.mixer.music.load("./musique/adventure.mp3")  # Remplace par ton fichier
+    pygame.mixer.music.set_volume(0.5)  # Volume à 50%
+    pygame.mixer.music.play(-1)  # -1 = boucle infinie
+
+
+def intro_animation():
+    screen.fill(BLACK)
+    logo_font = pygame.font.Font(None, 100)  
+    text_surface = logo_font.render("Smart Games", True, WHITE)
+
+    alpha = 0  
+    fade_in_speed = 5  
+    clock = pygame.time.Clock()
+
+    running = True
+    while running:
+        screen.fill(BLACK)
+
+        if alpha < 255:
+            alpha += fade_in_speed
+        else:
+            time.sleep(1)
+            running = False
+
+        text_surface.set_alpha(alpha)  
+        screen.blit(text_surface, (SCREEN_WIDTH // 2 - text_surface.get_width() // 2, SCREEN_HEIGHT // 2 - text_surface.get_height() // 2))
+
+        pygame.display.flip()
+        clock.tick(30)
+
+    time.sleep(1)  # Pause avant le menu
+    play_background_music()  # Lancer la musique
+
+
+
 # Animation de chargement
 def loading_screen(message="Chargement..."):
     screen.fill(GRAY)
     text = font.render(message, True, BLACK)
     screen.blit(text, (SCREEN_WIDTH // 2 - text.get_width() // 2, SCREEN_HEIGHT // 2 - text.get_height() // 2))
     pygame.display.flip()
-    time.sleep(1)  # Simulation de chargement
+    time.sleep(1)
 
 # Fonction pour dessiner les boutons
-def draw_button(text, x, y, width, height, color, hover_color):
+def draw_button(text, x, y, width, height, color, hover_color, text_color=WHITE):
     mouse_x, mouse_y = pygame.mouse.get_pos()
     button_rect = pygame.Rect(x, y, width, height)
 
     if button_rect.collidepoint((mouse_x, mouse_y)):
-        pygame.draw.rect(screen, hover_color, button_rect)
+        pygame.draw.rect(screen, hover_color, button_rect, border_radius=15)
+        pygame.draw.rect(screen, WHITE, button_rect, width=3, border_radius=15)  # Bordure blanche
     else:
-        pygame.draw.rect(screen, color, button_rect)
+        pygame.draw.rect(screen, color, button_rect, border_radius=15)
+        pygame.draw.rect(screen, BLACK, button_rect, width=3, border_radius=15)  # Bordure noire
 
-    text_surface = button_font.render(text, True, WHITE)
+    # Texte centré
+    text_surface = button_font.render(text, True, text_color)
     screen.blit(text_surface, (x + (width - text_surface.get_width()) // 2, y + (height - text_surface.get_height()) // 2))
 
     return button_rect
@@ -237,17 +285,31 @@ def player_names(game_name):
 
 def main_menu():
     running = True
+    title_alpha = 255  # Opacité du titre
+    fade_out = True  # Direction de l'animation du titre
+
     while running:
-        screen.fill(BLUE)
+        screen.blit(background_image, (0, 0))  # Affiche l'image de fond
+
+        # Animation du titre
+        if fade_out:
+            title_alpha -= 3
+            if title_alpha <= 100:
+                fade_out = False
+        else:
+            title_alpha += 3
+            if title_alpha >= 255:
+                fade_out = True
 
         # Titre
-        title_text = font.render(t("title"), True, WHITE)
-        screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 50))
+        title_surface = font.render("Katarenga", True, WHITE)
+        title_surface.set_alpha(title_alpha)  # Appliquer la transparence
+        screen.blit(title_surface, (SCREEN_WIDTH // 2 - title_surface.get_width() // 2, 50))
 
         # Boutons
-        start_button = draw_button(t("play_game"), 300, 200, 200, 50, GREEN, RED)
-        settings_button = draw_button(t("settings"), 300, 300, 200, 50, GREEN, RED)
-        quit_button = draw_button(t("quit"), 300, 400, 200, 50, GREEN, RED)
+        start_button = draw_button("Lancer le jeu", SCREEN_WIDTH // 2 - 150, 250, 300, 60, GREEN, HOVER_GREEN)
+        settings_button = draw_button("Paramètres", SCREEN_WIDTH // 2 - 150, 350, 300, 60, BLUE, HOVER_BLUE)
+        quit_button = draw_button("Quitter", SCREEN_WIDTH // 2 - 150, 450, 300, 60, RED, HOVER_RED)
 
         # Gérer les événements
         for event in pygame.event.get():
@@ -256,9 +318,9 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.collidepoint(event.pos):
-                    game_selection()
+                    game_selection()  # Sélection du jeu
                 if settings_button.collidepoint(event.pos):
-                    settings_menu()
+                    settings_menu()  # Menu des paramètres
                 if quit_button.collidepoint(event.pos):
                     pygame.quit()
                     sys.exit()
@@ -306,4 +368,6 @@ def game_selection():
 
 # Lancer le programme
 if __name__ == "__main__":
+    intro_animation()
+    play_background_music()
     main_menu()
