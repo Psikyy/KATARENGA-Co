@@ -1,8 +1,35 @@
 import random
 
+def checkQuart(quart: list) -> bool:
+    """
+        Renvoie un booléen qui indique si le cadrant créé est valide ou non
+    """
+    colors = {'blue': 0, 'green': 0, 'red': 0, 'yellow': 0}
+    for i in range(len(quart)):
+        for elt in quart[i]:
+            if elt in colors.keys():
+                colors[elt]+=1
+    for valeurs in colors.values():
+        if valeurs != 4:
+            return False
+    return True
+
+def genererQuart() -> list:
+    """
+        Génère un cadrant valide
+    """
+    couleurs = ('blue', 'green', 'red', 'yellow')
+    quart = [[couleurs[random.randrange(0, 4)] for j in range(4)] for i in range(4)]
+    while (checkQuart(quart) == False):
+        quart = [[couleurs[random.randrange(0, 4)] for j in range(4)] for i in range(4)]
+    return quart
+
+
+""" 
+    Classe 'Case' 
+"""
 class Case:
-    
-    def __init__(self, couleur, x, y):
+    def __init__(self, couleur : str, x : int, y : int):
         self.color = couleur
         self.x = x
         self.y = y
@@ -24,6 +51,9 @@ class Case:
     
     def getMoves(self):
         return self.deplacement
+"""
+    Fin classe 'Case'
+"""
 
 
 def init_region():
@@ -33,7 +63,9 @@ def init_region():
     grille = [couleurs_reparties[i:i+4] for i in range(0, 16, 4)]
     return grille
 
-
+"""
+    Classe 'Init_Board'
+"""
 class Init_Board:
     
     def __init__(self, quart_1, quart_2, quart_3, quart_4):
@@ -90,6 +122,9 @@ class Init_Board:
                 lignes.append(int(self.quart4[k][i]))
             k+=1
         return liste + liste_bis
+"""
+    Fin classe 'Init_Board'
+"""
 
 
 
