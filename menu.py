@@ -2,20 +2,38 @@ import pygame
 import sys
 import time
 import json
+import os
 
 # Charger les traductions
 def load_translations():
-    with open('translations.json', "r", encoding="utf-8") as file:
-        return json.load(file)
+    try:
+        with open('translations.json', "r", encoding="utf-8") as file:
+            return json.load(file)
+    except FileNotFoundError:
+        print("Fichier de traductions non trouvé.")
+        return {"Français": {}}
+
+# Sauvegarder les paramètres
+def save_settings():
+    with open('settings.json', 'w', encoding='utf-8') as file:
+        json.dump(settings, file)
+
+# Charger les paramètres
+def load_settings():
+    try:
+        with open('settings.json', 'r', encoding='utf-8') as file:
+            return json.load(file)
+    except FileNotFoundError:
+        return {"volume": 0.5, "language": "Français", "fullscreen": False}
 
 # Définir la langue actuelle
 translations = load_translations()
-current_language = "Français"
+settings = load_settings()
+current_language = settings["language"]
 
 # Fonction pour obtenir une traduction
 def t(key):
     return translations[current_language].get(key, key)
-
 
 # Initialisation de Pygame
 pygame.init()
@@ -25,11 +43,15 @@ SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Katarenga")
-# Charger et redimensionner l'image de fond
-background_image = pygame.image.load("./img/Image_du_jeu.png")
-background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
-#screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN) mettre en pleine écran automatiquement
 
+# Charger et redimensionner l'image de fond
+try:
+    background_image = pygame.image.load("./img/Image_du_jeu.png")
+    background_image = pygame.transform.scale(background_image, (SCREEN_WIDTH, SCREEN_HEIGHT))
+except pygame.error:
+    print("Image de fond non trouvée.")
+    background_image = pygame.Surface((SCREEN_WIDTH, SCREEN_HEIGHT))
+    background_image.fill((0, 0, 0))
 
 # Couleurs
 WHITE = (255, 255, 255)
@@ -42,33 +64,36 @@ RED = (231, 76, 60)
 HOVER_RED = (192, 57, 43)
 GRAY = (200, 200, 200)
 
-
 # Polices
 font = pygame.font.Font(None, 80)  # Grande police pour le titre
 button_font = pygame.font.Font(None, 40)  # Police pour les boutons
 small_font = pygame.font.Font(None, 30)  # Police plus petite pour les textes secondaires
 
-# État global des paramètres
-settings = {
-    "volume": 0.5,
-    "language": "Français",
-    "fullscreen": False
-}
+# Charger les sons
+try:
+    click_sound = pygame.mixer.Sound("musique/click.wav")  # Son de clic
+    hover_sound = pygame.mixer.Sound("musique/hover.wav")  # Son de survol
+except pygame.error:
+    print("Sons non trouvés. Les effets sonores seront désactivés.")
+    click_sound = None
+    hover_sound = None
 
-# Charger la musique
-def play_background_music():
-    pygame.mixer.music.load("./musique/adventure.mp3")  # Remplace par ton fichier
-    pygame.mixer.music.set_volume(0.5)  # Volume à 50%
-    pygame.mixer.music.play(-1)  # -1 = boucle infinie
+# Charger la musique de fond
+try:
+    pygame.mixer.music.load("musique/adventure.mp3")
+    pygame.mixer.music.set_volume(settings["volume"])
+    pygame.mixer.music.play(-1)  # Boucle infinie
+except pygame.error:
+    print("Musique de fond non trouvée.")
 
-
+# Animation d'intro
 def intro_animation():
     screen.fill(BLACK)
-    logo_font = pygame.font.Font(None, 100)  
+    logo_font = pygame.font.Font(None, 100)
     text_surface = logo_font.render("Smart Games", True, WHITE)
 
-    alpha = 0  
-    fade_in_speed = 5  
+    alpha = 0
+    fade_in_speed = 5
     clock = pygame.time.Clock()
 
     running = True
@@ -81,16 +106,13 @@ def intro_animation():
             time.sleep(1)
             running = False
 
-        text_surface.set_alpha(alpha)  
+        text_surface.set_alpha(alpha)
         screen.blit(text_surface, (SCREEN_WIDTH // 2 - text_surface.get_width() // 2, SCREEN_HEIGHT // 2 - text_surface.get_height() // 2))
 
         pygame.display.flip()
         clock.tick(30)
 
     time.sleep(1)  # Pause avant le menu
-    play_background_music()  # Lancer la musique
-
-
 
 # Animation de chargement
 def loading_screen(message="Chargement..."):
@@ -100,7 +122,7 @@ def loading_screen(message="Chargement..."):
     pygame.display.flip()
     time.sleep(1)
 
-# Fonction pour dessiner les boutons
+# Fonction pour dessiner les boutons avec des effets de survol
 def draw_button(text, x, y, width, height, color, hover_color, text_color=WHITE):
     mouse_x, mouse_y = pygame.mouse.get_pos()
     button_rect = pygame.Rect(x, y, width, height)
@@ -108,6 +130,10 @@ def draw_button(text, x, y, width, height, color, hover_color, text_color=WHITE)
     if button_rect.collidepoint((mouse_x, mouse_y)):
         pygame.draw.rect(screen, hover_color, button_rect, border_radius=15)
         pygame.draw.rect(screen, WHITE, button_rect, width=3, border_radius=15)  # Bordure blanche
+        if hover_sound:
+            if not hasattr(draw_button, 'last_hovered') or draw_button.last_hovered != button_rect:
+                hover_sound.play()
+                draw_button.last_hovered = button_rect
     else:
         pygame.draw.rect(screen, color, button_rect, border_radius=15)
         pygame.draw.rect(screen, BLACK, button_rect, width=3, border_radius=15)  # Bordure noire
@@ -153,6 +179,8 @@ def settings_menu():
                 if next_language_button.collidepoint(event.pos):
                     language_index = (language_index + 1) % len(language_options)
                     current_language = language_options[language_index]
+                    settings["language"] = current_language
+                    save_settings()
 
                 # Retour
                 if back_button.collidepoint(event.pos):
@@ -318,10 +346,16 @@ def main_menu():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if start_button.collidepoint(event.pos):
+                    if click_sound:
+                        click_sound.play()
                     game_selection()  # Sélection du jeu
                 if settings_button.collidepoint(event.pos):
+                    if click_sound:
+                        click_sound.play()
                     settings_menu()  # Menu des paramètres
                 if quit_button.collidepoint(event.pos):
+                    if click_sound:
+                        click_sound.play()
                     pygame.quit()
                     sys.exit()
 
@@ -352,15 +386,23 @@ def game_selection():
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if back_button.collidepoint(event.pos):
+                    if click_sound:
+                        click_sound.play()
                     loading_screen("Retour...")
                     return
                 if katarenga_button.collidepoint(event.pos):
+                    if click_sound:
+                        click_sound.play()
                     loading_screen("Chargement...")
                     player_names("Katarenga")
                 if congress_button.collidepoint(event.pos):
+                    if click_sound:
+                        click_sound.play()
                     loading_screen("Chargement...")
                     player_names("Congress")
                 if isolation_button.collidepoint(event.pos):
+                    if click_sound:
+                        click_sound.play()
                     loading_screen("Chargement...")
                     player_names("Isolation")
 
@@ -369,5 +411,4 @@ def game_selection():
 # Lancer le programme
 if __name__ == "__main__":
     intro_animation()
-    play_background_music()
     main_menu()
