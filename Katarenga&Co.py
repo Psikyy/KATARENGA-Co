@@ -173,17 +173,20 @@ def getYellowCases(board : list) -> list:
 def checkYellow(pawn : tuple, case : tuple, board : list, tab_Y : list) -> bool:
     """
         Vérifie si un déplacement est possible pour un pion partant d'une case jaune
+        en s'assurant qu'il ne traverse pas d'autres cases jaunes.
     """
-    temp_yellow = []
-    for elt in tab_Y:
-        if elt != pawn:
-            temp_yellow.append(elt)
+    temp_yellow = [elt for elt in tab_Y if elt != pawn]
     x, y = pawn
     i, j = case
-    for (k, l) in range((x, y), (i, j)):
-        if (k, l) in temp_yellow:
+    dx = 1 if i > x else -1 if i < x else 0
+    dy = 1 if j > y else -1 if j < y else 0
+    current_x, current_y = x, y
+    while (current_x, current_y) != (i, j):
+        current_x += dx
+        current_y += dy
+        if (current_x, current_y) in temp_yellow:
             return False
-        return True
+    return True
 
 
 class Board:
