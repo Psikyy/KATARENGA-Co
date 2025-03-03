@@ -56,7 +56,7 @@ class Case:
 """
 
 
-def init_region():
+def init_region() -> list:
     couleurs = ["blue", "green", "red", "yellow"]
     couleurs_reparties = 4*couleurs
     random.shuffle(couleurs_reparties)
@@ -68,7 +68,7 @@ def init_region():
 """
 class Init_Board:
     
-    def __init__(self, quart_1, quart_2, quart_3, quart_4):
+    def __init__(self, quart_1 : list, quart_2 : list, quart_3 : int, quart_4 : int):
         self.q1 = quart_1
         self.q2 = quart_2
         self.q3 = quart_3
@@ -77,14 +77,20 @@ class Init_Board:
     
     
 
-    def degres_90(self, quart):
+    def degres_90(self, quart : list) -> list:
+        """
+            Renvoie un cadrant tourné à 90° vers la gauche
+        """
         l = [[], [], [], []]
         for i in range(4):
             for j in range(3, -1, -1):
                 l[i].append(quart[j][i])
         return l
 
-    def degres_180(self, quart):
+    def degres_180(self, quart : list) -> list:
+        """
+            Renvoie cadrant tourné à 180°
+        """
         l = [[], [], [], []]
         k = 0
         for i in range(3, -1, -1):
@@ -93,7 +99,10 @@ class Init_Board:
             k+=1
         return l
 
-    def degres_270(self, quart):
+    def degres_270(self, quart : list) -> list:
+        """
+            Renvoie renvoie un cadrant tourné à 90° vers la droite
+        """
         l = [[], [], [], []]
         k = 0
         for i in range(3, -1, -1):
@@ -102,7 +111,10 @@ class Init_Board:
             k+=1
         return l
         
-    def symetrie(self, liste):
+    def symetrie(self, liste : list) -> list:
+        """
+            Renvoie un cadrant après avoir appliqué un effet mirroir dessus
+        """
         l = []
         for ligne in liste:
             l.append(ligne[::-1])
@@ -131,7 +143,7 @@ class Init_Board:
 
 class Board:
 
-    def __init__(self, plateau, board):
+    def __init__(self, plateau : list, board : list):
         self.plateau = plateau
         self.board = board
 
