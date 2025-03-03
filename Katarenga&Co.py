@@ -138,7 +138,52 @@ class Init_Board:
     Fin classe 'Init_Board'
 """
 
+# Première version des fonctions de déplacement et de verrification de déplacement
 
+def movePawn(pawn : tuple, case : tuple, board : list) -> None:
+    """
+        Déplace un pion 'pawn' sur une case 'case' dans un plateau de jeu 'board'
+    """
+    x, y = pawn
+    i, j = case
+    board[i][j] = board[x][y]
+    board[x][y] = 0
+
+def checkMove(pawn : tuple, case : tuple, board : list) -> bool:
+    """
+        Vérifie si un déplacement est possible
+    """
+    x, y = pawn
+    i, j = case
+    if board[i][j] == 0:
+        return True
+    return False
+
+def getYellowCases(board : list) -> list:
+    """
+        Renvoie la liste des cases jaunes du plateau de jeu
+    """
+    yellow_cases = []
+    for i in range(8):
+        for j in range(8):
+            if board[i][j] == "yellow":
+                yellow_cases.append((i, j))
+    return yellow_cases
+
+def checkYellow(pawn : tuple, case : tuple, board : list, tab_Y : list) -> bool:
+    """
+        Vérifie si un déplacement est possible pour un pion partant d'une case jaune
+    """
+    temp_yellow = []
+    for elt in tab_Y:
+        if elt != pawn:
+            temp_yellow.append(elt)
+    x, y = pawn
+    i, j = case
+    for (k, l) in range((x, y), (i, j)):
+        if (k, l) in temp_yellow:
+            return False
+        return True
 
 
 class Board:
@@ -172,3 +217,20 @@ q4 = [[37, 38, 39, 40],
       [53, 54, 55, 56],
       [61, 62, 63, 64]
      ]
+
+class RestartGame:
+    "On regenere différents quart pour recommencer une partie"
+    def __init__(self):
+        self.restart()
+
+    "On relance la partie avec un nouveau plateau"
+    def restart(self):
+        self.quart1 = genererQuart()
+        self.quart2 = genererQuart()
+        self.quart3 = genererQuart()
+        self.quart4 = genererQuart()
+        self.board = Init_Board(self.quart1, self.quart2, self.quart3, self.quart4)
+        return self.board
+
+    def get_board(self):
+        return self.board
