@@ -149,9 +149,9 @@ def movePawn(pawn : tuple, case : tuple, board : list) -> None:
     board[i][j] = board[x][y]
     board[x][y] = 0
 
-def checkMove(pawn : tuple, case : tuple, board : list) -> bool:
+def checkCaseIsEmpty(pawn : tuple, case : tuple, board : list) -> bool:
     """
-        Vérifie si un déplacement est possible
+        Vérifie si la case où l'on veut déplacer un pion est vide
     """
     x, y = pawn
     i, j = case
@@ -178,8 +178,10 @@ def checkYellow(pawn : tuple, case : tuple, board : list, tab_Y : list) -> bool:
     temp_yellow = [elt for elt in tab_Y if elt != pawn]
     x, y = pawn
     i, j = case
-    dx = 1 if i > x else -1 if i < x else 0
-    dy = 1 if j > y else -1 if j < y else 0
+    if abs(i - x) != abs(j - y):
+        return False
+    dx = 1 if i > x else -1
+    dy = 1 if j > y else -1
     current_x, current_y = x, y
     while (current_x, current_y) != (i, j):
         current_x += dx
@@ -187,6 +189,39 @@ def checkYellow(pawn : tuple, case : tuple, board : list, tab_Y : list) -> bool:
         if (current_x, current_y) in temp_yellow:
             return False
     return True
+
+def getRedCases(board : list) -> list:
+    """
+        Renvoie la liste des cases rouges du plateau de jeu
+    """
+    red_cases = []
+    for i in range(8):
+        for j in range(8):
+            if board[i][j] == "red":
+                red_cases.append((i, j))
+    return red_cases
+
+def checkRed(pawn : tuple, case : tuple, board : list, tab_R : list) -> bool:
+    """
+        Vérifie si un déplacement horizontal ou vertical est possible pour un pion partant d'une case rouge,
+        en s'assurant qu'il ne traverse pas d'autres cases rouges.
+    """
+    temp_red = [elt for elt in tab_R if elt != pawn]
+    x, y = pawn
+    i, j = case
+    if x != i and y != j:
+        return False
+    dx = 1 if i > x else -1 if i < x else 0
+    dy = 1 if j > y else -1 if j < y else 0
+    current_x, current_y = x, y
+    while (current_x, current_y) != (i, j):
+        current_x += dx
+        current_y += dy
+        if (current_x, current_y) in temp_red:
+            return False
+    return True
+
+
 
 
 class Board:
