@@ -1,8 +1,10 @@
+# menu.py
 import pygame
 import sys
 import time
 import json
 import os
+from Katarenga import genererQuart, Init_Board
 
 # Charger les traductions
 def load_translations():
@@ -41,8 +43,157 @@ pygame.init()
 # Dimensions de l'écran
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
+CELL_SIZE = 100  # Taille d'une case en pixels
+BOARD_SIZE = 8
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Katarenga")
+
+def draw_board(screen, selected_quadrants):
+    """
+    Dessine le plateau avec les quadrants configurés et des bordures pour les délimiter.
+    """
+
+    for (x, y), config in selected_quadrants.items():
+        quadrant = config["quadrant"]
+        for i in range(4):
+            for j in range(4):
+                color = quadrant[i][j]
+                # Dessiner la case
+                pygame.draw.rect(screen, color, (
+                    x * CELL_SIZE * 4 + j * CELL_SIZE,
+                    y * CELL_SIZE * 4 + i * CELL_SIZE,
+                    CELL_SIZE, CELL_SIZE
+                ))
+        
+        # Dessiner une bordure autour du quadrant
+        pygame.draw.rect(screen, BLACK, (
+            x * CELL_SIZE * 4,
+            y * CELL_SIZE * 4,
+            CELL_SIZE * 4, CELL_SIZE * 4
+        ), 3)  # 3 est l'épaisseur de la bordure
+
+def configure_board():
+    """
+    Permet à l'utilisateur de configurer le plateau en choisissant les quadrants et leur orientation.
+    """
+    running = True
+    quadrants = [genererQuart() for _ in range(4)]  # Génère 4 quadrants aléatoires
+    selected_quadrants = {
+        (0, 0): {"quadrant": quadrants[0], "initial_quadrant": [row[:] for row in quadrants[0]], "rotation": 0, "side": "recto", "selected": False},
+        (1, 0): {"quadrant": quadrants[1], "initial_quadrant": [row[:] for row in quadrants[1]], "rotation": 0, "side": "recto", "selected": False},
+        (0, 1): {"quadrant": quadrants[2], "initial_quadrant": [row[:] for row in quadrants[2]], "rotation": 0, "side": "recto", "selected": False},
+        (1, 1): {"quadrant": quadrants[3], "initial_quadrant": [row[:] for row in quadrants[3]], "rotation": 0, "side": "recto", "selected": False}
+    }
+
+    # Créer une instance de Init_Board
+    init_board = Init_Board(quadrants[0], quadrants[1], quadrants[2], quadrants[3])
+
+    # Variables pour stocker la position du quadrant sélectionné et l'échange
+    selected_quadrant_pos = None
+    swap_quadrant_pos = None
+
+    while running:
+        screen.fill(WHITE)
+
+        # Titre
+        title_text = font.render("Configuration du plateau", True, BLACK)
+        screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 50))
+
+        # Dessiner le plateau
+        if selected_quadrant_pos is None:
+            # Afficher tous les quadrants
+            draw_board(screen, selected_quadrants)
+        else:
+            # Afficher uniquement le quadrant sélectionné au centre
+            x, y = selected_quadrant_pos
+            config = selected_quadrants[(x, y)]
+            draw_quadrant_center(screen, config["quadrant"])
+
+        # Dessiner les zones cliquables pour déboguer
+        for (x, y), config in selected_quadrants.items():
+            button_rect = pygame.Rect(50 + x * 200, 400 + y * 60, 150, 50)
+            pygame.draw.rect(screen, RED, button_rect, 2)  # Dessine la zone cliquable en rouge
+
+        # Gérer les événements
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+
+                # Vérifier les clics sur les boutons des quadrants
+                for (x, y), config in selected_quadrants.items():
+                    button_rect = pygame.Rect(50 + x * 200, 400 + y * 60, 150, 50)
+                    if button_rect.collidepoint((mouse_x, mouse_y)):
+                        if selected_quadrant_pos is None:
+                            # Sélectionner ce quadrant pour le modifier
+                            selected_quadrant_pos = (x, y)
+                        else:
+                            # Échanger les positions des quadrants
+                            if swap_quadrant_pos is None:
+                                swap_quadrant_pos = (x, y)
+                            else:
+                                # Échanger les quadrants
+                                selected_quadrants[selected_quadrant_pos], selected_quadrants[swap_quadrant_pos] = selected_quadrants[swap_quadrant_pos], selected_quadrants[selected_quadrant_pos]
+                                selected_quadrant_pos = None
+                                swap_quadrant_pos = None
+
+            if event.type == pygame.KEYDOWN:
+                if selected_quadrant_pos is not None:
+                    x, y = selected_quadrant_pos
+                    config = selected_quadrants[(x, y)]
+
+                    # Faire tourner le quadrant sélectionné avec les flèches
+                    if event.key == pygame.K_LEFT:  # Flèche gauche
+                        config["rotation"] = (config["rotation"] - 90) % 360  # Rotation à gauche
+                    elif event.key == pygame.K_RIGHT:  # Flèche droite
+                        config["rotation"] = (config["rotation"] + 90) % 360  # Rotation à droite
+                    
+                    # Si la rotation est à 0°, restaurer le quadrant initial
+                    if config["rotation"] == 0:
+                        config["quadrant"] = [row[:] for row in config["initial_quadrant"]]
+                    else:
+                        # Appliquer la rotation au quadrant
+                        config["quadrant"] = init_board.rotate_quadrant(config["quadrant"], config["rotation"] // 90)
+                    
+                    print(f"Quadrant Q{x*2 + y + 1} tourné à {config['rotation']}°")
+
+                # Valider la configuration
+                if event.key == pygame.K_RETURN:
+                    if selected_quadrant_pos is not None:
+                        # Revenir à la vue d'ensemble
+                        selected_quadrant_pos = None
+                    else:
+                        print("Configuration confirmée :", selected_quadrants)
+                        loading_screen("Démarrage du jeu...")
+                        return selected_quadrants
+
+        pygame.display.flip()
+
+def draw_quadrant_center(screen, quadrant):
+    """
+    Dessine un quadrant au centre de l'écran.
+    """
+    for i in range(4):
+        for j in range(4):
+            color = quadrant[i][j]
+            pygame.draw.rect(screen, color, (
+                SCREEN_WIDTH // 2 - 2 * CELL_SIZE + j * CELL_SIZE,
+                SCREEN_HEIGHT // 2 - 2 * CELL_SIZE + i * CELL_SIZE,
+                CELL_SIZE, CELL_SIZE
+            ))
+
+def animate_rotation(quadrant, current_rotation, target_rotation):
+    """
+    Anime la rotation d'un quadrant de current_rotation à target_rotation.
+    """
+    step = 9  # Rotation de 9° par étape
+    if current_rotation < target_rotation:
+        current_rotation += step
+    elif current_rotation > target_rotation:
+        current_rotation -= step
+    return current_rotation % 360
 
 # Charger et redimensionner l'image de fond
 try:
@@ -190,7 +341,10 @@ def settings_menu():
         pygame.display.flip()
 
 # Démarrage du jeu
-def start_game(player1_name, player2_name, game_name):
+def start_game(player1_name, player2_name, game_name, selected_quadrants=None):
+    """
+    Démarre le jeu avec les noms des joueurs et la configuration du plateau (si applicable).
+    """
     running = True
 
     while running:
@@ -205,6 +359,10 @@ def start_game(player1_name, player2_name, game_name):
         player_text2 = small_font.render(f"Joueur 2 : {player2_name}", True, BLACK)
         screen.blit(player_text1, (SCREEN_WIDTH // 2 - player_text1.get_width() // 2, 200))
         screen.blit(player_text2, (SCREEN_WIDTH // 2 - player_text2.get_width() // 2, 250))
+
+        # Dessiner le plateau si c'est Katarenga
+        if game_name == "Katarenga" and selected_quadrants:
+            draw_board(screen, selected_quadrants)
 
         # Bouton Retour
         back_button = draw_button("Retour", 10, SCREEN_HEIGHT - 60, 100, 40, BLUE, RED)
@@ -305,6 +463,13 @@ def player_names(game_name):
                         print(f"Jeu sélectionné : {game_name}")
                         print(f"Joueur 1 : {player1_name}")
                         print(f"Joueur 2 : {player2_name}")
+
+                        # Démarrer le jeu après la validation des noms
+                        if game_name == "Katarenga":
+                            selected_quadrants = configure_board()  # Appelle la configuration du plateau
+                            start_game(player1_name, player2_name, game_name, selected_quadrants)
+                        else:
+                            start_game(player1_name, player2_name, game_name)
                         return
                     elif event.unicode.isalnum():  # Empêche les espaces et caractères spéciaux
                         player2_name += event.unicode
