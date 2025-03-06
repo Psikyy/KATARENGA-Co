@@ -1,5 +1,6 @@
 import random
 
+
 def checkQuart(quart: list) -> bool:
     """
         Renvoie un booléen qui indique si le cadrant créé est valide ou non
@@ -23,6 +24,13 @@ def genererQuart() -> list:
     while (checkQuart(quart) == False):
         quart = [[couleurs[random.randrange(0, 4)] for j in range(4)] for i in range(4)]
     return quart
+
+
+def generate_quadrants():
+    """
+    Génère 4 quadrants aléatoires.
+    """
+    return [genererQuart() for _ in range(4)]
 
 
 """ 
@@ -67,73 +75,86 @@ def init_region() -> list:
     Classe 'Init_Board'
 """
 class Init_Board:
-    
-    def __init__(self, quart_1 : list, quart_2 : list, quart_3 : int, quart_4 : int):
+    def __init__(self, quart_1: list, quart_2: list, quart_3: list, quart_4: list):
         self.q1 = quart_1
         self.q2 = quart_2
         self.q3 = quart_3
         self.q4 = quart_4
-        self.board = None
-    
-    
+        self.board = self.create_board()
 
-    def degres_90(self, quart : list) -> list:
+class Init_Board:
+    def __init__(self, quart_1: list, quart_2: list, quart_3: list, quart_4: list):
+        self.q1 = quart_1
+        self.q2 = quart_2
+        self.q3 = quart_3
+        self.q4 = quart_4
+        self.board = self.create_board()
+
+    @staticmethod
+    def rotate_quadrant(quadrant, rotation):
         """
-            Renvoie un cadrant tourné à 90° vers la gauche
+        Applique une rotation à un quadrant.
+        :param quadrant: Le quadrant à tourner.
+        :param rotation: 0 (0°), 1 (90°), 2 (180°), 3 (270°).
+        :return: Le quadrant tourné.
         """
-        l = [[], [], [], []]
+        if rotation == 0:
+            return quadrant
+        elif rotation == 1:
+            return [list(row) for row in zip(*quadrant[::-1])]  # 90°
+        elif rotation == 2:
+            return [row[::-1] for row in quadrant[::-1]]  # 180°
+        elif rotation == 3:
+            return [list(row) for row in zip(*quadrant)][::-1]  # 270°
+        else:
+            raise ValueError("Rotation invalide. Doit être 0, 1, 2 ou 3.")
+
+    def create_board(self) -> list:
+        """
+        Combine les 4 quadrants pour former le plateau complet.
+        """
+        board = []
         for i in range(4):
-            for j in range(3, -1, -1):
-                l[i].append(quart[j][i])
-        return l
+            board.append(self.q1[i] + self.q2[i])
+        for i in range(4):
+            board.append(self.q3[i] + self.q4[i])
+        return board
 
-    def degres_180(self, quart : list) -> list:
+    def rotate_quadrant(self, quadrant: list, rotation: int) -> list:
         """
-            Renvoie cadrant tourné à 180°
+        Applique une rotation à un quadrant.
+        :param quadrant: Le quadrant à tourner.
+        :param rotation: 0 (0°), 1 (90°), 2 (180°), 3 (270°).
+        :return: Le quadrant tourné.
         """
-        l = [[], [], [], []]
-        k = 0
-        for i in range(3, -1, -1):
-            for j in range(3, -1, -1):
-                l[k].append(quart[i][j])
-            k+=1
-        return l
+        if rotation == 0:
+            return quadrant
+        elif rotation == 1:
+            return self.degres_90(quadrant)
+        elif rotation == 2:
+            return self.degres_180(quadrant)
+        elif rotation == 3:
+            return self.degres_270(quadrant)
+        else:
+            raise ValueError("Rotation invalide. Doit être 0, 1, 2 ou 3.")
 
-    def degres_270(self, quart : list) -> list:
+    def degres_90(self, quart: list) -> list:
         """
-            Renvoie renvoie un cadrant tourné à 90° vers la droite
+        Renvoie un quadrant tourné à 90° vers la gauche.
         """
-        l = [[], [], [], []]
-        k = 0
-        for i in range(3, -1, -1):
-            for j in range(4):
-                l[k].append(quart[j][i])
-            k+=1
-        return l
-        
-    def symetrie(self, liste : list) -> list:
-        """
-            Renvoie un cadrant après avoir appliqué un effet mirroir dessus
-        """
-        l = []
-        for ligne in liste:
-            l.append(ligne[::-1])
-        return l
+        return [list(row) for row in zip(*quart[::-1])]
 
-    def board(self):
-        liste = self.quart1
-        k = 0
-        for lignes in liste:
-            for i in range(4):
-                lignes.append(int(self.quart2[k][i]))
-            k+=1
-        liste_bis = self.quart3
-        k = 0
-        for lignes in liste_bis:
-            for i in range(4):
-                lignes.append(int(self.quart4[k][i]))
-            k+=1
-        return liste + liste_bis
+    def degres_180(self, quart: list) -> list:
+        """
+        Renvoie un quadrant tourné à 180°.
+        """
+        return [row[::-1] for row in quart[::-1]]
+
+    def degres_270(self, quart: list) -> list:
+        """
+        Renvoie un quadrant tourné à 90° vers la droite.
+        """
+        return [list(row) for row in zip(*quart)][::-1]
 """
     Fin classe 'Init_Board'
 """
