@@ -1,0 +1,10 @@
+# Couleurs
+WHITE = (255, 255, 255)
+BLACK = (0, 0, 0)
+BLUE = (52, 152, 219)
+HOVER_BLUE = (41, 128, 185)
+GREEN = (46, 204, 113)
+HOVER_GREEN = (39, 174, 96)
+RED = (231, 76, 60)
+HOVER_RED = (192, 57, 43)
+GRAY = (200, 200, 200)
