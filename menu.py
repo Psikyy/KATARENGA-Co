@@ -52,25 +52,57 @@ def draw_board(screen, selected_quadrants):
     """
     Dessine le plateau avec les quadrants configurés et des bordures pour les délimiter.
     """
-
+    # Ajuster la position pour centrer le plateau et éviter les coupures
+    cell_size = min(CELL_SIZE, 50)  # Réduire la taille des cellules si nécessaire
+    board_width = 8 * cell_size
+    board_height = 8 * cell_size
+    
+    offset_x = (SCREEN_WIDTH - board_width) // 2
+    offset_y = 100  # Laisser de l'espace pour le titre, mais pas trop bas
+    
+    # Assurer que le plateau entier est visible
+    if offset_y + board_height > SCREEN_HEIGHT - 120:  # Laisser de l'espace pour les boutons
+        offset_y = max(80, SCREEN_HEIGHT - board_height - 120)
+    
     for (x, y), config in selected_quadrants.items():
         quadrant = config["quadrant"]
         for i in range(4):
             for j in range(4):
                 color = quadrant[i][j]
-                # Dessiner la case
+                # Dessiner la case avec le décalage approprié et la taille ajustée
                 pygame.draw.rect(screen, color, (
-                    x * CELL_SIZE * 4 + j * CELL_SIZE,
-                    y * CELL_SIZE * 4 + i * CELL_SIZE,
-                    CELL_SIZE, CELL_SIZE
+                    offset_x + x * cell_size * 4 + j * cell_size,
+                    offset_y + y * cell_size * 4 + i * cell_size,
+                    cell_size, cell_size
                 ))
         
-        # Dessiner une bordure autour du quadrant
+        # Dessiner une bordure autour du quadrant avec la taille ajustée
         pygame.draw.rect(screen, BLACK, (
-            x * CELL_SIZE * 4,
-            y * CELL_SIZE * 4,
-            CELL_SIZE * 4, CELL_SIZE * 4
-        ), 3)  # 3 est l'épaisseur de la bordure
+            offset_x + x * cell_size * 4,
+            offset_y + y * cell_size * 4,
+            cell_size * 4, cell_size * 4
+        ), 2)  # Réduire l'épaisseur de la bordure pour plus de clarté
+        
+        # Afficher un indicateur de quadrant pour l'identification
+        indicator_text = small_font.render(f"Q{x*2 + y*2 + 1}", True, BLACK)
+        indicator_bg = pygame.Surface((indicator_text.get_width() + 10, indicator_text.get_height() + 10))
+        indicator_bg.fill(WHITE)
+        indicator_bg.set_alpha(200)  # Semi-transparent
+        screen.blit(indicator_bg, (
+            offset_x + x * cell_size * 4 + 5,
+            offset_y + y * cell_size * 4 + 5
+        ))
+        screen.blit(indicator_text, (
+            offset_x + x * cell_size * 4 + 10,
+            offset_y + y * cell_size * 4 + 10
+        ))
+    
+    # Retourner les informations sur la position et la taille du plateau
+    return {
+        "offset_x": offset_x,
+        "offset_y": offset_y,
+        "cell_size": cell_size
+    }
 
 def configure_board():
     """
@@ -91,54 +123,328 @@ def configure_board():
     # Variables pour stocker la position du quadrant sélectionné et l'échange
     selected_quadrant_pos = None
     swap_quadrant_pos = None
+    
+    # Ajuster la taille des cellules pour l'affichage
+    cell_size_display = min(50, CELL_SIZE)  # Utiliser une taille plus petite pour l'affichage général
+
+    instructions_shown = True
+    instructions_timer = 5000  # Afficher les instructions pendant 5 secondes
+
+    clock = pygame.time.Clock()
+    start_time = pygame.time.get_ticks()
 
     while running:
         screen.fill(WHITE)
+        current_time = pygame.time.get_ticks()
 
         # Titre
         title_text = font.render("Configuration du plateau", True, BLACK)
-        screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 50))
+        screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 20))
 
         # Dessiner le plateau
         if selected_quadrant_pos is None:
-            # Afficher tous les quadrants
+            # Afficher tous les quadrants en mode vue d'ensemble
             draw_board(screen, selected_quadrants)
+            
+            # Dessiner des boutons pour chaque quadrant
+            button_width = 150
+            button_height = 40
+            button_spacing = 20
+            total_width = 2 * button_width + button_spacing
+            start_x = (SCREEN_WIDTH - total_width) // 2
+            
+            # Première rangée de boutons
+            for x in range(2):
+                button_rect = pygame.Rect(
+                    start_x + x * (button_width + button_spacing), 
+                    SCREEN_HEIGHT - 100, 
+                    button_width, 
+                    button_height
+                )
+                color = GREEN if selected_quadrants[(x, 0)]["selected"] else BLUE
+                hover_color = HOVER_GREEN if selected_quadrants[(x, 0)]["selected"] else HOVER_BLUE
+                pygame.draw.rect(screen, color, button_rect, border_radius=5)
+                
+                # Texte du bouton
+                button_text = button_font.render(f"Quadrant {x*2 + 1}", True, WHITE)
+                screen.blit(button_text, (
+                    button_rect.x + (button_rect.width - button_text.get_width()) // 2,
+                    button_rect.y + (button_rect.height - button_text.get_height()) // 2
+                ))
+                
+            # Deuxième rangée de boutons
+            for x in range(2):
+                button_rect = pygame.Rect(
+                    start_x + x * (button_width + button_spacing), 
+                    SCREEN_HEIGHT - 50, 
+                    button_width, 
+                    button_height
+                )
+                color = GREEN if selected_quadrants[(x, 1)]["selected"] else BLUE
+                hover_color = HOVER_GREEN if selected_quadrants[(x, 1)]["selected"] else HOVER_BLUE
+                pygame.draw.rect(screen, color, button_rect, border_radius=5)
+                
+                # Texte du bouton
+                button_text = button_font.render(f"Quadrant {x*2 + 2}", True, WHITE)
+                screen.blit(button_text, (
+                    button_rect.x + (button_rect.width - button_text.get_width()) // 2,
+                    button_rect.y + (button_rect.height - button_text.get_height()) // 2
+                ))
+                
+            # Bouton pour confirmer la configuration
+            confirm_button = pygame.Rect(
+                SCREEN_WIDTH - 150, 
+                SCREEN_HEIGHT - 60, 
+                120, 
+                40
+            )
+            pygame.draw.rect(screen, GREEN, confirm_button, border_radius=5)
+            confirm_text = button_font.render("Confirmer", True, WHITE)
+            screen.blit(confirm_text, (
+                confirm_button.x + (confirm_button.width - confirm_text.get_width()) // 2,
+                confirm_button.y + (confirm_button.height - confirm_text.get_height()) // 2
+            ))
+            
         else:
-            # Afficher uniquement le quadrant sélectionné au centre
+            # Afficher le quadrant sélectionné au centre pour modification
             x, y = selected_quadrant_pos
             config = selected_quadrants[(x, y)]
-            draw_quadrant_center(screen, config["quadrant"])
+            
+            # Dessiner un fond gris clair pour la zone de travail
+            work_area = pygame.Rect(
+                SCREEN_WIDTH // 2 - 2 * CELL_SIZE - 20,
+                SCREEN_HEIGHT // 2 - 2 * CELL_SIZE - 20,
+                4 * CELL_SIZE + 40,
+                4 * CELL_SIZE + 40
+            )
+            pygame.draw.rect(screen, GRAY, work_area, border_radius=10)
+            
+            # Dessiner le quadrant sélectionné
+            for i in range(4):
+                for j in range(4):
+                    color = config["quadrant"][i][j]
+                    pygame.draw.rect(screen, color, (
+                        SCREEN_WIDTH // 2 - 2 * CELL_SIZE + j * CELL_SIZE,
+                        SCREEN_HEIGHT // 2 - 2 * CELL_SIZE + i * CELL_SIZE,
+                        CELL_SIZE, CELL_SIZE
+                    ))
+            
+            # Dessiner une bordure autour du quadrant
+            pygame.draw.rect(screen, BLACK, (
+                SCREEN_WIDTH // 2 - 2 * CELL_SIZE,
+                SCREEN_HEIGHT // 2 - 2 * CELL_SIZE,
+                CELL_SIZE * 4, CELL_SIZE * 4
+            ), 3)
+            
+            # Boutons de rotation
+            rotate_left_button = pygame.Rect(
+                SCREEN_WIDTH // 2 - 2 * CELL_SIZE - 60,
+                SCREEN_HEIGHT // 2 - 30,
+                50,
+                60
+            )
+            rotate_right_button = pygame.Rect(
+                SCREEN_WIDTH // 2 + 2 * CELL_SIZE + 10,
+                SCREEN_HEIGHT // 2 - 30,
+                50,
+                60
+            )
+            
+            pygame.draw.rect(screen, BLUE, rotate_left_button, border_radius=5)
+            pygame.draw.rect(screen, BLUE, rotate_right_button, border_radius=5)
+            
+            left_text = font.render("←", True, WHITE)
+            right_text = font.render("→", True, WHITE)
+            
+            screen.blit(left_text, (
+                rotate_left_button.x + (rotate_left_button.width - left_text.get_width()) // 2,
+                rotate_left_button.y + (rotate_left_button.height - left_text.get_height()) // 2
+            ))
+            screen.blit(right_text, (
+                rotate_right_button.x + (rotate_right_button.width - right_text.get_width()) // 2,
+                rotate_right_button.y + (rotate_right_button.height - right_text.get_height()) // 2
+            ))
+            
+            # Bouton Retour
+            back_button = pygame.Rect(
+                10,
+                SCREEN_HEIGHT - 60,
+                100,
+                40
+            )
+            pygame.draw.rect(screen, RED, back_button, border_radius=5)
+            back_text = button_font.render("Retour", True, WHITE)
+            screen.blit(back_text, (
+                back_button.x + (back_button.width - back_text.get_width()) // 2,
+                back_button.y + (back_button.height - back_text.get_height()) // 2
+            ))
+            
+            # Afficher l'angle de rotation actuel
+            rotation_text = button_font.render(f"Rotation: {config['rotation']}°", True, BLACK)
+            screen.blit(rotation_text, (
+                SCREEN_WIDTH // 2 - rotation_text.get_width() // 2,
+                SCREEN_HEIGHT // 2 + 2 * CELL_SIZE + 20
+            ))
 
-        # Dessiner les zones cliquables pour déboguer
-        for (x, y), config in selected_quadrants.items():
-            button_rect = pygame.Rect(50 + x * 200, 400 + y * 60, 150, 50)
-            pygame.draw.rect(screen, RED, button_rect, 2)  # Dessine la zone cliquable en rouge
+        # Afficher les instructions pendant un certain temps
+        if instructions_shown and current_time - start_time < instructions_timer:
+            instruction_bg = pygame.Surface((SCREEN_WIDTH - 100, 100))
+            instruction_bg.fill(WHITE)
+            instruction_bg.set_alpha(220)
+            screen.blit(instruction_bg, (50, SCREEN_HEIGHT // 2 - 70))
+            
+            instructions = [
+                "- Cliquez sur un quadrant pour le sélectionner et le modifier",
+                "- Utilisez les flèches ou les boutons pour faire pivoter un quadrant",
+                "- Pour échanger deux quadrants, sélectionnez-les l'un après l'autre",
+                "- Appuyez sur ENTRÉE pour confirmer la configuration"
+            ]
+            
+            for i, line in enumerate(instructions):
+                instr_text = small_font.render(line, True, BLACK)
+                screen.blit(instr_text, (60, SCREEN_HEIGHT // 2 - 60 + i * 25))
+        elif instructions_shown:
+            instructions_shown = False
 
         # Gérer les événements
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
                 sys.exit()
+                
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
-
-                # Vérifier les clics sur les boutons des quadrants
-                for (x, y), config in selected_quadrants.items():
-                    button_rect = pygame.Rect(50 + x * 200, 400 + y * 60, 150, 50)
-                    if button_rect.collidepoint((mouse_x, mouse_y)):
-                        if selected_quadrant_pos is None:
-                            # Sélectionner ce quadrant pour le modifier
-                            selected_quadrant_pos = (x, y)
-                        else:
-                            # Échanger les positions des quadrants
+                
+                if selected_quadrant_pos is None:
+                    # En mode vue d'ensemble
+                    
+                    # Vérifier les clics sur les boutons de quadrant
+                    button_width = 150
+                    button_height = 40
+                    button_spacing = 20
+                    total_width = 2 * button_width + button_spacing
+                    start_x = (SCREEN_WIDTH - total_width) // 2
+                    
+                    # Première rangée de boutons
+                    for x in range(2):
+                        button_rect = pygame.Rect(
+                            start_x + x * (button_width + button_spacing), 
+                            SCREEN_HEIGHT - 100, 
+                            button_width, 
+                            button_height
+                        )
+                        if button_rect.collidepoint((mouse_x, mouse_y)):
+                            if click_sound:
+                                click_sound.play()
                             if swap_quadrant_pos is None:
-                                swap_quadrant_pos = (x, y)
+                                # Premier quadrant sélectionné pour échange
+                                selected_quadrants[(x, 0)]["selected"] = True
+                                swap_quadrant_pos = (x, 0)
                             else:
+                                # Deuxième quadrant sélectionné, effectuer l'échange
+                                x1, y1 = swap_quadrant_pos
+                                selected_quadrants[(x1, y1)]["selected"] = False
                                 # Échanger les quadrants
-                                selected_quadrants[selected_quadrant_pos], selected_quadrants[swap_quadrant_pos] = selected_quadrants[swap_quadrant_pos], selected_quadrants[selected_quadrant_pos]
-                                selected_quadrant_pos = None
+                                selected_quadrants[(x, 0)], selected_quadrants[swap_quadrant_pos] = selected_quadrants[swap_quadrant_pos], selected_quadrants[(x, 0)]
                                 swap_quadrant_pos = None
-
+                            
+                    # Deuxième rangée de boutons
+                    for x in range(2):
+                        button_rect = pygame.Rect(
+                            start_x + x * (button_width + button_spacing), 
+                            SCREEN_HEIGHT - 50, 
+                            button_width,button_height
+                        )
+                        if button_rect.collidepoint((mouse_x, mouse_y)):
+                            if click_sound:
+                                click_sound.play()
+                            if swap_quadrant_pos is None:
+                                # Premier quadrant sélectionné pour échange
+                                selected_quadrants[(x, 1)]["selected"] = True
+                                swap_quadrant_pos = (x, 1)
+                            else:
+                                # Deuxième quadrant sélectionné, effectuer l'échange
+                                x1, y1 = swap_quadrant_pos
+                                selected_quadrants[(x1, y1)]["selected"] = False
+                                # Échanger les quadrants
+                                selected_quadrants[(x, 1)], selected_quadrants[swap_quadrant_pos] = selected_quadrants[swap_quadrant_pos], selected_quadrants[(x, 1)]
+                                swap_quadrant_pos = None
+                    
+                    # Vérifier les clics sur le plateau pour sélectionner directement un quadrant pour édition
+                    offset_x = (SCREEN_WIDTH - BOARD_SIZE * CELL_SIZE) // 2
+                    offset_y = 100
+                    
+                    for (qx, qy), config in selected_quadrants.items():
+                        quadrant_rect = pygame.Rect(
+                            offset_x + qx * CELL_SIZE * 4,
+                            offset_y + qy * CELL_SIZE * 4,
+                            CELL_SIZE * 4, CELL_SIZE * 4
+                        )
+                        if quadrant_rect.collidepoint((mouse_x, mouse_y)):
+                            if click_sound:
+                                click_sound.play()
+                            selected_quadrant_pos = (qx, qy)
+                            break
+                    
+                    # Vérifier le clic sur le bouton de confirmation
+                    confirm_button = pygame.Rect(
+                        SCREEN_WIDTH - 150, 
+                        SCREEN_HEIGHT - 60, 
+                        120, 
+                        40
+                    )
+                    if confirm_button.collidepoint((mouse_x, mouse_y)):
+                        if click_sound:
+                            click_sound.play()
+                        print("Configuration confirmée :", selected_quadrants)
+                        loading_screen("Démarrage du jeu...")
+                        return selected_quadrants
+                
+                else:
+                    # En mode édition d'un quadrant
+                    x, y = selected_quadrant_pos
+                    config = selected_quadrants[(x, y)]
+                    
+                    # Vérifier les clics sur les boutons de rotation
+                    rotate_left_button = pygame.Rect(
+                        SCREEN_WIDTH // 2 - 2 * CELL_SIZE - 60,
+                        SCREEN_HEIGHT // 2 - 30,
+                        50,
+                        60
+                    )
+                    rotate_right_button = pygame.Rect(
+                        SCREEN_WIDTH // 2 + 2 * CELL_SIZE + 10,
+                        SCREEN_HEIGHT // 2 - 30,
+                        50,
+                        60
+                    )
+                    
+                    if rotate_left_button.collidepoint((mouse_x, mouse_y)):
+                        if click_sound:
+                            click_sound.play()
+                        config["rotation"] = (config["rotation"] - 90) % 360
+                        config["quadrant"] = init_board.rotate_quadrant(config["initial_quadrant"], config["rotation"] // 90)
+                        print(f"Quadrant Q{x*2 + y*2 + 1} tourné à {config['rotation']}°")
+                    
+                    elif rotate_right_button.collidepoint((mouse_x, mouse_y)):
+                        if click_sound:
+                            click_sound.play()
+                        config["rotation"] = (config["rotation"] + 90) % 360
+                        config["quadrant"] = init_board.rotate_quadrant(config["initial_quadrant"], config["rotation"] // 90)
+                        print(f"Quadrant Q{x*2 + y*2 + 1} tourné à {config['rotation']}°")
+                    
+                    # Vérifier le clic sur le bouton retour
+                    back_button = pygame.Rect(
+                        10,
+                        SCREEN_HEIGHT - 60,
+                        100,
+                        40
+                    )
+                    if back_button.collidepoint((mouse_x, mouse_y)):
+                        if click_sound:
+                            click_sound.play()
+                        selected_quadrant_pos = None
+            
             if event.type == pygame.KEYDOWN:
                 if selected_quadrant_pos is not None:
                     x, y = selected_quadrant_pos
@@ -147,19 +453,16 @@ def configure_board():
                     # Faire tourner le quadrant sélectionné avec les flèches
                     if event.key == pygame.K_LEFT:  # Flèche gauche
                         config["rotation"] = (config["rotation"] - 90) % 360  # Rotation à gauche
+                        config["quadrant"] = init_board.rotate_quadrant(config["initial_quadrant"], config["rotation"] // 90)
+                        print(f"Quadrant Q{x*2 + y*2 + 1} tourné à {config['rotation']}°")
                     elif event.key == pygame.K_RIGHT:  # Flèche droite
                         config["rotation"] = (config["rotation"] + 90) % 360  # Rotation à droite
-                    
-                    # Si la rotation est à 0°, restaurer le quadrant initial
-                    if config["rotation"] == 0:
-                        config["quadrant"] = [row[:] for row in config["initial_quadrant"]]
-                    else:
-                        # Appliquer la rotation au quadrant
-                        config["quadrant"] = init_board.rotate_quadrant(config["quadrant"], config["rotation"] // 90)
-                    
-                    print(f"Quadrant Q{x*2 + y + 1} tourné à {config['rotation']}°")
-
-                # Valider la configuration
+                        config["quadrant"] = init_board.rotate_quadrant(config["initial_quadrant"], config["rotation"] // 90)
+                        print(f"Quadrant Q{x*2 + y*2 + 1} tourné à {config['rotation']}°")
+                    elif event.key == pygame.K_ESCAPE:  # Echap pour retourner à la vue d'ensemble
+                        selected_quadrant_pos = None
+                
+                # Valider la configuration avec Entrée
                 if event.key == pygame.K_RETURN:
                     if selected_quadrant_pos is not None:
                         # Revenir à la vue d'ensemble
@@ -170,10 +473,11 @@ def configure_board():
                         return selected_quadrants
 
         pygame.display.flip()
+        clock.tick(30)
 
 def draw_quadrant_center(screen, quadrant):
     """
-    Dessine un quadrant au centre de l'écran.
+    Dessine un quadrant au centre de l'écran avec une taille appropriée.
     """
     for i in range(4):
         for j in range(4):
@@ -183,6 +487,51 @@ def draw_quadrant_center(screen, quadrant):
                 SCREEN_HEIGHT // 2 - 2 * CELL_SIZE + i * CELL_SIZE,
                 CELL_SIZE, CELL_SIZE
             ))
+    
+    # Dessiner une bordure autour du quadrant
+    pygame.draw.rect(screen, BLACK, (
+        SCREEN_WIDTH // 2 - 2 * CELL_SIZE,
+        SCREEN_HEIGHT // 2 - 2 * CELL_SIZE,
+        CELL_SIZE * 4, CELL_SIZE * 4
+    ), 3)  # 3 est l'épaisseur de la bordure
+
+def start_game(player1_name, player2_name, game_name, selected_quadrants=None):
+    """
+    Démarre le jeu avec les noms des joueurs et la configuration du plateau (si applicable).
+    """
+    running = True
+
+    while running:
+        screen.fill(WHITE)
+
+        # Titre du jeu
+        title_text = font.render(f"{game_name}", True, BLACK)
+        screen.blit(title_text, (SCREEN_WIDTH // 2 - title_text.get_width() // 2, 50))
+
+        # Affichage des joueurs
+        player_text1 = small_font.render(f"Joueur 1 : {player1_name}", True, BLACK)
+        player_text2 = small_font.render(f"Joueur 2 : {player2_name}", True, BLACK)
+        screen.blit(player_text1, (50, 120))
+        screen.blit(player_text2, (50, 150))
+
+        # Dessiner le plateau si c'est Katarenga
+        if game_name == "Katarenga" and selected_quadrants:
+            draw_board(screen, selected_quadrants)
+
+        # Bouton Retour
+        back_button = draw_button("Retour", 10, SCREEN_HEIGHT - 60, 100, 40, BLUE, RED)
+
+        # Gérer les événements
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.collidepoint(event.pos):
+                    loading_screen("Retour...")
+                    return
+
+        pygame.display.flip()
 
 def animate_rotation(quadrant, current_rotation, target_rotation):
     """
