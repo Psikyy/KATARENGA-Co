@@ -2,7 +2,7 @@ import pygame
 import sys
 from settings import load_settings
 from ui.animations import intro_animation
-from menu import main_menu
+from menu.main_menu import main_menu
 
 def main():
     # Initialisation de Pygame

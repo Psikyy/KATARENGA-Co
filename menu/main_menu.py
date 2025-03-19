@@ -4,8 +4,8 @@ from ui.colors import WHITE, GREEN, HOVER_GREEN, BLUE, HOVER_BLUE, RED, HOVER_RE
 from ui.buttons import draw_button, click_sound
 from ui.fonts import init_fonts
 from ui.animations import loading_screen
-from settings_menu import settings_menu
-from game_selection import game_selection
+from menu.settings_menu import settings_menu
+from menu.game_selection import game_selection
 
 def main_menu(screen):
     screen_width = screen.get_width()
@@ -16,7 +16,7 @@ def main_menu(screen):
     
     # Charger et redimensionner l'image de fond
     try:
-        background_image = pygame.image.load("assets/img/Image_du_jeu.png")
+        background_image = pygame.image.load("img/Image_du_jeu.png")
         background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
     except pygame.error:
         print("Image de fond non trouvée.")
