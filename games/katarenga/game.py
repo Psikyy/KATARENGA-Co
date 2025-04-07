@@ -67,7 +67,7 @@ def check_win(game_state):
     return None
 
 # Démarrer le jeu Katarenga
-def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants):
+def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     
