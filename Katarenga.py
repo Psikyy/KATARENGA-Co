@@ -115,8 +115,9 @@ class Init_Board_Color:
 
     def create_board(self):
         board = []
-        bord = ['1','0', '0', '0', '0', '0', '0', '0', '0', '1']
-        board.append(bord)
+        bord_top = ['2','0', '0', '0', '0', '0', '0', '0', '0', '2']
+        bord_bottom = ['1','0', '0', '0', '0', '0', '0', '0', '0', '1']
+        board.append(bord_top)
         plateau = [['0'] + row[:] for row in self.quart1]
         
         for i in range(4):
@@ -132,7 +133,7 @@ class Init_Board_Color:
         for i in range(8):
             board.append(plateau[i])
         
-        board.append(bord)
+        board.append(bord_bottom)
         self.plateau = board
         return self.plateau
 
@@ -193,24 +194,38 @@ class Init_Board_Color:
     Cette classe initialise le plateau de jeu avec les pions.
 """
 class Init_Board_Pawn:
-    def __init__(self, board: list):
-        self.board = board
+    def __init__(self, P1sPawn = 8, P2sPawn = 8):
+        self.P1sPawn = P1sPawn
+        self.P2sPawn = P2sPawn
+        self.board = self.create_board()
+    
+    def getPlayer1sPawn(self) -> int:
+        return self.P1sPawn
+    
+    def getPlayer2sPawn(self) -> int:
+        return self.P2sPawn
     
     def getBoard(self) -> list:
         return self.board
     
+    def setPlayer1sPawn(self, P1sPawn: int) -> None:
+        self.P1sPawn = P1sPawn
+    
+    def setPlayer2sPawn(self, P2sPawn: int) -> None:
+        self.P2sPawn = P2sPawn
 
     def create_board(self):
         board = []
-        bord = ['1', '0', '0', '0', '0', '0', '0', '0', '0', '1']
+        bord_top = ['2', '0', '0', '0', '0', '0', '0', '0', '0', '2']
+        bord_bottom = ['1', '0', '0', '0', '0', '0', '0', '0', '0', '1']
         Ekip1 = ['0', 1, 1, 1, 1, 1, 1, 1, 1, '0']
         Ekip2 = ['0', 2, 2, 2, 2, 2, 2, 2, 2, '0']
-        board.append(bord)
+        board.append(bord_top)
         board.append(Ekip2)
         for _ in range(6):
             board.append([None] * 10)
         board.append(Ekip1)
-        board.append(bord)
+        board.append(bord_bottom)
         self.board = board
         return board
 """
@@ -219,43 +234,59 @@ class Init_Board_Pawn:
 
 # Première version des fonctions de déplacement et de verrification de déplacement
 
-def movePawn(pawn : tuple, case : tuple, board_pawn : list) -> None:
+def movePawn(pawn : tuple, case : tuple, board_pawn : Init_Board_Pawn) -> None:
     """
         Déplace un pion 'pawn' sur une case 'case' dans un plateau de jeu 'board_pawn'
     """
     x, y = pawn
     i, j = case
-    board_pawn[i][j] = board_pawn[x][y]
-    board_pawn[x][y] = 0
+    board_pawn.board[i][j] = board_pawn.board[x][y]
+    board_pawn.board[x][y] = None
 
-def checkNoAllyInCase(pawn : tuple, case : tuple, board_pawn : list) -> bool:
+def checkCanMove(pawn : tuple, case : tuple, board_pawn : Init_Board_Pawn) -> bool:
+    """
+        Vérifie si un pion peut se déplacer sur une case 'case'
+    """
+    if board_pawn.board[case[0]][case[1]] == '0':
+        return False
+    x, y = pawn
+    i, j = case
+    if board_pawn.board[i][j] is None:
+        return True
+    return False
+
+def checkNoAllyInCase(pawn : tuple, case : tuple, board_pawn : Init_Board_Pawn) -> bool:
     """
         Vérifie si la case où l'on veut déplacer un pion est vide
     """
+    if board_pawn.board[case[0]][case[1]] == '0':
+        return False
     x, y = pawn
     i, j = case
-    if board_pawn[i][j] == 0:
+    if board_pawn.board[i][j] == 0:
         return True
     return False
 
-def checkCanCapture(pawn : tuple, case : tuple, board_pawn : list) -> bool:
+def checkCanCapture(pawn : tuple, case : tuple, board_pawn : Init_Board_Pawn) -> bool:
     """
         Vérifie si un pion peut capturer un autre pion sur la case 'case'
     """
+    if board_pawn.board[case[0]][case[1]] == '0':
+        return False
     x, y = pawn
     i, j = case
-    if board_pawn[i][j] != 0 and board_pawn[i][j] != board_pawn[x][y]:
+    if board_pawn.board[i][j] is not None and board_pawn.board[i][j] != board_pawn.board[x][y]:
         return True
     return False
 
-def getYellowCases(board_color : list) -> list:
+def getYellowCases(board_color : Init_Board_Color) -> list:
     """
         Renvoie la liste des cases jaunes du plateau de jeu
     """
     yellow_cases = []
     for i in range(10):
         for j in range(10):
-            if board_color[i][j] == "yellow":
+            if board_color.board[i][j] == "yellow":
                 yellow_cases.append((i, j))
     return yellow_cases
 
@@ -279,14 +310,14 @@ def checkYellow(pawn : tuple, case : tuple, tab_Y : list) -> bool:
             return False
     return True
 
-def getRedCases(board_color : list) -> list:
+def getRedCases(board_color : Init_Board_Color) -> list:
     """
         Renvoie la liste des cases rouges du plateau de jeu
     """
     red_cases = []
-    for i in range(8):
-        for j in range(8):
-            if board_color[i][j] == "red":
+    for i in range(10):
+        for j in range(10):
+            if board_color.board[i][j] == "red":
                 red_cases.append((i, j))
     return red_cases
 
@@ -310,6 +341,23 @@ def checkRed(pawn : tuple, case : tuple, tab_R : list) -> bool:
             return False
     return True
 
+# Première version de la win condition
+
+def gameIsOver(board_pawn : Init_Board_Pawn) -> tuple:
+    """
+        Verrifie si la partie est terminée
+        Si un des joueur à capturé le camp adverse ou si il ne reste qu'un pion ou moins à l'un des joueurs
+    """
+    if board_pawn.board[0][0] == 1 and board_pawn.board[0][9] == 1:
+        return (1, True)
+    elif board_pawn.board[9][0] == 2 and board_pawn.board[9][9] == 2:
+        return (2, True)
+    elif board_pawn.P2sPawn <= 1:
+        return (1, True)
+    elif board_pawn.P1sPawn <= 1:
+        return (2, True)
+    else:
+        return False
 
 class RestartGame:
     "On regenere différents quart pour recommencer une partie"
@@ -322,8 +370,9 @@ class RestartGame:
         self.quart2 = genererQuart()
         self.quart3 = genererQuart()
         self.quart4 = genererQuart()
-        self.board = Init_Board_Color(self.quart1, self.quart2, self.quart3, self.quart4)
-        return self.board
+        self.board_Color = Init_Board_Color(self.quart1, self.quart2, self.quart3, self.quart4)
+        self.board_Pawn = Init_Board_Pawn()
+        return self.board_Color, self.board_Pawn
 
     def get_board(self):
-        return self.board
+        return self.board_Color, self.board_Pawn
