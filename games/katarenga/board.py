@@ -14,10 +14,10 @@ from ui.buttons import draw_button, click_sound
 # }
 
 TILE_IMAGES = {
-    'A': pygame.image.load(os.path.join("design_case", "rendu_case_rouge.png")),
-    'B': pygame.image.load(os.path.join("design_case", "rendu_case_jaune.png")),
-    'C': pygame.image.load(os.path.join("design_case", "rendu_case_vert.png")),
-    'D': pygame.image.load(os.path.join("design_case", "rendu_case_bleu.png")),
+    'A': pygame.image.load(os.path.join("design_case", "rouge_sans_blanc.png")),
+    'B': pygame.image.load(os.path.join("design_case", "jaune_sans_blanc.png")),
+    'C': pygame.image.load(os.path.join("design_case", "vert_sans_blanc.png")),
+    'D': pygame.image.load(os.path.join("design_case", "bleu_sans_blanc.png")),
 }
 
 # Taille du plateau
