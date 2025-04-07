@@ -64,24 +64,9 @@ class Case:
 """
 
 
-def init_region() -> list:
-    couleurs = ["blue", "green", "red", "yellow"]
-    couleurs_reparties = 4*couleurs
-    random.shuffle(couleurs_reparties)
-    grille = [couleurs_reparties[i:i+4] for i in range(0, 16, 4)]
-    return grille
-
 """
     Classe 'Init_Board'
 """
-class Init_Board:
-    def __init__(self, quart_1: list, quart_2: list, quart_3: list, quart_4: list):
-        self.q1 = quart_1
-        self.q2 = quart_2
-        self.q3 = quart_3
-        self.q4 = quart_4
-        self.board = self.create_board()
-
 class Init_Board:
     def __init__(self, quart_1: list, quart_2: list, quart_3: list, quart_4: list):
         self.q1 = quart_1
@@ -109,16 +94,28 @@ class Init_Board:
         else:
             raise ValueError("Rotation invalide. Doit être 0, 1, 2 ou 3.")
 
-    def create_board(self) -> list:
-        """
-        Combine les 4 quadrants pour former le plateau complet.
-        """
+    def create_board(self):
         board = []
+        bord = ['1','0', '0', '0', '0', '0', '0', '0', '0', '1']
+        board.append(bord)
+        plateau = [['0'] + row[:] for row in self.quart1]
+        
         for i in range(4):
-            board.append(self.q1[i] + self.q2[i])
+            plateau[i].extend(self.quart2[i] + ['0'])
+        
         for i in range(4):
-            board.append(self.q3[i] + self.q4[i])
-        return board
+            plateau.append(['0'] + self.quart3[i])
+            
+        for i in range(4):
+            plateau[i + 4].extend(self.quart4[i] + ['0'])
+
+        
+        for i in range(8):
+            board.append(plateau[i])
+        
+        board.append(bord)
+        self.plateau = board
+        return self.plateau
 
     def rotate_quadrant(self, quadrant: list, rotation: int) -> list:
         """
