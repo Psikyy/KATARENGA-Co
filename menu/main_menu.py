@@ -41,9 +41,6 @@ def main_menu(screen):
                 fade_out = True
 
         # Titre
-        title_surface = fonts['title'].render("Katarenga", True, WHITE)
-        title_surface.set_alpha(title_alpha)  # Appliquer la transparence
-        screen.blit(title_surface, (screen_width // 2 - title_surface.get_width() // 2, 50))
 
         # Boutons
         start_button = draw_button(screen, fonts, "Lancer le jeu", screen_width // 2 - 150, 250, 300, 60, GREEN, HOVER_GREEN)
