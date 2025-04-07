@@ -1,15 +1,23 @@
 import pygame
 import random
 import sys
+import os
 from ui.colors import WHITE, BLACK, BLUE, RED, GREEN, HOVER_GREEN
 from ui.buttons import draw_button, click_sound
 
 # Définition des types de cases et leurs couleurs
-TILE_TYPES = {
-    'A': (220, 220, 220),  # Gris clair - Déplacement orthogonal
-    'B': (160, 82, 45),    # Marron - Déplacement diagonal
-    'C': (0, 128, 0),      # Vert - Déplacement en L (comme un cavalier)
-    'D': (70, 130, 180),   # Bleu acier - Déplacement dans toutes les directions
+# TILE_TYPES = {
+#     'A': (220, 220, 220),  # Gris clair - Déplacement orthogonal
+#     'B': (160, 82, 45),    # Marron - Déplacement diagonal
+#     'C': (0, 128, 0),      # Vert - Déplacement en L (comme un cavalier)
+#     'D': (70, 130, 180),   # Bleu acier - Déplacement dans toutes les directions
+# }
+
+TILE_IMAGES = {
+    'A': pygame.image.load(os.path.join("design_case", "rendu_case_rouge.png")),
+    'B': pygame.image.load(os.path.join("design_case", "rendu_case_jaune.png")),
+    'C': pygame.image.load(os.path.join("design_case", "rendu_case_vert.png")),
+    'D': pygame.image.load(os.path.join("design_case", "rendu_case_bleu.png")),
 }
 
 # Taille du plateau
@@ -18,13 +26,16 @@ BOARD_SIZE = 8
 # Taille des cases
 TILE_SIZE = 60
 
+TILE_KEYS = ['A', 'B', 'C', 'D']
+
+
 # Générer un plateau aléatoire
 def generate_random_board():
     board = []
     for _ in range(BOARD_SIZE):
         row = []
         for _ in range(BOARD_SIZE):
-            tile_type = random.choice(list(TILE_TYPES.keys()))
+            tile_type = random.choice(TILE_KEYS)
             row.append(tile_type)
         board.append(row)
     return board
@@ -50,7 +61,7 @@ def generate_random_quadrant():
     for _ in range(4):
         row = []
         for _ in range(4):
-            tile_type = random.choice(list(TILE_TYPES.keys()))
+            tile_type = random.choice(TILE_KEYS)
             row.append(tile_type)
         quadrant.append(row)
     return quadrant
@@ -83,7 +94,6 @@ def draw_board(screen, fonts, selected_quadrants=None):
     for y in range(BOARD_SIZE):
         for x in range(BOARD_SIZE):
             tile_type = board[y][x]
-            tile_color = TILE_TYPES[tile_type]
             
             tile_rect = pygame.Rect(
                 board_x + x * TILE_SIZE,
@@ -91,17 +101,12 @@ def draw_board(screen, fonts, selected_quadrants=None):
                 TILE_SIZE,
                 TILE_SIZE
             )
-            
-            pygame.draw.rect(screen, tile_color, tile_rect)
+            tile_image = TILE_IMAGES[tile_type]
+            tile_image = pygame.transform.scale(tile_image, (TILE_SIZE, TILE_SIZE))  # si pas déjà à la bonne taille
+            screen.blit(tile_image, tile_rect.topleft)
+
             pygame.draw.rect(screen, BLACK, tile_rect, 1)
             
-            # Afficher le type de la case (pour le débogage)
-            tile_text = fonts['small'].render(tile_type, True, BLACK)
-            screen.blit(tile_text, (
-                board_x + x * TILE_SIZE + (TILE_SIZE - tile_text.get_width()) // 2,
-                board_y + y * TILE_SIZE + (TILE_SIZE - tile_text.get_height()) // 2
-            ))
-    
     # Dessiner les pièces initiales
     # Joueur 1 (Rouge)
     piece_radius = TILE_SIZE // 3
@@ -156,16 +161,17 @@ def configure_board(screen, fonts):
                 for y in range(4):
                     for x in range(4):
                         tile_type = quadrant[y][x]
-                        tile_color = TILE_TYPES[tile_type]
-                        
                         tile_rect = pygame.Rect(
-                            quadrant_x + x * TILE_SIZE,
-                            quadrant_y + y * TILE_SIZE,
-                            TILE_SIZE,
-                            TILE_SIZE
+                        quadrant_x + x * TILE_SIZE,
+                        quadrant_y + y * TILE_SIZE,
+                        TILE_SIZE,
+                        TILE_SIZE
                         )
-                        
-                        pygame.draw.rect(screen, tile_color, tile_rect)
+
+                        tile_image = TILE_IMAGES[tile_type]
+                        tile_image = pygame.transform.scale(tile_image, (TILE_SIZE, TILE_SIZE))  # si ce n'est pas déjà fait
+                        screen.blit(tile_image, tile_rect.topleft)
+
                         pygame.draw.rect(screen, BLACK, tile_rect, 1)
                         
                         # Afficher le type de la case
