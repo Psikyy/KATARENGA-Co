@@ -28,13 +28,14 @@ def genererQuart() -> list:
 
 def generate_quadrants():
     """
-    Génère 4 quadrants aléatoires.
+        Génère 4 quadrants aléatoires.
     """
     return [genererQuart() for _ in range(4)]
 
 
 """ 
-    Classe 'Case' 
+    Classe 'Case'
+    Cette classe représente une case du plateau de jeu. 
 """
 class Case:
     def __init__(self, couleur : str, x : int, y : int):
@@ -65,23 +66,39 @@ class Case:
 
 
 """
-    Classe 'Init_Board'
+    Classe 'Init_Board_Color'
+    Cette classe initialise le plateau de jeu avec les 4 quadrants.
 """
-class Init_Board:
+class Init_Board_Color:
     def __init__(self, quart_1: list, quart_2: list, quart_3: list, quart_4: list):
         self.q1 = quart_1
         self.q2 = quart_2
         self.q3 = quart_3
         self.q4 = quart_4
         self.board = self.create_board()
+    
+    def getQuart1(self) -> list:
+        return self.q1
+    
+    def getQuart2(self) -> list:
+        return self.q2
+    
+    def getQuart3(self) -> list:
+        return self.q3
+    
+    def getQuart4(self) -> list:
+        return self.q4
+    
+    def getBoard(self) -> list:
+        return self.board
 
     @staticmethod
     def rotate_quadrant(quadrant, rotation):
         """
-        Applique une rotation à un quadrant.
-        :param quadrant: Le quadrant à tourner.
-        :param rotation: 0 (0°), 1 (90°), 2 (180°), 3 (270°).
-        :return: Le quadrant tourné.
+            Applique une rotation à un quadrant.
+            :param quadrant: Le quadrant à tourner.
+            :param rotation: 0 (0°), 1 (90°), 2 (180°), 3 (270°), 4 en mirroir (ou symétrie axiale).
+            :return: Le quadrant tourné.
         """
         if rotation == 0:
             return quadrant
@@ -91,6 +108,8 @@ class Init_Board:
             return [row[::-1] for row in quadrant[::-1]]  # 180°
         elif rotation == 3:
             return [list(row) for row in zip(*quadrant)][::-1]  # 270°
+        elif rotation == 4:
+            return [row[::-1] for row in quadrant] # Mirroir horizontal
         else:
             raise ValueError("Rotation invalide. Doit être 0, 1, 2 ou 3.")
 
@@ -119,10 +138,10 @@ class Init_Board:
 
     def rotate_quadrant(self, quadrant: list, rotation: int) -> list:
         """
-        Applique une rotation à un quadrant.
-        :param quadrant: Le quadrant à tourner.
-        :param rotation: 0 (0°), 1 (90°), 2 (180°), 3 (270°).
-        :return: Le quadrant tourné.
+            Applique une rotation à un quadrant.
+            :param quadrant: Le quadrant à tourner.
+            :param rotation: 0 (0°), 1 (90°), 2 (180°), 3 (270°), 4 en mirroir.
+            :return: Le quadrant tourné.
         """
         if rotation == 0:
             return quadrant
@@ -132,63 +151,115 @@ class Init_Board:
             return self.degres_180(quadrant)
         elif rotation == 3:
             return self.degres_270(quadrant)
+        elif rotation == 4:
+            return self.mirroir(quadrant)
         else:
             raise ValueError("Rotation invalide. Doit être 0, 1, 2 ou 3.")
 
     def degres_90(self, quart: list) -> list:
         """
-        Renvoie un quadrant tourné à 90° vers la gauche.
+            Renvoie un quadrant tourné à 90° vers la gauche.
         """
         return [list(row) for row in zip(*quart[::-1])]
 
     def degres_180(self, quart: list) -> list:
         """
-        Renvoie un quadrant tourné à 180°.
+            Renvoie un quadrant tourné à 180°.
         """
         return [row[::-1] for row in quart[::-1]]
 
     def degres_270(self, quart: list) -> list:
         """
-        Renvoie un quadrant tourné à 90° vers la droite.
+            Renvoie un quadrant tourné à 90° vers la droite.
         """
         return [list(row) for row in zip(*quart)][::-1]
+    
+    def mirroir(self, liste : list) -> list:
+        """
+            Renvoie un cadrant après avoir appliqué un effet mirroir dessus
+        """
+        l = []
+        for ligne in liste:
+            l.append(ligne[::-1])
+        return l
 """
     Fin classe 'Init_Board'
 """
 
+
+
+"""
+    Classe 'Init_Board_Pawn'
+    Cette classe initialise le plateau de jeu avec les pions.
+"""
+class Init_Board_Pawn:
+    def __init__(self, board: list):
+        self.board = board
+    
+    def getBoard(self) -> list:
+        return self.board
+    
+
+    def create_board(self):
+        board = []
+        bord = ['1', '0', '0', '0', '0', '0', '0', '0', '0', '1']
+        Ekip1 = ['0', 1, 1, 1, 1, 1, 1, 1, 1, '0']
+        Ekip2 = ['0', 2, 2, 2, 2, 2, 2, 2, 2, '0']
+        board.append(bord)
+        board.append(Ekip2)
+        for _ in range(6):
+            board.append([None] * 10)
+        board.append(Ekip1)
+        board.append(bord)
+        self.board = board
+        return board
+"""
+    Fin classe 'Init_Board_Pawn'
+"""
+
 # Première version des fonctions de déplacement et de verrification de déplacement
 
-def movePawn(pawn : tuple, case : tuple, board : list) -> None:
+def movePawn(pawn : tuple, case : tuple, board_pawn : list) -> None:
     """
-        Déplace un pion 'pawn' sur une case 'case' dans un plateau de jeu 'board'
+        Déplace un pion 'pawn' sur une case 'case' dans un plateau de jeu 'board_pawn'
     """
     x, y = pawn
     i, j = case
-    board[i][j] = board[x][y]
-    board[x][y] = 0
+    board_pawn[i][j] = board_pawn[x][y]
+    board_pawn[x][y] = 0
 
-def checkCaseIsEmpty(pawn : tuple, case : tuple, board : list) -> bool:
+def checkNoAllyInCase(pawn : tuple, case : tuple, board_pawn : list) -> bool:
     """
         Vérifie si la case où l'on veut déplacer un pion est vide
     """
     x, y = pawn
     i, j = case
-    if board[i][j] == 0:
+    if board_pawn[i][j] == 0:
         return True
     return False
 
-def getYellowCases(board : list) -> list:
+def checkCanCapture(pawn : tuple, case : tuple, board_pawn : list) -> bool:
+    """
+        Vérifie si un pion peut capturer un autre pion sur la case 'case'
+    """
+    x, y = pawn
+    i, j = case
+    if board_pawn[i][j] != 0 and board_pawn[i][j] != board_pawn[x][y]:
+        return True
+    return False
+
+def getYellowCases(board_color : list) -> list:
     """
         Renvoie la liste des cases jaunes du plateau de jeu
     """
     yellow_cases = []
-    for i in range(8):
-        for j in range(8):
-            if board[i][j] == "yellow":
+    for i in range(10):
+        for j in range(10):
+            if board_color[i][j] == "yellow":
                 yellow_cases.append((i, j))
     return yellow_cases
 
-def checkYellow(pawn : tuple, case : tuple, board : list, tab_Y : list) -> bool:
+def checkYellow(pawn : tuple, case : tuple, tab_Y : list) -> bool:
     """
         Vérifie si un déplacement est possible pour un pion partant d'une case jaune
         en s'assurant qu'il ne traverse pas d'autres cases jaunes.
@@ -208,18 +279,18 @@ def checkYellow(pawn : tuple, case : tuple, board : list, tab_Y : list) -> bool:
             return False
     return True
 
-def getRedCases(board : list) -> list:
+def getRedCases(board_color : list) -> list:
     """
         Renvoie la liste des cases rouges du plateau de jeu
     """
     red_cases = []
     for i in range(8):
         for j in range(8):
-            if board[i][j] == "red":
+            if board_color[i][j] == "red":
                 red_cases.append((i, j))
     return red_cases
 
-def checkRed(pawn : tuple, case : tuple, board : list, tab_R : list) -> bool:
+def checkRed(pawn : tuple, case : tuple, tab_R : list) -> bool:
     """
         Vérifie si un déplacement horizontal ou vertical est possible pour un pion partant d'une case rouge,
         en s'assurant qu'il ne traverse pas d'autres cases rouges.
@@ -240,40 +311,6 @@ def checkRed(pawn : tuple, case : tuple, board : list, tab_R : list) -> bool:
     return True
 
 
-
-
-class Board:
-
-    def __init__(self, plateau : list, board : list):
-        self.plateau = plateau
-        self.board = board
-
-
-# regions de test 
-q1 = [[1, 2, 3, 4],
-      [9, 10, 11, 12],
-      [17, 18, 19, 20],
-      [25, 26, 27, 28]
-     ]
-
-q2 = [[5, 6, 7, 8],
-      [13, 14, 15, 16],
-      [21, 22, 23, 24],
-      [29, 30, 31, 32]
-     ]
-
-q3 = [[33, 34, 35, 36],
-      [41, 42, 43, 44],
-      [49, 50, 51, 52],
-      [57, 58, 59, 60]
-     ]
-
-q4 = [[37, 38, 39, 40],
-      [45, 46, 47, 48],
-      [53, 54, 55, 56],
-      [61, 62, 63, 64]
-     ]
-
 class RestartGame:
     "On regenere différents quart pour recommencer une partie"
     def __init__(self):
@@ -285,7 +322,7 @@ class RestartGame:
         self.quart2 = genererQuart()
         self.quart3 = genererQuart()
         self.quart4 = genererQuart()
-        self.board = Init_Board(self.quart1, self.quart2, self.quart3, self.quart4)
+        self.board = Init_Board_Color(self.quart1, self.quart2, self.quart3, self.quart4)
         return self.board
 
     def get_board(self):
