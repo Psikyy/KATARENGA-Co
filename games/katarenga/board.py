@@ -62,7 +62,7 @@ def rotate_quadrant(quadrant, rotations=1):
     return quadrant
 
 # Dessiner le plateau
-def draw_board(screen, fonts, selected_quadrants=None):
+def draw_board(screen, fonts, selected_quadrants=None, draw_pieces=True):
     board_width = BOARD_SIZE * TILE_SIZE
     board_height = BOARD_SIZE * TILE_SIZE
     
@@ -102,19 +102,8 @@ def draw_board(screen, fonts, selected_quadrants=None):
                 board_y + y * TILE_SIZE + (TILE_SIZE - tile_text.get_height()) // 2
             ))
     
-    # Dessiner les pièces initiales
-    # Joueur 1 (Rouge)
-    piece_radius = TILE_SIZE // 3
-    pygame.draw.circle(screen, RED, (
-        board_x + 0 * TILE_SIZE + TILE_SIZE // 2,
-        board_y + 0 * TILE_SIZE + TILE_SIZE // 2
-    ), piece_radius)
-    
-    # Joueur 2 (Bleu)
-    pygame.draw.circle(screen, BLUE, (
-        board_x + 7 * TILE_SIZE + TILE_SIZE // 2,
-        board_y + 7 * TILE_SIZE + TILE_SIZE // 2
-    ), piece_radius)
+    # Ne plus dessiner les pions ici
+    # Ils seront dessinés uniquement dans la fonction start_katarenga_game
     
     return board
 
