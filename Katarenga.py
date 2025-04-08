@@ -118,16 +118,16 @@ class Init_Board_Color:
         bord_top = ['2','0', '0', '0', '0', '0', '0', '0', '0', '2']
         bord_bottom = ['1','0', '0', '0', '0', '0', '0', '0', '0', '1']
         board.append(bord_top)
-        plateau = [['0'] + row[:] for row in self.quart1]
+        plateau = [['0'] + row[:] for row in self.q1]
         
         for i in range(4):
-            plateau[i].extend(self.quart2[i] + ['0'])
+            plateau[i].extend(self.q2[i] + ['0'])
         
         for i in range(4):
-            plateau.append(['0'] + self.quart3[i])
+            plateau.append(['0'] + self.q3[i])
             
         for i in range(4):
-            plateau[i + 4].extend(self.quart4[i] + ['0'])
+            plateau[i + 4].extend(self.q4[i] + ['0'])
 
         
         for i in range(8):
@@ -183,6 +183,12 @@ class Init_Board_Color:
         for ligne in liste:
             l.append(ligne[::-1])
         return l
+    
+    def affichage_test(self):
+        for ligne in self.plateau:
+            print(" ".join(str(cell).ljust(6) for cell in ligne))
+            print("\n")
+    
 """
     Fin classe 'Init_Board'
 """
@@ -223,11 +229,18 @@ class Init_Board_Pawn:
         board.append(bord_top)
         board.append(Ekip2)
         for _ in range(6):
-            board.append([None] * 10)
+            line = ['0', None, None, None, None, None, None, None, None, '0']
+            board.append(line)
         board.append(Ekip1)
         board.append(bord_bottom)
         self.board = board
         return board
+    
+    def affichage_test(self):
+        for ligne in self.board:
+            print(" ".join(str(cell).ljust(6) for cell in ligne))
+            print("\n")
+    
 """
     Fin classe 'Init_Board_Pawn'
 """
@@ -376,3 +389,11 @@ class RestartGame:
 
     def get_board(self):
         return self.board_Color, self.board_Pawn
+
+# Zone de test
+
+Q1, Q2, Q3, Q4 = genererQuart(), genererQuart(), genererQuart(), genererQuart()
+board_Color = Init_Board_Color(Q1, Q2, Q3, Q4)
+board_Color.affichage_test()
+board_Pawn = Init_Board_Pawn()
+board_Pawn.affichage_test()
