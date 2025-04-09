@@ -272,18 +272,6 @@ def checkCanMove(pawn : tuple, case : tuple, board_pawn : Init_Board_Pawn) -> bo
         return True
     return False
 
-def checkNoAllyInCase(pawn : tuple, case : tuple, board_pawn : Init_Board_Pawn) -> bool:
-    """
-        Vérifie si la case où l'on veut déplacer un pion est vide
-    """
-    if board_pawn.board[case[0]][case[1]] == '0':
-        return False
-    x, y = pawn
-    i, j = case
-    if board_pawn.board[i][j] == 0:
-        return True
-    return False
-
 def checkCanCapture(pawn : tuple, case : tuple, board_pawn : Init_Board_Pawn) -> bool:
     """
         Vérifie si un pion peut capturer un autre pion sur la case 'case'
