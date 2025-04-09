@@ -262,6 +262,10 @@ def checkCanMove(pawn : tuple, case : tuple, board_pawn : Init_Board_Pawn) -> bo
     """
     if board_pawn.board[case[0]][case[1]] == '0':
         return False
+    elif board_pawn.board[case[0]][case[1]] == 1 and board_pawn.board[pawn[0]][pawn[1]] == '1':
+        return False
+    elif board_pawn.board[case[0]][case[1]] == 2 and board_pawn.board[pawn[0]][pawn[1]] == '2':
+        return False
     x, y = pawn
     i, j = case
     if board_pawn.board[i][j] is None:
@@ -397,3 +401,28 @@ board_Color = Init_Board_Color(Q1, Q2, Q3, Q4)
 board_Color.affichage_test()
 board_Pawn = Init_Board_Pawn()
 board_Pawn.affichage_test()
+
+print(checkCanMove((1, 1), (1, 2), board_Pawn)) # Renvoie attendu : False
+print(checkCanMove((1, 1), (2, 0), board_Pawn)) # Renvoie attendu : False
+print(checkCanMove((1, 1), (0, 0), board_Pawn)) # Renvoie attendu : False
+print(checkCanMove((1, 1), (8, 1), board_Pawn)) # Renvoie attendu : False
+
+print(gameIsOver(board_Pawn)) # Renvoie attendu : False
+
+print(checkCanCapture((1, 1), (8, 5), board_Pawn)) # Renvoie attendu : True
+
+print(getYellowCases(board_Color))
+print(getRedCases(board_Color))
+
+board_Pawn.setPlayer1sPawn(1)
+print(gameIsOver(board_Pawn)) # Renvoie attendu : (2, True)
+board_Pawn.setPlayer1sPawn(8)
+board_Pawn.setPlayer2sPawn(1)
+print(gameIsOver(board_Pawn)) # Renvoie attendu : (1, True)
+
+board_Pawn.board[0][0], board_Pawn.board[0][9] = 1, 1
+print(gameIsOver(board_Pawn)) # Renvoie attendu : (1, True)
+
+board_Pawn.board[0][0], board_Pawn.board[0][9] = '2', '2'
+board_Pawn.board[9][0], board_Pawn.board[9][9] = 2, 2
+print(gameIsOver(board_Pawn)) # Renvoie attendu : (2, True)
