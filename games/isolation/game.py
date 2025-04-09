@@ -3,60 +3,50 @@ import sys
 from ui.colors import WHITE, BLACK, BLUE, RED, GREEN, HOVER_GREEN
 from ui.buttons import draw_button, click_sound
 from games.katarenga.board import BOARD_SIZE, TILE_SIZE, TILE_TYPES, draw_board
-from collections import deque
 
-# Nouvelle classe d’état du jeu avec plusieurs pions par joueur
+# Nouvelle classe d’état du jeu pour la variante "pose uniquement"
 class GameState:
     def __init__(self):
         self.board = None
-        self.player1_pieces = [(0, 0), (0, 1), (1, 0), (1, 1)]
-        self.player2_pieces = [(6, 6), (6, 7), (7, 6), (7, 7)]
+        self.player1_pieces = []
+        self.player2_pieces = []
         self.current_player = 1
-        self.selected_piece = None
-        self.valid_moves = []
+        self.preview_pos = None
         self.game_over = False
         self.winner = None
 
-# Obtenir les mouvements valides pour un pion
-def get_valid_moves(pos, board, all_positions):
-    x, y = pos
-    tile_type = board[y][x]
-    directions = []
-
+# Obtenir les directions d’attaque en fonction du type de case
+def get_attack_directions(tile_type):
     if tile_type == 'A':
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+        return [(0, 1), (1, 0), (0, -1), (-1, 0)]
     elif tile_type == 'B':
-        directions = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
+        return [(1, 1), (1, -1), (-1, -1), (-1, 1)]
     elif tile_type == 'C':
-        directions = [(1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
+        return [(1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
     elif tile_type == 'D':
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, -1), (-1, 1)]
+        return [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, -1), (-1, 1)]
+    return []
 
-    valid = []
-    for dx, dy in directions:
-        nx, ny = x + dx, y + dy
-        if 0 <= nx < BOARD_SIZE and 0 <= ny < BOARD_SIZE and (nx, ny) not in all_positions:
-            valid.append((nx, ny))
-    return valid
+# Vérifie si un pion posé en (x, y) serait en prise
+def is_under_threat(x, y, board, all_pieces):
+    for px, py in all_pieces:
+        tile_type = board[py][px]
+        directions = get_attack_directions(tile_type)
+        for dx, dy in directions:
+            if px + dx == x and py + dy == y:
+                return True
+    return False
 
-# Vérifie si tous les pions sont connectés orthogonalement
-def is_connected(pieces):
-    if not pieces:
-        return False
-    visited = set()
-    queue = deque([pieces[0]])
-    while queue:
-        x, y = queue.popleft()
-        if (x, y) in visited:
-            continue
-        visited.add((x, y))
-        for dx, dy in [(0, 1), (1, 0), (0, -1), (-1, 0)]:
-            nx, ny = x + dx, y + dy
-            if (nx, ny) in pieces and (nx, ny) not in visited:
-                queue.append((nx, ny))
-    return len(visited) == len(pieces)
+# Récupère toutes les positions jouables pour le joueur courant
+def get_legal_moves(board, all_pieces):
+    legal = []
+    for x in range(BOARD_SIZE):
+        for y in range(BOARD_SIZE):
+            if (x, y) not in all_pieces and not is_under_threat(x, y, board, all_pieces):
+                legal.append((x, y))
+    return legal
 
-# Jeu principal
+# Jeu principal pour la variante "pose uniquement"
 def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
     screen_width, screen_height = screen.get_width(), screen.get_height()
     game_state = GameState()
@@ -67,14 +57,13 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
     board_x = (screen_width - board_width) // 2
     board_y = (screen_height - board_height) // 2
 
-    help_text = fonts['small'].render("Sélectionnez un pion puis une case valide", True, BLACK)
+    help_text = fonts['small'].render("Posez un pion sur une case non menacée", True, BLACK)
     running = True
 
     while running:
         screen.fill(WHITE)
 
-        # UI
-        title_text = fonts['title'].render("Katarenga", True, BLACK)
+        title_text = fonts['title'].render("Katarenga - Variante Pose", True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
 
         player1_text = fonts['small'].render(f"{player1_name} (Rouge)", True, RED)
@@ -98,14 +87,15 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
         for pos in game_state.player2_pieces:
             pygame.draw.circle(screen, BLUE, (board_x + pos[0]*TILE_SIZE + TILE_SIZE//2, board_y + pos[1]*TILE_SIZE + TILE_SIZE//2), TILE_SIZE//3)
 
-        # Mouvements valides
-        for x, y in game_state.valid_moves:
-            pygame.draw.circle(screen, GREEN, (board_x + x*TILE_SIZE + TILE_SIZE//2, board_y + y*TILE_SIZE + TILE_SIZE//2), TILE_SIZE//6, 2)
+        all_pieces = game_state.player1_pieces + game_state.player2_pieces
+        legal_moves = get_legal_moves(game_state.board, all_pieces)
 
-        # Surlignage du pion sélectionné
-        if game_state.selected_piece:
-            sel_x, sel_y = game_state.selected_piece
-            pygame.draw.rect(screen, HOVER_GREEN, (board_x + sel_x*TILE_SIZE, board_y + sel_y*TILE_SIZE, TILE_SIZE, TILE_SIZE), 3)
+        # Prévisualisation des coups possibles
+        for (lx, ly) in legal_moves:
+            color = (255, 100, 100, 100) if game_state.current_player == 1 else (100, 100, 255, 100)
+            preview_circle = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
+            pygame.draw.circle(preview_circle, color, (TILE_SIZE//2, TILE_SIZE//2), TILE_SIZE//4)
+            screen.blit(preview_circle, (board_x + lx*TILE_SIZE, board_y + ly*TILE_SIZE))
 
         back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, RED)
 
@@ -123,6 +113,15 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
                 pygame.quit()
                 sys.exit()
 
+            if event.type == pygame.MOUSEMOTION:
+                mouse_x, mouse_y = event.pos
+                tile_x = (mouse_x - board_x) // TILE_SIZE
+                tile_y = (mouse_y - board_y) // TILE_SIZE
+                if 0 <= tile_x < BOARD_SIZE and 0 <= tile_y < BOARD_SIZE:
+                    game_state.preview_pos = (tile_x, tile_y)
+                else:
+                    game_state.preview_pos = None
+
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
                 if back_button.collidepoint(mouse_x, mouse_y):
@@ -138,29 +137,24 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
                 if not game_state.game_over:
                     tile_x = (mouse_x - board_x) // TILE_SIZE
                     tile_y = (mouse_y - board_y) // TILE_SIZE
+                    pos = (tile_x, tile_y)
 
-                    if 0 <= tile_x < BOARD_SIZE and 0 <= tile_y < BOARD_SIZE:
-                        pos = (tile_x, tile_y)
-                        current_pieces = game_state.player1_pieces if game_state.current_player == 1 else game_state.player2_pieces
-                        opponent_pieces = game_state.player2_pieces if game_state.current_player == 1 else game_state.player1_pieces
-                        all_pieces = current_pieces + opponent_pieces
+                    if pos in legal_moves:
+                        if click_sound:
+                            click_sound.play()
 
-                        if pos in current_pieces:
-                            game_state.selected_piece = pos
-                            game_state.valid_moves = get_valid_moves(pos, game_state.board, all_pieces)
-                        elif game_state.selected_piece and pos in game_state.valid_moves:
-                            if click_sound:
-                                click_sound.play()
+                        if game_state.current_player == 1:
+                            game_state.player1_pieces.append(pos)
+                        else:
+                            game_state.player2_pieces.append(pos)
 
-                            current_pieces.remove(game_state.selected_piece)
-                            current_pieces.append(pos)
-                            game_state.selected_piece = None
-                            game_state.valid_moves = []
-
-                            if is_connected(current_pieces):
-                                game_state.game_over = True
-                                game_state.winner = game_state.current_player
-                            else:
-                                game_state.current_player = 3 - game_state.current_player
+                        # Vérifie si l’adversaire peut encore jouer
+                        next_player = 3 - game_state.current_player
+                        new_all_pieces = game_state.player1_pieces + game_state.player2_pieces
+                        if get_legal_moves(game_state.board, new_all_pieces):
+                            game_state.current_player = next_player
+                        else:
+                            game_state.game_over = True
+                            game_state.winner = game_state.current_player
 
         pygame.display.flip()
