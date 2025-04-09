@@ -24,7 +24,7 @@ TILE_IMAGES = {
 BOARD_SIZE = 8
 
 # Taille des cases
-TILE_SIZE = 60
+TILE_SIZE = 50
 
 TILE_KEYS = ['A', 'B', 'C', 'D']
 
@@ -142,20 +142,22 @@ def configure_board(screen, fonts):
         
         # Titre
         title_text = fonts['title'].render("Configuration du plateau", True, BLACK)
-        screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 50))
+        screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
         
         # Instructions
         instruction_text = fonts['small'].render("Cliquez sur un quadrant pour le faire pivoter", True, BLACK)
-        screen.blit(instruction_text, (screen_width // 2 - instruction_text.get_width() // 2, 100))
+        screen.blit(instruction_text, (screen_width // 2 - instruction_text.get_width() // 2, 90))
         
         # Dessiner les quadrants
+
+        max_y=0
         for i in range(2):
             for j in range(2):
                 quadrant_index = i * 2 + j
                 quadrant = rotate_quadrant(quadrants[quadrant_index], rotations[quadrant_index])
                 
                 quadrant_x = screen_width // 2 - quadrant_size + j * quadrant_size
-                quadrant_y = 150 + i * quadrant_size
+                quadrant_y = 120 + i * quadrant_size
                 
                 # Dessiner chaque case du quadrant
                 for y in range(4):
@@ -173,14 +175,7 @@ def configure_board(screen, fonts):
                         screen.blit(tile_image, tile_rect.topleft)
 
                         pygame.draw.rect(screen, BLACK, tile_rect, 1)
-                        
-                        # Afficher le type de la case
-                        tile_text = fonts['small'].render(tile_type, True, BLACK)
-                        screen.blit(tile_text, (
-                            quadrant_x + x * TILE_SIZE + (TILE_SIZE - tile_text.get_width()) // 2,
-                            quadrant_y + y * TILE_SIZE + (TILE_SIZE - tile_text.get_height()) // 2
-                        ))
-                
+                    
                 # Cadre autour du quadrant
                 pygame.draw.rect(screen, BLACK, (
                     quadrant_x,
@@ -188,9 +183,11 @@ def configure_board(screen, fonts):
                     quadrant_size,
                     quadrant_size
                 ), 2)
+                max_y = max(max_y, quadrant_y + quadrant_size)
         
         # Bouton Valider
-        valid_button = draw_button(screen, fonts, "Valider", screen_width // 2 - 100, screen_height - 100, 200, 50, GREEN, HOVER_GREEN)
+        valid_button = draw_button(screen, fonts, "Valider", screen_width // 2 - 100, max_y + 30, 200, 50, GREEN, HOVER_GREEN)
+
         
         # Gérer les événements
         for event in pygame.event.get():
