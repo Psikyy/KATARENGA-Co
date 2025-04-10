@@ -121,14 +121,26 @@ def check_win(game_state):
     
     # Si le joueur 1 occupe les deux camps adverses, il gagne
     if camps2_occupied == 2:
+        game_state.winner = 1
         return True
     
     # Si le joueur 2 occupe les deux camps adverses, il gagne
     if camps1_occupied == 2:
+        game_state.winner = 2
         return True
     
-    # Si un joueur n'a plus de pions, il perd
-    if len(game_state.player1_pieces) == 0 or len(game_state.player2_pieces) == 0:
+    # Si un joueur n'a plus de pions ou ne peut plus bouger, il perd
+    remaining_pieces1 = sum(1 for x, y, in_camp in game_state.player1_pieces if in_camp is None)
+    remaining_pieces2 = sum(1 for x, y, in_camp in game_state.player2_pieces if in_camp is None)
+    
+    # Si le joueur 1 n'a plus assez de pions pour gagner
+    if remaining_pieces1 == 0 or (remaining_pieces1 < 2 and camps2_occupied < 2):
+        game_state.winner = 2
+        return True
+    
+    # Si le joueur 2 n'a plus assez de pions pour gagner
+    if remaining_pieces2 == 0 or (remaining_pieces2 < 2 and camps1_occupied < 2):
+        game_state.winner = 1
         return True
     
     return False
@@ -149,21 +161,35 @@ def show_rules(screen, fonts):
         # Règles
         rules = [
             "Katarenga est un jeu de stratégie pour deux joueurs.",
-            "Chaque joueur contrôle une pièce qui se déplace selon la case où elle se trouve:",
+            "Chaque joueur contrôle 8 pions qui se déplacent selon la case où ils se trouvent:",
             "",
-            "Case A (Jaune): Mouvements orthogonaux (comme une tour aux échecs)",
-            "Case B (Rouge): Mouvements diagonaux (comme un fou aux échecs)",
-            "Case C (Bleu): Mouvements de cavalier (comme aux échecs)",
-            "Case D (Verte): Toutes directions (comme une dame aux échecs)",
+            "Case A (Gris clair): Mouvements orthogonaux (comme une tour aux échecs)",
+            "Case B (Marron): Mouvements diagonaux (comme un fou aux échecs)",
+            "Case C (Vert): Mouvements en L (comme un cavalier aux échecs)",
+            "Case D (Bleu acier): Mouvements dans toutes directions (comme une dame aux échecs)",
             "",
-            "Le but est d'atteindre le bord opposé du plateau ou de bloquer l'adversaire.",
-            "Le joueur Rouge commence en haut à gauche et doit atteindre le bas.",
-            "Le joueur Bleu commence en bas à droite et doit atteindre le haut."
+            "But du jeu: Occuper les deux camps adverses ou empêcher l'adversaire de jouer",
+            "en capturant suffisamment de ses pions.",
+            "",
+            "Pour occuper un camp adverse :",
+            "1. Amener d'abord un pion sur la ligne de base adverse",
+            "2. Puis déplacer ce pion dans un camp adverse (déplacement spécial)",
+            "3. Une fois dans un camp, le pion y reste jusqu'à la fin de la partie",
+            "",
+            "Les captures sont autorisées sauf lors du premier tour de jeu.",
+            "La capture se fait en déplaçant un de ses pions sur une case occupée par un pion adverse.",
+            "",
+            "Le joueur Noir commence en haut et doit atteindre les camps en bas.",
+            "Le joueur Blanc commence en bas et doit atteindre les camps en haut."
         ]
+        
+        # Calcul de la hauteur totale du texte pour centrer verticalement
+        total_height = len(rules) * 30
+        start_y = max(150, (screen_height - total_height) // 2 - 50)
         
         for i, rule in enumerate(rules):
             rule_text = fonts['small'].render(rule, True, BLACK)
-            screen.blit(rule_text, (screen_width // 2 - rule_text.get_width() // 2, 150 + i * 30))
+            screen.blit(rule_text, (screen_width // 2 - rule_text.get_width() // 2, start_y + i * 30))
         
         # Bouton Retour
         back_button = draw_button(screen, fonts, "Retour", screen_width // 2 - 50, screen_height - 100, 100, 40, BLUE, RED)

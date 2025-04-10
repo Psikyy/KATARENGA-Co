@@ -63,15 +63,19 @@ def rotate_quadrant(quadrant, rotations=1):
 
 # Dessiner le plateau
 def draw_board(screen, fonts, selected_quadrants=None, draw_pieces=True):
+    # Taille du plateau original (8x8)
     board_width = BOARD_SIZE * TILE_SIZE
     board_height = BOARD_SIZE * TILE_SIZE
     
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     
-    # Calculer la position du plateau pour le centrer
-    board_x = (screen_width - board_width) // 2
-    board_y = (screen_height - board_height) // 2
+    # Taille de la bordure décorative
+    border_size = TILE_SIZE // 2
+    
+    # Calculer la position du plateau pour le centrer (en incluant la bordure)
+    board_x = (screen_width - (board_width + 2 * border_size)) // 2 + border_size
+    board_y = (screen_height - (board_height + 2 * border_size)) // 2 + border_size
     
     # Générer le plateau si nécessaire
     if selected_quadrants:
@@ -79,7 +83,61 @@ def draw_board(screen, fonts, selected_quadrants=None, draw_pieces=True):
     else:
         board = generate_random_board()
     
-    # Dessiner chaque case
+    # Dessiner la bordure décorative (avec arrière-plan gris foncé)
+    border_color = (50, 50, 60)  # Gris foncé pour la bordure
+    # Bordure extérieure complète
+    pygame.draw.rect(screen, border_color, (
+        board_x - border_size,
+        board_y - border_size,
+        board_width + 2 * border_size,
+        board_height + 2 * border_size
+    ))
+    
+    # Ajouter des motifs ou décorations dans la bordure
+    # Motifs aux coins non-camp (coin supérieur droit et inférieur gauche)
+    corner_decoration_size = border_size - 4
+    
+    # Couleur du motif coin
+    corner_color = (30, 30, 30)  # Noir/gris foncé
+
+    # Coin supérieur gauche
+    pygame.draw.rect(screen, corner_color, (
+        board_x - border_size + 2,
+        board_y - border_size + 2,
+        corner_decoration_size,
+        corner_decoration_size
+    ))
+
+    # Coin supérieur droit
+    pygame.draw.rect(screen, corner_color, (
+        board_x + board_width + 2,
+        board_y - border_size + 2,
+        corner_decoration_size,
+        corner_decoration_size
+    ))
+
+    # Coin inférieur gauche
+    pygame.draw.rect(screen, corner_color, (
+        board_x - border_size + 2,
+        board_y + board_height + 2,
+        corner_decoration_size,
+        corner_decoration_size
+    ))
+
+    # Coin inférieur droit
+    pygame.draw.rect(screen, corner_color, (
+        board_x + board_width + 2,
+        board_y + board_height + 2,
+        corner_decoration_size,
+        corner_decoration_size
+    ))
+
+    
+    # Définir les positions des camps
+    camps1_positions = [(0, 0), (7, 0)]  # Camps du joueur 1 (Noir)
+    camps2_positions = [(0, 7), (7, 7)]  # Camps du joueur 2 (Blanc)
+    
+    # Dessiner chaque case du plateau
     for y in range(BOARD_SIZE):
         for x in range(BOARD_SIZE):
             tile_type = board[y][x]
@@ -92,7 +150,23 @@ def draw_board(screen, fonts, selected_quadrants=None, draw_pieces=True):
                 TILE_SIZE
             )
             
+            # Vérifier si c'est un camp
+            is_camp1 = (x, y) in camps1_positions
+            is_camp2 = (x, y) in camps2_positions
+            
+            # Dessiner la case avec sa couleur normale
             pygame.draw.rect(screen, tile_color, tile_rect)
+            
+            # Ajouter un motif ou une marque pour les camps
+            if is_camp1 or is_camp2:
+                # Encadrement plus visible pour les camps
+                camp_color = BLACK if is_camp1 else WHITE
+                pygame.draw.rect(screen, camp_color, tile_rect, 3)
+                
+                if is_camp2:  # Ajouter un contour noir pour les camps blancs
+                    pygame.draw.rect(screen, BLACK, tile_rect, 1)
+            
+            # Bordure fine pour toutes les cases
             pygame.draw.rect(screen, BLACK, tile_rect, 1)
             
             # Afficher le type de la case (pour le débogage)
@@ -102,8 +176,40 @@ def draw_board(screen, fonts, selected_quadrants=None, draw_pieces=True):
                 board_y + y * TILE_SIZE + (TILE_SIZE - tile_text.get_height()) // 2
             ))
     
-    # Ne plus dessiner les pions ici
-    # Ils seront dessinés uniquement dans la fonction start_katarenga_game
+    # Dessiner des décorations supplémentaires dans la bordure (similaires à l'image)
+    # Motifs horizontaux et verticaux
+    for i in range(1, 7):
+        # Motif horizontal haut
+        pygame.draw.rect(screen, (70, 70, 80), (
+            board_x + i * TILE_SIZE,
+            board_y - border_size + border_size//3,
+            TILE_SIZE//2,
+            border_size//3
+        ))
+        
+        # Motif horizontal bas
+        pygame.draw.rect(screen, (70, 70, 80), (
+            board_x + i * TILE_SIZE,
+            board_y + board_height + border_size//3,
+            TILE_SIZE//2,
+            border_size//3
+        ))
+        
+        # Motif vertical gauche
+        pygame.draw.rect(screen, (70, 70, 80), (
+            board_x - border_size + border_size//3,
+            board_y + i * TILE_SIZE,
+            border_size//3,
+            TILE_SIZE//2
+        ))
+        
+        # Motif vertical droit
+        pygame.draw.rect(screen, (70, 70, 80), (
+            board_x + board_width + border_size//3,
+            board_y + i * TILE_SIZE,
+            border_size//3,
+            TILE_SIZE//2
+        ))
     
     return board
 
