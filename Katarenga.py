@@ -399,6 +399,7 @@ class RestartGame:
 Q1, Q2, Q3, Q4 = genererQuart(), genererQuart(), genererQuart(), genererQuart()
 board_Color = Init_Board_Color(Q1, Q2, Q3, Q4)
 board_Color.affichage_test()
+print("\n")
 board_Pawn = Init_Board_Pawn()
 board_Pawn.affichage_test()
 
