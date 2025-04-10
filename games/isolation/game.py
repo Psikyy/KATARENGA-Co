@@ -155,6 +155,6 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
                             game_state.current_player = next_player
                         else:
                             game_state.game_over = True
-                            game_state.winner = game_state.current_player
+                            game_state.winner = next_player
 
         pygame.display.flip()

@@ -6,8 +6,10 @@ from ui.animations import loading_screen
 
 from games.katarenga.board import configure_board as configure_katarenga_board
 from games.isolation.board import configure_board as configure_isolation_board
+from games.congress.board import configure_board as configure_congress_board
 from games.katarenga.game import start_game as start_katarenga_game
 from games.isolation.game import start_game as start_isolation_game
+from games.congress.game import start_game as start_congress_game
 
 
 
@@ -98,6 +100,9 @@ def player_names(screen, fonts, game_name):
                         elif game_name == "Isolation":
                             selected_quadrants = configure_isolation_board(screen, fonts)
                             start_isolation_game(screen, fonts, player1_name, player2_name, selected_quadrants)
+                        elif game_name == "Congress":
+                            selected_quadrants = configure_congress_board(screen, fonts)
+                            start_congress_game(screen, fonts, player1_name, player2_name, selected_quadrants)
                         else:
                             print(f"[ERREUR] Mode inconnu : {game_name}")
                         return
