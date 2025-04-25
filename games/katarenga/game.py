@@ -2,9 +2,8 @@ import pygame
 import sys
 from ui.colors import WHITE, BLACK, BLUE, RED, GREEN, HOVER_GREEN
 from ui.buttons import draw_button, click_sound
-from games.katarenga.board import BOARD_SIZE, TILE_SIZE, TILE_TYPES, draw_board
+from games.katarenga.board import BOARD_SIZE, TILE_SIZE, draw_board
 
-# Positions des pièces sur le plateau
 # Positions des pièces sur le plateau
 class GameState:
     def __init__(self):
@@ -143,6 +142,11 @@ def check_win(game_state):
         game_state.winner = 1
         return True
     
+    # Vérifier si un joueur ne peut plus se déplacer
+    if len(game_state.valid_moves) == 0:
+        game_state.winner = 3 - game_state.current_player  # Le joueur adverse gagne
+        return True
+    
     return False
 
 # Afficher les règles du jeu
@@ -207,7 +211,7 @@ def show_rules(screen, fonts):
         pygame.display.flip()
 
 # Démarrer le jeu Katarenga
-def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
+def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants):
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     
@@ -449,7 +453,6 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
                                 # Vérifier si un joueur a gagné
                                 if check_win(game_state):
                                     game_state.game_over = True
-                                    game_state.winner = game_state.current_player
                                 else:
                                     # Changer de joueur
                                     game_state.current_player = 3 - game_state.current_player  # Alterne entre 1 et 2
@@ -482,3 +485,7 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
                                         break
         
         pygame.display.flip()
+
+# Pour la compatibilité avec l'ancienne version
+def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
+    start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants)

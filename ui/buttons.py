@@ -28,7 +28,7 @@ def draw_button(screen, fonts, text, x, y, width, height, color, hover_color, te
     else:
         pygame.draw.rect(screen, color, button_rect, border_radius=15)
         pygame.draw.rect(screen, BLACK, button_rect, width=3, border_radius=15)  # Bordure noire
-
+   
     # Texte centré
     text_surface = fonts['button'].render(text, True, text_color)
     screen.blit(text_surface, (x + (width - text_surface.get_width()) // 2, y + (height - text_surface.get_height()) // 2))

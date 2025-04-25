@@ -2,7 +2,7 @@ import pygame
 import sys
 from ui.colors import WHITE, BLACK, BLUE, RED, GREEN, HOVER_GREEN
 from ui.buttons import draw_button, click_sound
-from games.katarenga.board import BOARD_SIZE, TILE_SIZE, TILE_TYPES, draw_board
+from games.katarenga.board import BOARD_SIZE, TILE_SIZE, draw_board
 
 class GameState:
     def __init__(self):
