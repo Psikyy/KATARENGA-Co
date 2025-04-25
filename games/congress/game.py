@@ -1,8 +1,8 @@
 import pygame
 import sys
-from ui.colors import WHITE, BLACK, BLUE, RED, GREEN, HOVER_GREEN
+from ui.colors import WHITE, BROWN, BLUE, RED, GREEN, HOVER_GREEN, BLACK
 from ui.buttons import draw_button, click_sound
-from games.katarenga.board import BOARD_SIZE, TILE_SIZE, draw_board
+from games.congress.board import BOARD_SIZE, TILE_SIZE, draw_board
 
 class GameState:
     def __init__(self):
@@ -54,7 +54,7 @@ def are_pieces_connected(pieces):
     return len(visited) == len(pieces)
 
 def setup_initial_pieces():
-    p1 = [(0, 1),(0,4),(1,7),(4,7),(7,6),(7,4),(3,0),(6,0)]
+    p1 = [(0, 1),(0,4),(1,7),(4,7),(7,6),(7,3),(3,0),(6,0)]
     p2 = [(1, 0),(4,0),(6,7),(3,7),(0,3),(0,6),(7,4),(7,1)]
     return p1, p2
 
@@ -76,15 +76,15 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
     while running:
         screen.fill(WHITE)
 
-        title_text = fonts['title'].render("Katarenga - Mode Connexion", True, BLACK)
+        title_text = fonts['title'].render("Congress", True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
 
         player1_text = fonts['small'].render(f"{player1_name} (Blanc)", True, BLACK)
-        player2_text = fonts['small'].render(f"{player2_name} (Noir)", True, BLACK)
+        player2_text = fonts['small'].render(f"{player2_name} (marron)", True, BLACK)
         screen.blit(player1_text, (50, 100))
         screen.blit(player2_text, (screen_width - 50 - player2_text.get_width(), 100))
 
-        current_color = BLACK if game_state.current_player == 1 else (50, 50, 50)
+        current_color = BROWN if game_state.current_player == 2 else BLACK
         current_player_text = fonts['button'].render(
             f"Tour de {player1_name}" if game_state.current_player == 1 else f"Tour de {player2_name}",
             True, current_color)
@@ -99,7 +99,7 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
         for x, y in game_state.player1_pieces:
             pygame.draw.circle(screen, WHITE, (board_x + x * TILE_SIZE + TILE_SIZE // 2, board_y + y * TILE_SIZE + TILE_SIZE // 2), piece_radius)
         for x, y in game_state.player2_pieces:
-            pygame.draw.circle(screen, BLACK, (board_x + x * TILE_SIZE + TILE_SIZE // 2, board_y + y * TILE_SIZE + TILE_SIZE // 2), piece_radius)
+            pygame.draw.circle(screen, BROWN, (board_x + x * TILE_SIZE + TILE_SIZE // 2, board_y + y * TILE_SIZE + TILE_SIZE // 2), piece_radius)
 
         for move_x, move_y in game_state.valid_moves:
             pygame.draw.circle(screen, GREEN, (board_x + move_x * TILE_SIZE + TILE_SIZE // 2, board_y + move_y * TILE_SIZE + TILE_SIZE // 2), piece_radius // 2, 2)
@@ -108,7 +108,7 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
 
         if game_state.game_over:
             winner_name = player1_name if game_state.winner == 1 else player2_name
-            winner_text = fonts['title'].render(f"{winner_name} a gagné !", True, BLACK)
+            winner_text = fonts['title'].render(f"{winner_name} a gagné !", True, BROWN)
             overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
             overlay.fill((255, 255, 255, 200))
             screen.blit(overlay, (0, 0))
