@@ -67,10 +67,66 @@ def get_valid_moves(game_state, board):
         tile_type = board[y][x]
         
         # Mouvements selon le type de case
-        if tile_type == 'A':  # Orthogonal
+        if tile_type == 'A':  # Case rouge : tour avec arrêt sur la première case rouge
             directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-        elif tile_type == 'B':  # Diagonal
+            for dx, dy in directions:
+                step = 1
+                while True:
+                    new_x = x + dx * step
+                    new_y = y + dy * step
+                    if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
+                        break  # Hors du plateau
+
+                    # Vérifie si une pièce alliée bloque
+                    if any(px == new_x and py == new_y and pcamp is None for px, py, pcamp in player_pieces):
+                        break  # Bloqué par un allié
+
+                    is_capture = (new_x, new_y) in opponent_positions
+                    if game_state.turn_count == 0 and is_capture:
+                        break  # Interdit de capturer au premier tour
+
+                    piece_moves.append((new_x, new_y, False))
+
+                    # Si on tombe sur une autre case rouge, on s'arrête
+                    if board[new_y][new_x] == 'A':
+                        break
+
+                    # Si c’est une capture, on s’arrête aussi
+                    if is_capture:
+                        break
+
+                    step += 1
+
+        elif tile_type == 'B':  # Diagonale spéciale : "comme un fou", arrêt sur première case jaune
             directions = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
+            for dx, dy in directions:
+                step = 1
+                while True:
+                    new_x = x + dx * step
+                    new_y = y + dy * step
+                    if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
+                        break  # Hors du plateau
+
+                    # Vérifie si une pièce alliée bloque
+                    if any(px == new_x and py == new_y and pcamp is None for px, py, pcamp in player_pieces):
+                        break  # Bloqué par un allié
+
+                    is_capture = (new_x, new_y) in opponent_positions
+                    if game_state.turn_count == 0 and is_capture:
+                        break  # Interdit de capturer au premier tour
+
+                    # Ajoute le mouvement valide
+                    piece_moves.append((new_x, new_y, False))
+
+                    # Si la case atteinte est aussi une case 'B' (jaune), on s’arrête là
+                    if board[new_y][new_x] == 'B':
+                        break
+
+                    # Si c'est une capture, on s'arrête aussi
+                    if is_capture:
+                        break
+
+                    step += 1
         elif tile_type == 'C':  # Cavalier
             directions = [(1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
         elif tile_type == 'D':  # Toutes directions

@@ -1,8 +1,8 @@
 import pygame
 import sys
-from ui.colors import WHITE, BLACK, BLUE, RED, GREEN, HOVER_GREEN
+from ui.colors import WHITE, BLACK, BROWN, GREEN, HOVER_GREEN
 from ui.buttons import draw_button, click_sound
-from games.katarenga.board import BOARD_SIZE, TILE_SIZE, draw_board
+from games.isolation.board import BOARD_SIZE, TILE_SIZE, draw_board
 
 # Nouvelle classe d’état du jeu pour la variante "pose uniquement"
 class GameState:
@@ -31,11 +31,80 @@ def get_attack_directions(tile_type):
 def is_under_threat(x, y, board, all_pieces):
     for px, py in all_pieces:
         tile_type = board[py][px]
-        directions = get_attack_directions(tile_type)
-        for dx, dy in directions:
-            if px + dx == x and py + dy == y:
-                return True
+
+        if tile_type == 'A':  # Tour, arrêt sur première case rouge ou capture
+            directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
+            for dx, dy in directions:
+                step = 1
+                while True:
+                    new_x = px + dx * step
+                    new_y = py + dy * step
+
+                    if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
+                        break
+
+                    if (new_x, new_y) in all_pieces:
+                        break  # Bloqué
+
+                    if (new_x, new_y) == (x, y):
+                        return True
+
+                    if board[new_y][new_x] == 'A':
+                        break
+
+                    step += 1
+
+        elif tile_type == 'B':  # Diagonale, arrêt sur première case jaune ou capture
+            directions = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
+            for dx, dy in directions:
+                step = 1
+                while True:
+                    new_x = px + dx * step
+                    new_y = py + dy * step
+
+                    if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
+                        break
+
+                    if (new_x, new_y) in all_pieces:
+                        break
+
+                    if (new_x, new_y) == (x, y):
+                        return True
+
+                    if board[new_y][new_x] == 'B':
+                        break
+
+                    step += 1
+
+        elif tile_type == 'C':  # Cavalier
+            directions = [(1, 2), (2, 1), (2, -1), (1, -2),
+                          (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
+            for dx, dy in directions:
+                if (px + dx, py + dy) == (x, y):
+                    return True
+
+        elif tile_type == 'D':  # Toutes directions
+            directions = [(0, 1), (1, 0), (0, -1), (-1, 0),
+                          (1, 1), (1, -1), (-1, -1), (-1, 1)]
+            for dx, dy in directions:
+                step = 1
+                while True:
+                    new_x = px + dx * step
+                    new_y = py + dy * step
+
+                    if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
+                        break
+
+                    if (new_x, new_y) in all_pieces:
+                        break
+
+                    if (new_x, new_y) == (x, y):
+                        return True
+
+                    step += 1
+
     return False
+
 
 # Récupère toutes les positions jouables pour le joueur courant
 def get_legal_moves(board, all_pieces):
@@ -66,15 +135,15 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
         title_text = fonts['title'].render("Katarenga - Variante Pose", True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
 
-        player1_text = fonts['small'].render(f"{player1_name} (Rouge)", True, RED)
-        player2_text = fonts['small'].render(f"{player2_name} (Bleu)", True, BLUE)
+        player1_text = fonts['small'].render(f"{player1_name} (Rouge)", True, WHITE)
+        player2_text = fonts['small'].render(f"{player2_name} (Bleu)", True, BROWN)
         screen.blit(player1_text, (50, 100))
         screen.blit(player2_text, (screen_width - 50 - player2_text.get_width(), 100))
 
         current_player_text = fonts['button'].render(
             f"Tour de {player1_name}" if game_state.current_player == 1 else f"Tour de {player2_name}",
             True,
-            RED if game_state.current_player == 1 else BLUE
+            WHITE if game_state.current_player == 1 else BROWN
         )
         screen.blit(current_player_text, (screen_width // 2 - current_player_text.get_width() // 2, 100))
         screen.blit(help_text, (screen_width // 2 - help_text.get_width() // 2, 140))
@@ -83,9 +152,9 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
 
         # Dessiner les pions
         for pos in game_state.player1_pieces:
-            pygame.draw.circle(screen, RED, (board_x + pos[0]*TILE_SIZE + TILE_SIZE//2, board_y + pos[1]*TILE_SIZE + TILE_SIZE//2), TILE_SIZE//3)
+            pygame.draw.circle(screen, WHITE, (board_x + pos[0]*TILE_SIZE + TILE_SIZE//2, board_y + pos[1]*TILE_SIZE + TILE_SIZE//2), TILE_SIZE//3)
         for pos in game_state.player2_pieces:
-            pygame.draw.circle(screen, BLUE, (board_x + pos[0]*TILE_SIZE + TILE_SIZE//2, board_y + pos[1]*TILE_SIZE + TILE_SIZE//2), TILE_SIZE//3)
+            pygame.draw.circle(screen, BROWN, (board_x + pos[0]*TILE_SIZE + TILE_SIZE//2, board_y + pos[1]*TILE_SIZE + TILE_SIZE//2), TILE_SIZE//3)
 
         all_pieces = game_state.player1_pieces + game_state.player2_pieces
         legal_moves = get_legal_moves(game_state.board, all_pieces)
@@ -97,7 +166,7 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
             pygame.draw.circle(preview_circle, color, (TILE_SIZE//2, TILE_SIZE//2), TILE_SIZE//4)
             screen.blit(preview_circle, (board_x + lx*TILE_SIZE, board_y + ly*TILE_SIZE))
 
-        back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, RED)
+        back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BROWN, WHITE)
 
         if game_state.game_over:
             winner_name = player1_name if game_state.winner == 1 else player2_name
