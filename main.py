@@ -12,8 +12,8 @@ def main():
     settings = load_settings()
     
     # Configurer l'écran
-    SCREEN_WIDTH = 800
-    SCREEN_HEIGHT = 600
+    SCREEN_WIDTH = 1000
+    SCREEN_HEIGHT = 800
     if settings.get("fullscreen", False):
         screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT), pygame.FULLSCREEN)
     else:
