@@ -91,6 +91,9 @@ def player_names(screen, fonts, game_name):
                     elif game_name == "Isolation":
                         selected_quadrants = configure_isolation_board(screen, fonts)
                         start_isolation_game(screen, fonts, player1_name, player2_name, selected_quadrants)
+                    elif game_name == "Congress":
+                        selected_quadrants = configure_congress_board(screen, fonts)
+                        start_congress_game(screen, fonts, player1_name, player2_name, selected_quadrants)
                     else:
                         print(f"[ERREUR] Mode inconnu : {game_name}")
                     return
