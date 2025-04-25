@@ -93,7 +93,7 @@ def draw_borders_and_corners(screen, board_x, board_y, board_width, board_height
     screen.blit(pygame.transform.rotate(coin_scaled, 180), (board_x + board_width, board_y + board_height))  # Bottom right
 
 # Draw the board
-def draw_board(screen, fonts, selected_quadrants=None, draw_pieces=True):
+def draw_board(screen, fonts, selected_quadrants=None, draw_pieces=True,):
     board_width = BOARD_SIZE * TILE_SIZE
     board_height = BOARD_SIZE * TILE_SIZE
     

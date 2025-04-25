@@ -27,11 +27,19 @@ def player_names(screen, fonts, game_name):
 
         # Titre
         title_text = fonts['title'].render(f"{game_name}", True, BLACK)
-        screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 50))
+        title_x = screen_width // 2 - title_text.get_width() // 2
+        title_y = 50
+        screen.blit(title_text, (title_x, title_y))
 
-        # Instructions
-        instruction_text = fonts['small'].render("Entrez les noms des joueurs sans espaces ni caractères spéciaux.", True, BLACK)
-        screen.blit(instruction_text, (screen_width // 2 - instruction_text.get_width() // 2, 100))
+        spacing_after_title = 20  
+
+        instruction_text = fonts['small'].render(
+            "Entrez les noms des joueurs sans espaces ni caractères spéciaux.",
+            True, BLACK)
+        instruction_x = screen_width // 2 - instruction_text.get_width() // 2
+        instruction_y = title_y + title_text.get_height() + spacing_after_title
+        screen.blit(instruction_text, (instruction_x, instruction_y))
+
 
         # Zones de texte
         input_rect1 = pygame.Rect(250, 200, 300, 50)
@@ -39,11 +47,14 @@ def player_names(screen, fonts, game_name):
         pygame.draw.rect(screen, GREEN if input_active1 else GRAY, input_rect1, 2)
         pygame.draw.rect(screen, GREEN if input_active2 else GRAY, input_rect2, 2)
 
-        # Labels et texte de saisie
         player1_label = fonts['small'].render("Joueur 1 (Rouge):", True, RED)
         player2_label = fonts['small'].render("Joueur 2 (Bleu):", True, BLUE)
-        screen.blit(player1_label, (input_rect1.x - 150, input_rect1.y + 15))
-        screen.blit(player2_label, (input_rect2.x - 150, input_rect2.y + 15))
+
+        vertical_spacing = 10
+
+        screen.blit(player1_label, (input_rect1.x, input_rect1.y - player1_label.get_height() - vertical_spacing))
+        screen.blit(player2_label, (input_rect2.x, input_rect2.y - player2_label.get_height() - vertical_spacing))
+
 
         player1_display = fonts['button'].render(player1_name if player1_name else "Joueur 1", True, BLACK)
         player2_display = fonts['button'].render(player2_name if player2_name else "Joueur 2", True, BLACK)
