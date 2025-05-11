@@ -297,24 +297,11 @@ def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_qua
         # Titre
         title_text = fonts['title'].render("Katarenga", True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
-        
-        # Afficher les joueurs
-        player1_text = fonts['small'].render(f"{player1_name} (Noir)", True, BLACK)
-        player2_text = fonts['small'].render(f"{player2_name} (Blanc)", True, WHITE)
-        
-        screen.blit(player1_text, (50, 100))
-        screen.blit(player2_text, (screen_width - 50 - player2_text.get_width(), 100))
+
         
         # Afficher le joueur actuel
         current_player_name = player1_name if game_state.current_player == 1 else player2_name
         current_player_color = BLACK if game_state.current_player == 1 else WHITE
-        
-        current_player_text = fonts['button'].render(
-            f"Tour de {current_player_name}",
-            True,
-            current_player_color
-        )
-        screen.blit(current_player_text, (screen_width // 2 - current_player_text.get_width() // 2, 100))
         
         # Afficher l'indicateur du tour en bas également
         turn_indicator = fonts['button'].render(
@@ -325,7 +312,7 @@ def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_qua
         screen.blit(turn_indicator, (screen_width // 2 - turn_indicator.get_width() // 2, screen_height - 60))
         
         # Afficher le texte d'aide
-        screen.blit(help_text, (screen_width // 2 - help_text.get_width() // 2, 140))
+        screen.blit(help_text, (screen_width // 2 - help_text.get_width() // 2, 100))
         
         # Dessiner le plateau sans les pions
         draw_board(screen, fonts, selected_quadrants, draw_pieces=False)
