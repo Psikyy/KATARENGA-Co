@@ -5,13 +5,10 @@ from ui.animations import intro_animation
 from menu.main_menu import main_menu
 
 def main():
-    # Initialisation de Pygame
     pygame.init()
     
-    # Charger les paramètres
     settings = load_settings()
     
-    # Configurer l'écran
     SCREEN_WIDTH = 1000
     SCREEN_HEIGHT = 800
     if settings.get("fullscreen", False):
@@ -21,18 +18,15 @@ def main():
     
     pygame.display.set_caption("Katarenga")
     
-    # Charger la musique de fond
     try:
         pygame.mixer.music.load("assets/musique/adventure.mp3")
         pygame.mixer.music.set_volume(settings["volume"])
-        pygame.mixer.music.play(-1)  # Boucle infinie
+        pygame.mixer.music.play(-1)  
     except pygame.error:
         print("Musique de fond non trouvée.")
     
-    # Animation d'intro
     intro_animation(screen)
     
-    # Démarrer le menu principal
     main_menu(screen)
 
 if __name__ == "__main__":
