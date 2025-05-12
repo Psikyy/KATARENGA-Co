@@ -12,7 +12,7 @@ from games.isolation.game import start_game as start_isolation_game
 from games.congress.game import start_game as start_congress_game
 
 
-def player_names(screen, fonts, game_name):
+def player_names(screen, fonts, game_name, mode=None):
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     
@@ -98,7 +98,7 @@ def player_names(screen, fonts, game_name):
 
                     if game_name == "Katarenga":
                         selected_quadrants = configure_katarenga_board(screen, fonts)
-                        start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants)
+                        start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode=mode)
                     elif game_name == "Isolation":
                         selected_quadrants = configure_isolation_board(screen, fonts)
                         start_isolation_game(screen, fonts, player1_name, player2_name, selected_quadrants)

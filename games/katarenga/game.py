@@ -1,4 +1,5 @@
 import pygame
+import random
 import sys
 from ui.colors import WHITE, BLACK, BLUE, RED, GREEN, HOVER_GREEN
 from ui.buttons import draw_button, click_sound
@@ -267,7 +268,8 @@ def show_rules(screen, fonts):
         pygame.display.flip()
 
 # Démarrer le jeu Katarenga
-def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants):
+def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode="local"):
+    bot_player = 2 if mode == "bot" else None
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     
@@ -515,6 +517,20 @@ def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_qua
                                     
                                     # Mettre à jour les mouvements valides
                                     game_state.valid_moves = get_valid_moves(game_state, game_state.board)
+
+                                    # Si c'est au bot de jouer (mode bot)
+                                    if bot_player is not None and game_state.current_player == bot_player and not game_state.game_over:
+                                        pygame.time.wait(500)  # Petite pause pour voir l'action du bot (500ms)
+                                        bot_play(game_state)
+
+                                        # Vérifie victoire après action du bot
+                                        if check_win(game_state):
+                                            game_state.game_over = True
+                                        else:
+                                            # Repasser au joueur humain
+                                            game_state.current_player = 3 - game_state.current_player
+                                            game_state.valid_moves = get_valid_moves(game_state, game_state.board)
+
                                     
                                     # Si le nouveau joueur n'a pas de mouvement valide, il perd
                                     if not game_state.valid_moves:
@@ -542,6 +558,39 @@ def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_qua
         
         pygame.display.flip()
 
+
+def bot_play(game_state):
+    # Obtenir les mouvements valides pour le bot
+    valid_moves = game_state.valid_moves
+
+    if not valid_moves:
+        return False  # Aucun coup possible
+
+    # Choisir un pion au hasard parmi ceux qui ont des coups valides
+    piece_idx = random.choice(list(valid_moves.keys()))
+
+    # Choisir un mouvement au hasard pour ce pion
+    move_x, move_y, is_camp_move = random.choice(valid_moves[piece_idx])
+
+    # Effectuer le mouvement (même logique que pour le joueur)
+    if game_state.current_player == 2:
+        # Vérifier s'il s'agit d'une capture
+        for idx, (p_x, p_y, p_camp) in enumerate(game_state.player1_pieces):
+            if p_camp is None and (p_x, p_y) == (move_x, move_y):
+                game_state.player1_pieces.pop(idx)
+                break
+
+        # Mettre à jour la position du pion
+        x, y, _ = game_state.player2_pieces[piece_idx]
+        if is_camp_move:
+            camp_idx = 1 if (move_x, move_y) == game_state.camp1_positions[0] else 2
+            game_state.player2_pieces[piece_idx] = (move_x, move_y, camp_idx)
+        else:
+            game_state.player2_pieces[piece_idx] = (move_x, move_y, None)
+
+    return True  # Coup joué
+        
+
 # Pour la compatibilité avec l'ancienne version
-def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
-    start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants)
+def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode="local"):
+    start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode=mode)
