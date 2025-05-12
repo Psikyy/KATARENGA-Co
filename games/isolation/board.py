@@ -5,6 +5,7 @@ import os
 from ui.colors import WHITE, BLACK, GREEN, HOVER_GREEN
 from ui.buttons import draw_button, click_sound
 
+
 TILE_IMAGES = {
     'A': pygame.image.load(os.path.join("design_case", "rouge_sans_blanc.png")),
     'B': pygame.image.load(os.path.join("design_case", "jaune_sans_blanc.png")),
@@ -18,6 +19,87 @@ COIN_IMAGE = pygame.image.load(os.path.join("design_case", "coin.png"))
 BOARD_SIZE = 8
 TILE_SIZE = 55
 TILE_KEYS = ['A', 'B', 'C', 'D']
+
+
+
+def split_board_into_quadrants(board_8x8):
+    quadrants = []
+    for i in range(2):
+        for j in range(2):
+            quadrant = [row[j*4:(j+1)*4] for row in board_8x8[i*4:(i+1)*4]]
+            quadrants.append(quadrant)
+    return quadrants
+
+def edit_board(screen, fonts):
+    screen_width = screen.get_width()
+    screen_height = screen.get_height()
+
+    board = generate_random_board()
+
+    board_width = BOARD_SIZE * TILE_SIZE
+    board_height = BOARD_SIZE * TILE_SIZE
+    board_x = (screen_width - board_width) // 2
+    board_y = (screen_height - board_height) // 2
+
+    running = True
+
+    while running:
+        screen.fill(WHITE)
+
+        title_text = fonts['title'].render("Éditeur de plateau", True, BLACK)
+        screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
+
+        instruction_text = fonts['small'].render("Cliquez sur une case pour changer sa couleur", True, BLACK)
+        screen.blit(instruction_text, (screen_width // 2 - instruction_text.get_width() // 2, 90))
+
+        draw_borders_and_corners(screen, board_x, board_y, board_width, board_height)
+
+        for y in range(BOARD_SIZE):
+            for x in range(BOARD_SIZE):
+                tile_type = board[y][x]
+                tile_rect = pygame.Rect(
+                    board_x + x * TILE_SIZE,
+                    board_y + y * TILE_SIZE,
+                    TILE_SIZE,
+                    TILE_SIZE
+                )
+                tile_image = pygame.transform.scale(TILE_IMAGES[tile_type], (TILE_SIZE, TILE_SIZE))
+                screen.blit(tile_image, tile_rect.topleft)
+                pygame.draw.rect(screen, BLACK, tile_rect, 1)
+
+        # Bouton "Valider"
+        valid_button = draw_button(screen, fonts, "Valider", screen_width // 2 - 100, board_y + board_height + 50, 200, 50, GREEN, HOVER_GREEN)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+
+                # Changer le type de tuile
+                for y in range(BOARD_SIZE):
+                    for x in range(BOARD_SIZE):
+                        tile_rect = pygame.Rect(
+                            board_x + x * TILE_SIZE,
+                            board_y + y * TILE_SIZE,
+                            TILE_SIZE,
+                            TILE_SIZE
+                        )
+                        if tile_rect.collidepoint(mouse_x, mouse_y):
+                            if click_sound:
+                                click_sound.play()
+                            current_index = TILE_KEYS.index(board[y][x])
+                            board[y][x] = TILE_KEYS[(current_index + 1) % len(TILE_KEYS)]
+
+                # Valider le plateau
+                if valid_button.collidepoint(mouse_x, mouse_y):
+                    if click_sound:
+                        click_sound.play()
+                    return board
+
+        pygame.display.flip()
 
 def generate_random_board():
     return [[random.choice(TILE_KEYS) for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
@@ -106,9 +188,9 @@ def configure_board(screen, fonts):
         instruction_text = fonts['small'].render("Cliquez sur un quadrant pour le faire pivoter", True, BLACK)
         screen.blit(instruction_text, (screen_width // 2 - instruction_text.get_width() // 2, 90))
 
-        # --- ESPACEMENT AJOUTÉ ICI ---
-        board_y = 140  # Anciennement 160 → réduit l'espace entre le texte et le plateau
-        board_y += 30  # Ajoute un espacement supplémentaire
+       
+        board_y = 140  # Position verticale du plateau
+        board_y += 30  # Espacement entre le titre et le plateau
         board_x = screen_width // 2 - quadrant_size
 
         draw_borders_and_corners(screen, board_x, board_y, board_width, board_height)
@@ -141,9 +223,10 @@ def configure_board(screen, fonts):
                     quadrant_size
                 ), 2)
 
-        # --- ESPACEMENT AJOUTÉ ICI ---
-        valid_button_y = board_y + board_height + 70  # Anciennement +50 → plus d'espace en dessous
+        # Bouton "Valider"
+        valid_button_y = board_y + board_height + 70  # Position verticale du bouton "Valider"
         valid_button = draw_button(screen, fonts, "Valider", screen_width // 2 - 100, valid_button_y, 200, 50, GREEN, HOVER_GREEN)
+        edit_button = draw_button(screen, fonts, "Éditer", screen_width // 2 - 100, valid_button_y + 70, 200, 50, GREEN, HOVER_GREEN)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -175,5 +258,19 @@ def configure_board(screen, fonts):
                         click_sound.play()
                     rotated_quadrants = [rotate_quadrant(quadrants[i], rotations[i]) for i in range(4)]
                     return rotated_quadrants
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                mouse_x, mouse_y = event.pos
+
+                if edit_button.collidepoint(mouse_x, mouse_y):
+                    if click_sound:
+                        click_sound.play()
+                    edited_board = edit_board(screen, fonts)
+                    if edited_board is not None:
+                        quadrants = split_board_into_quadrants(edited_board)
+                        return quadrants
+                    else:
+                        # Si l'utilisateur a annulé l'édition, on retourne None ou un autre indicateur
+                        return None
+
 
         pygame.display.flip()
