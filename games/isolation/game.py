@@ -1,10 +1,9 @@
 import pygame
 import sys
-from ui.colors import WHITE, BLACK, BROWN, GREEN, HOVER_GREEN
+from ui.colors import WHITE, BLACK, BROWN, GREEN, HOVER_GREEN, BLUE, RED
 from ui.buttons import draw_button, click_sound
 from games.isolation.board import BOARD_SIZE, TILE_SIZE, draw_board
 
-# Nouvelle classe d’état du jeu pour la variante "pose uniquement"
 class GameState:
     def __init__(self):
         self.board = None
@@ -15,7 +14,6 @@ class GameState:
         self.game_over = False
         self.winner = None
 
-# Obtenir les directions d’attaque en fonction du type de case
 def get_attack_directions(tile_type):
     if tile_type == 'A':
         return [(0, 1), (1, 0), (0, -1), (-1, 0)]
@@ -27,7 +25,6 @@ def get_attack_directions(tile_type):
         return [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, -1), (-1, 1)]
     return []
 
-# Vérifie si un pion posé en (x, y) serait en prise
 def is_under_threat(x, y, board, all_pieces):
     for px, py in all_pieces:
         tile_type = board[py][px]
@@ -105,8 +102,63 @@ def is_under_threat(x, y, board, all_pieces):
 
     return False
 
+def show_rules(screen, fonts):
+    screen_width = screen.get_width()
+    screen_height = screen.get_height()
 
-# Récupère toutes les positions jouables pour le joueur courant
+    running = True
+    while running:
+        screen.fill(WHITE)
+
+        title_text = fonts['title'].render("Règles du jeu", True, BLACK)
+        title_x = screen_width // 2 - title_text.get_width() // 2
+        screen.blit(title_text, (title_x, 60))
+
+        rules = [
+            "Le plateau est initialement vide.",
+            "Le jeu se joue à deux joueurs.",
+            "",
+            "À tour de rôle, chaque joueur place un de ses pions sur une case vide du plateau.",
+            "Un pion ne peut être placé que s’il n’est pas en prise, c’est-à-dire :",
+            "  - Il ne doit pas pouvoir être capturé par un pion déjà présent sur le plateau",
+            "    (quelle que soit sa couleur), selon les règles de capture définies pour le jeu.",
+            "",
+            "Il n'y a aucun déplacement ni capture pendant la partie :",
+            "  - Les pions restent sur la case où ils ont été posés.",
+            "",
+            "Le jeu continue tant que les joueurs peuvent poser des pions selon la règle ci-dessus.",
+            "",
+            "Le vainqueur est le dernier joueur à avoir pu poser un pion."
+        ]
+
+        line_spacing = 28
+        total_height = len(rules) * line_spacing
+        start_y = max(130, (screen_height - total_height) // 2)
+
+        for i, line in enumerate(rules):
+            is_indent = line.strip().startswith("-") or line.strip().startswith("•")
+            font_color = BLACK
+            font_used = fonts['small']
+            rendered_text = font_used.render(line, True, font_color)
+            x = screen_width // 2 - rendered_text.get_width() // 2 if not is_indent else screen_width // 2 - rendered_text.get_width() // 2 + 20
+            y = start_y + i * line_spacing
+            screen.blit(rendered_text, (x, y))
+
+        back_button = draw_button(screen, fonts, "Retour", screen_width // 2 - 50, screen_height - 70, 100, 40, BLUE, RED)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.collidepoint(event.pos):
+                    if click_sound:
+                        click_sound.play()
+                    return
+
+        pygame.display.flip()
+
+
 def get_legal_moves(board, all_pieces):
     legal = []
     for x in range(BOARD_SIZE):
@@ -115,7 +167,6 @@ def get_legal_moves(board, all_pieces):
                 legal.append((x, y))
     return legal
 
-# Jeu principal pour la variante "pose uniquement"
 def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
     screen_width, screen_height = screen.get_width(), screen.get_height()
     game_state = GameState()
@@ -168,6 +219,8 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
 
         back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BROWN, WHITE)
 
+        rules_button = draw_button(screen, fonts, "Règles", screen_width - 110, screen_height - 60, 100, 40, GREEN, HOVER_GREEN)
+
         if game_state.game_over:
             winner_name = player1_name if game_state.winner == 1 else player2_name
             winner_text = fonts['title'].render(f"{winner_name} a gagné !", True, BLACK)
@@ -197,6 +250,12 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
                     if click_sound:
                         click_sound.play()
                     return
+                
+                if rules_button.collidepoint(mouse_x, mouse_y):
+                    if click_sound:
+                        click_sound.play()
+                    show_rules(screen, fonts)
+                
 
                 if game_state.game_over and 'new_game_button' in locals() and new_game_button.collidepoint(mouse_x, mouse_y):
                     if click_sound:

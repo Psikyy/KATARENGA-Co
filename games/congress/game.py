@@ -58,6 +58,65 @@ def setup_initial_pieces():
     p2 = [(1, 0),(4,0),(6,7),(3,7),(0,3),(0,6),(7,4),(7,1)]
     return p1, p2
 
+def show_rules(screen, fonts):
+    screen_width = screen.get_width()
+    screen_height = screen.get_height()
+
+    running = True
+    while running:
+        screen.fill(WHITE)
+
+        title_text = fonts['title'].render("Règles du Katarenga", True, BLACK)
+        title_x = screen_width // 2 - title_text.get_width() // 2
+        screen.blit(title_text, (title_x, 50))
+
+        rules = [
+            "Congress est un jeu de stratégie pour deux joueurs.",
+            "Chaque joueur contrôle 8 pions qui se déplacent selon la case où ils se trouvent :",
+            "",
+            "Case Rouge : Mouvements orthogonaux (comme une tour aux échecs)",
+            "Case Jaune : Mouvements diagonaux (comme un fou aux échecs)",
+            "Case Vert : Mouvements en L (comme un cavalier aux échecs)",
+            "Case Bleu : Mouvements dans toutes directions (comme une dame aux échecs)",
+            "",
+            "À tour de rôle, chaque joueur déplace l'un de ses pions selon les règles de déplacement ci-dessus.",
+            "Les captures sont interdites.",
+            "",
+            "Le but du jeu est de réunir ses 8 pions sous la forme d'un bloc connecté.",
+            "Un bloc connecté est un ensemble de pions du même joueur,",
+            "où chaque pion est adjacent orthogonalement (haut, bas, gauche ou droite)",
+            "à au moins un autre pion du même joueur.",
+            "",
+            "Le premier joueur à réussir cette formation gagne la partie.",
+            "Si aucun joueur ne peut plus bouger et qu’aucun bloc connecté ne peut être formé,",
+            "la partie est nulle.",
+        ]
+
+        line_spacing = 30
+        total_height = len(rules) * line_spacing
+        start_y = (screen_height - total_height) // 2
+
+        for i, line in enumerate(rules):
+            text_surface = fonts['small'].render(line, True, BLACK)
+            x = screen_width // 2 - text_surface.get_width() // 2
+            y = start_y + i * line_spacing
+            screen.blit(text_surface, (x, y))
+
+        back_button = draw_button(screen, fonts, "Retour", screen_width // 2 - 50, screen_height - 80, 100, 40, BLUE, RED)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.collidepoint(event.pos):
+                    if click_sound:
+                        click_sound.play()
+                    return
+
+        pygame.display.flip()
+
+
 def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
     screen_width = screen.get_width()
     screen_height = screen.get_height()
@@ -106,6 +165,8 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
 
         back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, RED)
 
+        rules_button = draw_button(screen, fonts, "Règles", screen_width - 110, screen_height - 60, 100, 40, GREEN, HOVER_GREEN)
+
         if game_state.game_over:
             winner_name = player1_name if game_state.winner == 1 else player2_name
             winner_text = fonts['title'].render(f"{winner_name} a gagné !", True, BROWN)
@@ -126,6 +187,11 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
                     if click_sound:
                         click_sound.play()
                     return
+                
+                if rules_button.collidepoint(mouse_x, mouse_y):
+                    if click_sound:
+                        click_sound.play()
+                    show_rules(screen, fonts)
 
                 if game_state.game_over:
                     if 'new_game_button' in locals() and new_game_button.collidepoint(mouse_x, mouse_y):
