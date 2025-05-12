@@ -167,6 +167,22 @@ def movePawn(pawn : tuple, case : tuple, board : list) -> None:
     board[i][j] = board[x][y]
     board[x][y] = 0
 
+def checkCanCapture(pawn : tuple, case : tuple, board : list) -> bool:
+    """
+        Vérifie si un pion peut capturer un camps adverse
+    """
+    x, y = pawn
+    i, j = case
+    if x == 1 and y == 1 and board[x][y] == '2' and i == 0 and j == 0 and board[i][j] == '1':
+        return True
+    elif x == 1 and y == 8 and board[x][y] == '2' and i == 0 and j == 9 and board[i][j] == '1':
+        return True
+    elif x == 8 and y == 1 and board[x][y] == '1' and i == 9 and j == 0 and board[i][j] == '2':
+        return True
+    elif x == 8 and y == 8 and board[x][y] == '1' and i == 9 and j == 9 and board[i][j] == '2':
+        return True
+    return False
+
 def checkCaseIsEmpty(pawn : tuple, case : tuple, board : list) -> bool:
     """
         Vérifie si la case où l'on veut déplacer un pion est vide
