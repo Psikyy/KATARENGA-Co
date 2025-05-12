@@ -9,3 +9,6 @@ RED = (231, 76, 60)
 HOVER_RED = (192, 57, 43)
 GRAY = (200, 200, 200)
 BROWN = (153, 101, 21)
+
+# Alias pour les deux orthographes
+GREY = GRAY
