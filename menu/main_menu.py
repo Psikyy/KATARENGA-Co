@@ -3,9 +3,9 @@ import sys
 from ui.colors import WHITE, GREEN, HOVER_GREEN, BLUE, HOVER_BLUE, RED, HOVER_RED
 from ui.buttons import draw_button, click_sound
 from ui.fonts import init_fonts
-from ui.animations import loading_screen
 from menu.settings_menu import settings_menu
 from menu.game_selection import game_selection
+
 
 def main_menu(screen):
     screen_width = screen.get_width()

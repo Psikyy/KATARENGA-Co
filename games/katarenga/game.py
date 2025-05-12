@@ -4,6 +4,7 @@ from ui.colors import WHITE, BLACK, BLUE, RED, GREEN, HOVER_GREEN
 from ui.buttons import draw_button, click_sound
 from games.katarenga.board import BOARD_SIZE, TILE_SIZE, draw_board
 
+
 # Positions des pièces sur le plateau
 class GameState:
     def __init__(self):
@@ -267,15 +268,15 @@ def show_rules(screen, fonts):
         pygame.display.flip()
 
 # Démarrer le jeu Katarenga
-def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants):
+def start_katarenga_game(screen, fonts, player1_name, player2_name, board):
     screen_width = screen.get_width()
     screen_height = screen.get_height()
-    
+    print(board)
     # Initialiser l'état du jeu
     game_state = GameState()
     
     # Dessiner le plateau et l'obtenir
-    game_state.board = draw_board(screen, fonts, selected_quadrants, draw_pieces=False)
+    game_state.board = draw_board(screen, fonts, board, draw_pieces=False)
     
     # Calculer la position du plateau pour le centrer
     board_width = BOARD_SIZE * TILE_SIZE
@@ -291,6 +292,7 @@ def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_qua
     
     # Boucle principale du jeu
     running = True
+   
     while running:
         screen.fill(WHITE)
         
@@ -314,8 +316,9 @@ def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_qua
         # Afficher le texte d'aide
         screen.blit(help_text, (screen_width // 2 - help_text.get_width() // 2, 100))
         
+
         # Dessiner le plateau sans les pions
-        draw_board(screen, fonts, selected_quadrants, draw_pieces=False)
+        draw_board(screen, fonts, board, draw_pieces=False)
         
         # Dessiner les pièces
         piece_radius = TILE_SIZE // 3
@@ -530,5 +533,5 @@ def start_katarenga_game(screen, fonts, player1_name, player2_name, selected_qua
         pygame.display.flip()
 
 # Pour la compatibilité avec l'ancienne version
-def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
-    start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants)
+def start_game(screen, fonts, player1_name, player2_name,board):
+    start_katarenga_game(screen, fonts, player1_name, player2_name, board)
