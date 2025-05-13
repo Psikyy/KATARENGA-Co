@@ -1,4 +1,5 @@
 import pygame
+import random
 import sys
 from ui.colors import WHITE, BROWN, BLUE, RED, GREEN, HOVER_GREEN, BLACK
 from ui.buttons import draw_button, click_sound
@@ -58,7 +59,67 @@ def setup_initial_pieces():
     p2 = [(1, 0),(4,0),(6,7),(3,7),(0,3),(0,6),(7,4),(7,1)]
     return p1, p2
 
-def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
+def show_rules(screen, fonts):
+    screen_width = screen.get_width()
+    screen_height = screen.get_height()
+
+    running = True
+    while running:
+        screen.fill(WHITE)
+
+        title_text = fonts['title'].render("Règles du Katarenga", True, BLACK)
+        title_x = screen_width // 2 - title_text.get_width() // 2
+        screen.blit(title_text, (title_x, 50))
+
+        rules = [
+            "Congress est un jeu de stratégie pour deux joueurs.",
+            "Chaque joueur contrôle 8 pions qui se déplacent selon la case où ils se trouvent :",
+            "",
+            "Case Rouge : Mouvements orthogonaux (comme une tour aux échecs)",
+            "Case Jaune : Mouvements diagonaux (comme un fou aux échecs)",
+            "Case Vert : Mouvements en L (comme un cavalier aux échecs)",
+            "Case Bleu : Mouvements dans toutes directions (comme une dame aux échecs)",
+            "",
+            "À tour de rôle, chaque joueur déplace l'un de ses pions selon les règles de déplacement ci-dessus.",
+            "Les captures sont interdites.",
+            "",
+            "Le but du jeu est de réunir ses 8 pions sous la forme d'un bloc connecté.",
+            "Un bloc connecté est un ensemble de pions du même joueur,",
+            "où chaque pion est adjacent orthogonalement (haut, bas, gauche ou droite)",
+            "à au moins un autre pion du même joueur.",
+            "",
+            "Le premier joueur à réussir cette formation gagne la partie.",
+            "Si aucun joueur ne peut plus bouger et qu’aucun bloc connecté ne peut être formé,",
+            "la partie est nulle.",
+        ]
+
+        line_spacing = 30
+        total_height = len(rules) * line_spacing
+        start_y = (screen_height - total_height) // 2
+
+        for i, line in enumerate(rules):
+            text_surface = fonts['small'].render(line, True, BLACK)
+            x = screen_width // 2 - text_surface.get_width() // 2
+            y = start_y + i * line_spacing
+            screen.blit(text_surface, (x, y))
+
+        back_button = draw_button(screen, fonts, "Retour", screen_width // 2 - 50, screen_height - 80, 100, 40, BLUE, RED)
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+                sys.exit()
+            if event.type == pygame.MOUSEBUTTONDOWN:
+                if back_button.collidepoint(event.pos):
+                    if click_sound:
+                        click_sound.play()
+                    return
+
+        pygame.display.flip()
+
+
+def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode="local"):
+    bot_player = 2 if mode == "bot" else None
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     game_state = GameState()
@@ -106,6 +167,8 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
 
         back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, RED)
 
+        rules_button = draw_button(screen, fonts, "Règles", screen_width - 110, screen_height - 60, 100, 40, GREEN, HOVER_GREEN)
+
         if game_state.game_over:
             winner_name = player1_name if game_state.winner == 1 else player2_name
             winner_text = fonts['title'].render(f"{winner_name} a gagné !", True, BROWN)
@@ -126,6 +189,11 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
                     if click_sound:
                         click_sound.play()
                     return
+                
+                if rules_button.collidepoint(mouse_x, mouse_y):
+                    if click_sound:
+                        click_sound.play()
+                    show_rules(screen, fonts)
 
                 if game_state.game_over:
                     if 'new_game_button' in locals() and new_game_button.collidepoint(mouse_x, mouse_y):
@@ -154,5 +222,43 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
                                 game_state.winner = game_state.current_player
                             else:
                                 game_state.current_player = 3 - game_state.current_player
+                            # Si c'est au bot de jouer, il joue automatiquement
+                            if bot_player is not None and game_state.current_player == bot_player and not game_state.game_over:
+                                pygame.time.wait(500)  # Petite pause pour voir l'action
+                                bot_play(game_state)
+
 
         pygame.display.flip()
+
+
+def bot_play(game_state):
+    # Liste tous les pions du bot avec des mouvements valides
+    pieces = game_state.player2_pieces if game_state.current_player == 2 else game_state.player1_pieces
+    opponent_pieces = game_state.player1_pieces if game_state.current_player == 2 else game_state.player2_pieces
+
+    movable_pieces = []
+
+    for piece in pieces:
+        moves = get_valid_moves_for_piece(piece, game_state.board, pieces + opponent_pieces)
+        if moves:
+            movable_pieces.append((piece, moves))
+
+    if not movable_pieces:
+        return False  # Aucun coup possible
+
+    # Choisir un pion et un mouvement au hasard
+    selected_piece, moves = random.choice(movable_pieces)
+    destination = random.choice(moves)
+
+    # Appliquer le mouvement
+    pieces.remove(selected_piece)
+    pieces.append(destination)
+
+    # Vérifier si le bot a gagné
+    if are_pieces_connected(pieces):
+        game_state.game_over = True
+        game_state.winner = game_state.current_player
+    else:
+        game_state.current_player = 3 - game_state.current_player
+
+    return True

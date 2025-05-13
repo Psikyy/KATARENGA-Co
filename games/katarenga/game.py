@@ -240,12 +240,8 @@ def show_rules(screen, fonts):
             "",
             "Les captures sont autorisées sauf lors du premier tour de jeu.",
             "La capture se fait en déplaçant un de ses pions sur une case occupée par un pion adverse.",
-            "",
-            "Le joueur Noir commence en haut et doit atteindre les camps en bas.",
-            "Le joueur Blanc commence en bas et doit atteindre les camps en haut."
         ]
-        
-        # Calcul de la hauteur totale du texte pour centrer verticalement
+
         total_height = len(rules) * 30
         start_y = max(150, (screen_height - total_height) // 2 - 50)
         
@@ -253,7 +249,6 @@ def show_rules(screen, fonts):
             rule_text = fonts['small'].render(rule, True, BLACK)
             screen.blit(rule_text, (screen_width // 2 - rule_text.get_width() // 2, start_y + i * 30))
         
-        # Bouton Retour
         back_button = draw_button(screen, fonts, "Retour", screen_width // 2 - 50, screen_height - 100, 100, 40, BLUE, RED)
         
         for event in pygame.event.get():
@@ -269,7 +264,8 @@ def show_rules(screen, fonts):
         pygame.display.flip()
 
 # Démarrer le jeu Katarenga
-def start_katarenga_game(screen, fonts, player1_name, player2_name,board, mode="local"):
+def start_katarenga_game(screen, fonts, player1_name, player2_name, board, mode='local'):
+    bot_player = 2 if mode == "bot" else None
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     print(board)
@@ -362,7 +358,6 @@ def start_katarenga_game(screen, fonts, player1_name, player2_name,board, mode="
                     board_y + camp_y * TILE_SIZE + TILE_SIZE // 2
                 ), piece_radius, 1)
         
-        # Dessiner une bordure autour du pion sélectionné
         if game_state.selected_piece_idx is not None:
             if game_state.current_player == 1:
                 selected_piece = game_state.player1_pieces[game_state.selected_piece_idx]
@@ -376,7 +371,6 @@ def start_katarenga_game(screen, fonts, player1_name, player2_name,board, mode="
                     board_y + y * TILE_SIZE + TILE_SIZE // 2
                 ), piece_radius + 3, 2)
         
-        # Dessiner les mouvements valides pour le pion sélectionné
         if game_state.selected_piece_idx is not None and game_state.selected_piece_idx in game_state.valid_moves:
             for move_x, move_y, is_camp_move in game_state.valid_moves[game_state.selected_piece_idx]:
                 pygame.draw.circle(screen, GREEN, (
@@ -384,29 +378,22 @@ def start_katarenga_game(screen, fonts, player1_name, player2_name,board, mode="
                     board_y + move_y * TILE_SIZE + TILE_SIZE // 2
                 ), piece_radius // 2, 2)
         
-        # Bouton Retour
         back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, RED)
         
-        # Bouton Règles
         rules_button = draw_button(screen, fonts, "Règles", screen_width - 110, screen_height - 60, 100, 40, GREEN, HOVER_GREEN)
         
-        # Afficher le message de fin de partie si le jeu est terminé
         if game_state.game_over:
             winner_name = player1_name if game_state.winner == 1 else player2_name
             winner_text = fonts['title'].render(f"{winner_name} a gagné !", True, BLACK)
             
-            # Fond semi-transparent
             overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
             overlay.fill((255, 255, 255, 200))
             screen.blit(overlay, (0, 0))
             
-            # Message de victoire
             screen.blit(winner_text, (screen_width // 2 - winner_text.get_width() // 2, screen_height // 2 - 50))
             
-            # Bouton Nouvelle Partie
             new_game_button = draw_button(screen, fonts, "Nouvelle Partie", screen_width // 2 - 100, screen_height // 2 + 50, 200, 50, GREEN, HOVER_GREEN)
         
-        # Gérer les événements
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
@@ -415,19 +402,16 @@ def start_katarenga_game(screen, fonts, player1_name, player2_name,board, mode="
             if event.type == pygame.MOUSEBUTTONDOWN:
                 mouse_x, mouse_y = event.pos
                 
-                # Retour au menu
                 if back_button.collidepoint(mouse_x, mouse_y):
                     if click_sound:
                         click_sound.play()
                     return
                 
-                # Afficher les règles
                 if rules_button.collidepoint(mouse_x, mouse_y):
                     if click_sound:
                         click_sound.play()
                     show_rules(screen, fonts)
                 
-                # Si le jeu est terminé
                 if game_state.game_over:
                     if 'new_game_button' in locals() and new_game_button.collidepoint(mouse_x, mouse_y):
                         if click_sound:
@@ -582,4 +566,4 @@ def bot_play(game_state):
 
 # Pour la compatibilité avec l'ancienne version
 def start_game(screen, fonts, player1_name, player2_name, board,  mode="local"):
-    start_katarenga_game(screen, fonts, player1_name, player2_name, board,  mode="local")
+    start_katarenga_game(screen, fonts, player1_name, player2_name,  board,  mode="local")
