@@ -1,4 +1,5 @@
 import pygame
+import random
 import sys
 from ui.colors import WHITE, BLACK, BROWN, GREEN, HOVER_GREEN, BLUE, RED
 from ui.buttons import draw_button, click_sound
@@ -167,7 +168,8 @@ def get_legal_moves(board, all_pieces):
                 legal.append((x, y))
     return legal
 
-def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
+def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode="local"):
+    bot_player = 2 if mode == "bot" else None
     screen_width, screen_height = screen.get_width(), screen.get_height()
     game_state = GameState()
     game_state.board = draw_board(screen, fonts, selected_quadrants)
@@ -284,5 +286,34 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
                         else:
                             game_state.game_over = True
                             game_state.winner = next_player
+                        # Si c'est le tour du bot, il joue automatiquement
+                        if bot_player is not None and game_state.current_player == bot_player and not game_state.game_over:
+                            pygame.time.wait(500)  # Petite pause pour voir le mouvement du bot
+                            all_pieces = game_state.player1_pieces + game_state.player2_pieces
+                            legal = get_legal_moves(game_state.board, all_pieces)
+
+                            if bot_play(game_state, legal):
+                                next_player = 3 - game_state.current_player
+                                new_all_pieces = game_state.player1_pieces + game_state.player2_pieces
+                                if get_legal_moves(game_state.board, new_all_pieces):
+                                    game_state.current_player = next_player
+                                else:
+                                    game_state.game_over = True
+                                    game_state.winner = next_player
+
 
         pygame.display.flip()
+
+def bot_play(game_state, legal_moves):
+    if not legal_moves:
+        return False
+
+    move = random.choice(legal_moves)
+
+    if game_state.current_player == 2:
+        game_state.player2_pieces.append(move)
+    elif game_state.current_player == 1:
+        game_state.player1_pieces.append(move)
+
+    return True
+

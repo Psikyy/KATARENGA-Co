@@ -101,10 +101,10 @@ def player_names(screen, fonts, game_name, mode=None):
                         start_katarenga_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode=mode)
                     elif game_name == "Isolation":
                         selected_quadrants = configure_isolation_board(screen, fonts)
-                        start_isolation_game(screen, fonts, player1_name, player2_name, selected_quadrants)
+                        start_isolation_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode=mode)
                     elif game_name == "Congress":
                         selected_quadrants = configure_congress_board(screen, fonts)
-                        start_congress_game(screen, fonts, player1_name, player2_name, selected_quadrants)
+                        start_congress_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode=mode)
                     else:
                         print(f"[ERREUR] Mode inconnu : {game_name}")
                     return

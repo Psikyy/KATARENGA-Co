@@ -1,4 +1,5 @@
 import pygame
+import random
 import sys
 from ui.colors import WHITE, BROWN, BLUE, RED, GREEN, HOVER_GREEN, BLACK
 from ui.buttons import draw_button, click_sound
@@ -117,7 +118,8 @@ def show_rules(screen, fonts):
         pygame.display.flip()
 
 
-def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
+def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode="local"):
+    bot_player = 2 if mode == "bot" else None
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     game_state = GameState()
@@ -220,5 +222,43 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants):
                                 game_state.winner = game_state.current_player
                             else:
                                 game_state.current_player = 3 - game_state.current_player
+                            # Si c'est au bot de jouer, il joue automatiquement
+                            if bot_player is not None and game_state.current_player == bot_player and not game_state.game_over:
+                                pygame.time.wait(500)  # Petite pause pour voir l'action
+                                bot_play(game_state)
+
 
         pygame.display.flip()
+
+
+def bot_play(game_state):
+    # Liste tous les pions du bot avec des mouvements valides
+    pieces = game_state.player2_pieces if game_state.current_player == 2 else game_state.player1_pieces
+    opponent_pieces = game_state.player1_pieces if game_state.current_player == 2 else game_state.player2_pieces
+
+    movable_pieces = []
+
+    for piece in pieces:
+        moves = get_valid_moves_for_piece(piece, game_state.board, pieces + opponent_pieces)
+        if moves:
+            movable_pieces.append((piece, moves))
+
+    if not movable_pieces:
+        return False  # Aucun coup possible
+
+    # Choisir un pion et un mouvement au hasard
+    selected_piece, moves = random.choice(movable_pieces)
+    destination = random.choice(moves)
+
+    # Appliquer le mouvement
+    pieces.remove(selected_piece)
+    pieces.append(destination)
+
+    # Vérifier si le bot a gagné
+    if are_pieces_connected(pieces):
+        game_state.game_over = True
+        game_state.winner = game_state.current_player
+    else:
+        game_state.current_player = 3 - game_state.current_player
+
+    return True
