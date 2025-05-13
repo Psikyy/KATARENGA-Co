@@ -19,24 +19,57 @@ class GameState:
 def get_valid_moves_for_piece(pos, board, all_pieces):
     x, y = pos
     tile_type = board[y][x]
+    start_tile = tile_type  # couleur de départ
 
-    if tile_type == 'A':
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
-    elif tile_type == 'B':
+    if tile_type == 'A':  # Rouge : orthogonal, arrêt à première case rouge
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
+        max_steps = BOARD_SIZE
+    elif tile_type == 'B':  # Jaune : diagonal, arrêt à première case jaune
         directions = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
-    elif tile_type == 'C':
-        directions = [(1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
-    elif tile_type == 'D':
-        directions = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, -1), (-1, 1)]
+        max_steps = BOARD_SIZE
+    elif tile_type == 'C':  # Vert : cavalier
+        knight_moves = [
+            (1, 2), (2, 1), (2, -1), (1, -2),
+            (-1, -2), (-2, -1), (-2, 1), (-1, 2)
+        ]
+        return [
+            (x + dx, y + dy)
+            for dx, dy in knight_moves
+            if 0 <= x + dx < BOARD_SIZE and 0 <= y + dy < BOARD_SIZE
+            and (x + dx, y + dy) not in all_pieces
+        ]
+    elif tile_type == 'D':  # Bleu : roi, 1 seule case dans toutes les directions
+        directions = [(0, 1), (0, -1), (1, 0), (-1, 0),
+                      (1, 1), (1, -1), (-1, -1), (-1, 1)]
+        moves = []
+        for dx, dy in directions:
+            new_x = x + dx
+            new_y = y + dy
+            if (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE and
+                    (new_x, new_y) not in all_pieces):
+                moves.append((new_x, new_y))
+        return moves
     else:
-        directions = []
+        return []
 
+    # Pour les tuiles A et B (déplacements limités par couleur)
     moves = []
     for dx, dy in directions:
-        new_x, new_y = x + dx, y + dy
-        if 0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE:
-            if (new_x, new_y) not in all_pieces:
-                moves.append((new_x, new_y))
+        for step in range(1, max_steps):
+            new_x = x + dx * step
+            new_y = y + dy * step
+            if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
+                break
+
+            if (new_x, new_y) in all_pieces:
+                break  # bloqué par une pièce
+
+            current_tile = board[new_y][new_x]
+            moves.append((new_x, new_y))
+
+            # on s'arrête à la première case de même type
+            if current_tile == start_tile:
+                break
     return moves
 
 def are_pieces_connected(pieces):
