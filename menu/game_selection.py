@@ -1,9 +1,14 @@
+# menu/game_selection.py
+
 import pygame
 import sys
 from ui.colors import WHITE, BLACK, BLUE, HOVER_BLUE, GREEN, HOVER_GREEN
 from ui.buttons import draw_button, click_sound
 from ui.animations import loading_screen
-from menu.player_names import player_names
+
+from menu.katarenga_mode_slection import katarenga_mode_selection
+from menu.congress_mode_selection import congress_mode_selection
+from menu.isolation_mode_selection import isolation_mode_selection
 
 def game_selection(screen, fonts):
     screen_width = screen.get_width()
@@ -36,22 +41,22 @@ def game_selection(screen, fonts):
                 if katarenga_button.collidepoint(event.pos):
                     if click_sound:
                         click_sound.play()
-                    loading_screen(screen, fonts, "Chargement de Katarenga...")
-                    player_names(screen, fonts, "Katarenga")
+                    loading_screen(screen, fonts, "Sélection du mode Katarenga...")
+                    katarenga_mode_selection(screen, fonts)
                     return
                     
                 if congress_button.collidepoint(event.pos):
                     if click_sound:
                         click_sound.play()
-                    loading_screen(screen, fonts, "Chargement de Congress...")
-                    player_names(screen, fonts, "Congress")
+                    loading_screen(screen, fonts, "Sélection du mode Congress...")
+                    congress_mode_selection(screen, fonts)
                     return
                     
                 if isolation_button.collidepoint(event.pos):
                     if click_sound:
                         click_sound.play()
-                    loading_screen(screen, fonts, "Chargement d'Isolation...")
-                    player_names(screen, fonts, "Isolation")
+                    loading_screen(screen, fonts, "Sélection du mode Isolation...")
+                    isolation_mode_selection(screen, fonts)
                     return
                     
                 if back_button.collidepoint(event.pos):
