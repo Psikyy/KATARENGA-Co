@@ -565,5 +565,5 @@ def bot_play(game_state):
         
 
 # Pour la compatibilité avec l'ancienne version
-def start_game(screen, fonts, player1_name, player2_name, board,  mode="local"):
-    start_katarenga_game(screen, fonts, player1_name, player2_name,  board,  mode="local")
+def start_game(screen, fonts, player1_name, player2_name, board, mode="local"):
+    start_katarenga_game(screen, fonts, player1_name, player2_name, board, mode=mode)

@@ -1,5 +1,3 @@
-# menu/game_selection.py
-
 import pygame
 import sys
 from ui.colors import WHITE, BLACK, BLUE, HOVER_BLUE, GREEN, HOVER_GREEN
