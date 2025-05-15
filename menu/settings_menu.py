@@ -3,7 +3,8 @@ import sys
 from ui.colors import WHITE, BLACK, BLUE, RED
 from ui.buttons import draw_button
 from ui.animations import loading_screen
-from settings import translations, settings, save_settings, t, current_language
+from menu.settings import translations, settings, save_settings, t, current_language, set_language
+
 
 def settings_menu(screen, fonts):
     screen_width = screen.get_width()
@@ -41,9 +42,9 @@ def settings_menu(screen, fonts):
                 # Changer de langue
                 if next_language_button.collidepoint(event.pos):
                     language_index = (language_index + 1) % len(language_options)
-                    current_language = language_options[language_index]
-                    settings["language"] = current_language
-                    save_settings(settings)
+                    new_lang = language_options[language_index]
+                    set_language(new_lang)
+                    current_language = new_lang
 
                 # Retour
                 if back_button.collidepoint(event.pos):

@@ -5,6 +5,7 @@ from ui.buttons import draw_button, click_sound
 from ui.fonts import init_fonts
 from menu.settings_menu import settings_menu
 from menu.game_selection import game_selection
+from menu.settings import t
 
 
 def main_menu(screen):
@@ -46,9 +47,9 @@ def main_menu(screen):
         # screen.blit(title_surface, (screen_width // 2 - title_surface.get_width() // 2, 50))
 
         # Boutons
-        start_button = draw_button(screen, fonts, "Lancer le jeu", screen_width // 2 - 150, 250, 300, 60, GREEN, HOVER_GREEN)
-        settings_button = draw_button(screen, fonts, "Paramètres", screen_width // 2 - 150, 350, 300, 60, BLUE, HOVER_BLUE)
-        quit_button = draw_button(screen, fonts, "Quitter", screen_width // 2 - 150, 450, 300, 60, RED, HOVER_RED)
+        start_button = draw_button(screen, fonts, t("start_game"), screen_width // 2 - 150, 250, 300, 60, GREEN, HOVER_GREEN)
+        settings_button = draw_button(screen, fonts, t("settings"), screen_width // 2 - 150, 350, 300, 60, BLUE, HOVER_BLUE)
+        quit_button = draw_button(screen, fonts, t("quit"), screen_width // 2 - 150, 450, 300, 60, RED, HOVER_RED)
 
         # Gérer les événements
         for event in pygame.event.get():
