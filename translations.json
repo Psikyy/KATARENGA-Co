@@ -1,45 +1,18 @@
 {
-    "Français": {
-      "title": "Katarenga",
-      "settings": "Paramètres",
-      "play_game": "Lancer le jeu",
-      "quit": "Quitter",
-      "volume": "Volume",
-      "language": "Langue",
-      "fullscreen": "Plein écran",
-      "choose_game": "Choisissez un jeu",
-      "player1": "Joueur 1",
-      "player2": "Joueur 2",
-      "enter_names": "Entrez les noms des joueurs sans espaces ni caractères spéciaux.",
-      "back": "Retour"
-    },
-    "English": {
-      "title": "Katarenga",
-      "settings": "Settings",
-      "play_game": "Play Game",
-      "quit": "Quit",
-      "volume": "Volume",
-      "language": "Language",
-      "fullscreen": "Fullscreen",
-      "choose_game": "Choose a game",
-      "player1": "Player 1",
-      "player2": "Player 2",
-      "enter_names": "Enter player names without spaces or special characters.",
-      "back": "Back"
-    },
-    "Español": {
-      "title": "Katarenga",
-      "settings": "Configuración",
-      "play_game": "Jugar",
-      "quit": "Salir",
-      "volume": "Volumen",
-      "language": "Idioma",
-      "fullscreen": "Pantalla completa",
-      "choose_game": "Elige un juego",
-      "player1": "Jugador 1",
-      "player2": "Jugador 2",
-      "enter_names": "Ingrese los nombres de los jugadores sin espacios ni caracteres especiales.",
-      "back": "Atrás"
-    }
+  "Français": {
+    "start_game": "Lancer le jeu",
+    "settings": "Paramètres",
+    "quit": "Quitter",
+    "language": "Langue",
+    "back": "Retour",
+    "validate": "Valider"
+  },
+  "English": {
+    "start_game": "Start Game",
+    "settings": "Settings",
+    "quit": "Quit",
+    "language": "Language",
+    "back": "Back",
+    "validate": "Validate"
   }
-  
+}
