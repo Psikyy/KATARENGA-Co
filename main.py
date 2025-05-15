@@ -19,7 +19,7 @@ def main():
     pygame.display.set_caption("Katarenga")
     
     try:
-        pygame.mixer.music.load("assets/musique/adventure.mp3")
+        pygame.mixer.music.load("musique/adventure.mp3")
         pygame.mixer.music.set_volume(settings["volume"])
         pygame.mixer.music.play(-1)  
     except pygame.error:
