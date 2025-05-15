@@ -9,7 +9,7 @@ def draw_centered_text(screen, font, text, y, color=BLACK):
     screen.blit(text_surface, (screen_width // 2 - text_surface.get_width() // 2, y))
 
 # Fonction pour afficher le tour du joueur
-def display_player_turn(screen, fonts, player_name, player_color):
+def display_player_turn(screen, fonts, player_name):
     turn_text = fonts['button'].render(f"Tour de {player_name}", True, player_color)
     screen_width = screen.get_width()
     screen.blit(turn_text, (screen_width // 2 - turn_text.get_width() // 2, 100))

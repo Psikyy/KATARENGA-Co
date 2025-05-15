@@ -188,15 +188,12 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
         title_text = fonts['title'].render("Katarenga - Variante Pose", True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
 
-        player1_text = fonts['small'].render(f"{player1_name} (Rouge)", True, WHITE)
-        player2_text = fonts['small'].render(f"{player2_name} (Bleu)", True, BROWN)
-        screen.blit(player1_text, (50, 100))
-        screen.blit(player2_text, (screen_width - 50 - player2_text.get_width(), 100))
+
 
         current_player_text = fonts['button'].render(
             f"Tour de {player1_name}" if game_state.current_player == 1 else f"Tour de {player2_name}",
             True,
-            WHITE if game_state.current_player == 1 else BROWN
+            BLACK if game_state.current_player == 1 else BLACK
         )
         screen.blit(current_player_text, (screen_width // 2 - current_player_text.get_width() // 2, 100))
         screen.blit(help_text, (screen_width // 2 - help_text.get_width() // 2, 140))
