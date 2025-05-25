@@ -5,7 +5,28 @@
     "quit": "Quitter",
     "language": "Langue",
     "back": "Retour",
-    "validate": "Valider"
+    "validate": "Valider",
+    "rules": "Règles",
+    "rule_katarenga": [
+      "Katarenga est un jeu de stratégie pour deux joueurs.",
+      "Chaque joueur contrôle 8 pions qui se déplacent selon la case où ils se trouvent:",
+      "",
+      "Case A (Gris clair): Mouvements orthogonaux (comme une tour aux échecs)",
+      "Case B (Marron): Mouvements diagonaux (comme un fou aux échecs)",
+      "Case C (Vert): Mouvements en L (comme un cavalier aux échecs)",
+      "Case D (Bleu acier): Mouvements dans toutes directions (comme une dame aux échecs)",
+      "",
+      "But du jeu: Occuper les deux camps adverses ou empêcher l'adversaire de jouer",
+      "en capturant suffisamment de ses pions.",
+      "",
+      "Pour occuper un camp adverse :",
+      "1. Amener d'abord un pion sur la ligne de base adverse",
+      "2. Puis déplacer ce pion dans un camp adverse (déplacement spécial)",
+      "3. Une fois dans un camp, le pion y reste jusqu'à la fin de la partie",
+      "",
+      "Les captures sont autorisées sauf lors du premier tour de jeu.",
+      "La capture se fait en déplaçant un de ses pions sur une case occupée par un pion adverse."
+    ]
   },
   "English": {
     "start_game": "Start Game",
@@ -13,6 +34,27 @@
     "quit": "Quit",
     "language": "Language",
     "back": "Back",
-    "validate": "Validate"
+    "validate": "Validate",
+    "rules": "Rules",
+    "rule_katarenga": [
+      "Katarenga is a strategy game for two players.",
+      "Each player controls 8 pieces that move depending on the square they are on:",
+      "",
+      "Square A (Light gray): Orthogonal moves (like a rook in chess)",
+      "Square B (Brown): Diagonal moves (like a bishop in chess)",
+      "Square C (Green): L-shaped moves (like a knight in chess)",
+      "Square D (Steel blue): Moves in all directions (like a queen in chess)",
+      "",
+      "Objective: Occupy both enemy camps or prevent the opponent from playing",
+      "by capturing enough of their pieces.",
+      "",
+      "To occupy an opponent's camp:",
+      "1. First move a piece to the opponent’s back row",
+      "2. Then move this piece into an enemy camp (special move)",
+      "3. Once in a camp, the piece stays there until the end of the game",
+      "",
+      "Captures are allowed except during the first turn of the game.",
+      "A capture is made by moving a piece onto a square occupied by an opponent's piece."
+    ]
   }
 }
