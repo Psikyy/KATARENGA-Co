@@ -4,6 +4,7 @@ import sys
 from ui.colors import WHITE, BROWN, BLUE, RED, GREEN, HOVER_GREEN, BLACK
 from ui.buttons import draw_button, click_sound
 from games.congress.board import BOARD_SIZE, TILE_SIZE, draw_board
+from menu.settings import t
 
 class GameState:
     def __init__(self):
@@ -200,7 +201,7 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
 
         back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, RED)
 
-        rules_button = draw_button(screen, fonts, "Règles", screen_width - 110, screen_height - 60, 100, 40, GREEN, HOVER_GREEN)
+        rules_button = draw_button(screen, fonts, t("rules"), screen_width - 110, screen_height - 60 , 100, 40, GREEN, HOVER_GREEN)
 
         if game_state.game_over:
             winner_name = player1_name if game_state.winner == 1 else player2_name
