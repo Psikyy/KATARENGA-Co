@@ -9,10 +9,9 @@ BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 HOVER_GREEN = (0, 200, 0)
 RED = (255, 0, 0)
-
 BOARD_SIZE = 8
 TILE_SIZE = 55
-TILE_KEYS = ['A', 'B', 'C', 'D']
+TILE_KEYS = ['A', 'B', 'C', 'D']  
 
 TILE_IMAGES = {
     'A': pygame.image.load(os.path.join("design_case", "rouge_sans_blanc.png")),
@@ -34,7 +33,6 @@ def validate_board(board):
     Returns:
         bool: True if board is valid, False otherwise
     """
-
     quadrants = split_board_into_quadrants(board)
     for quadrant in quadrants:
         if not is_valid_quadrant(quadrant):
