@@ -17,6 +17,9 @@ class GameState:
         self.winner = None
 
 def get_attack_directions(tile_type):
+    """Retourne les directions d'attaque pour chaque type de tuile.
+    Args:
+        tile_type (str): Le type de tuile ('A', 'B', 'C', 'D')."""
     if tile_type == 'A':
         return [(0, 1), (1, 0), (0, -1), (-1, 0)]
     elif tile_type == 'B':
@@ -28,6 +31,15 @@ def get_attack_directions(tile_type):
     return []
 
 def is_under_threat(x, y, board, all_pieces):
+    """Vérifie si la position (x, y) est menacée par un pion sur le plateau.
+    Args:
+        x (int): La coordonnée x de la position à vérifier.
+        y (int): La coordonnée y de la position à vérifier.
+        board (list): Le plateau de jeu, une liste de listes représentant les tuiles.
+        all_pieces (list): La liste de toutes les positions occupées par des pions.
+    Returns:
+        bool: True si la position est menacée, False sinon.
+    """
     for px, py in all_pieces:
         tile_type = board[py][px]
 
@@ -105,6 +117,11 @@ def is_under_threat(x, y, board, all_pieces):
     return False
 
 def show_rules(screen, fonts):
+    """Affiche les règles du jeu dans une fenêtre Pygame.
+    Args:
+        screen (pygame.Surface): L'écran Pygame sur lequel dessiner les règles.
+        fonts (dict): Dictionnaire contenant les polices de caractères utilisées.
+    """
     screen_width = screen.get_width()
     screen_height = screen.get_height()
 
@@ -162,6 +179,13 @@ def show_rules(screen, fonts):
 
 
 def get_legal_moves(board, all_pieces):
+    """Retourne une liste de positions légales où un joueur peut placer un pion.
+    Args:
+        board (list): Le plateau de jeu, une liste de listes représentant les tuiles.
+        all_pieces (list): La liste de toutes les positions occupées par des pions.
+    Returns:
+        list: Une liste de tuples représentant les positions légales (x, y).
+    """
     legal = []
     for x in range(BOARD_SIZE):
         for y in range(BOARD_SIZE):
@@ -170,6 +194,15 @@ def get_legal_moves(board, all_pieces):
     return legal
 
 def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode="local"):
+    """Démarre une partie de Katarenga.
+    Args:
+        screen (pygame.Surface): L'écran Pygame sur lequel dessiner le jeu.
+        fonts (dict): Dictionnaire contenant les polices de caractères utilisées.
+        player1_name (str): Nom du joueur 1.
+        player2_name (str): Nom du joueur 2.
+        selected_quadrants (list): Liste des quadrants sélectionnés pour le jeu.
+        mode (str): Mode de jeu ('local', 'bot').
+    """
     bot_player = 2 if mode == "bot" else None
     screen_width, screen_height = screen.get_width(), screen.get_height()
     game_state = GameState()
@@ -300,6 +333,13 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
         pygame.display.flip()
 
 def bot_play(game_state, legal_moves):
+    """Fait jouer le bot en choisissant un coup aléatoire parmi les coups légaux.
+    Args:
+        game_state (GameState): L'état actuel du jeu.
+        legal_moves (list): Liste des coups légaux disponibles pour le bot.
+    Returns:
+        bool: True si le bot a joué un coup, False sinon.
+    """
     if not legal_moves:
         return False
 

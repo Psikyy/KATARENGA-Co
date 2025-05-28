@@ -235,6 +235,15 @@ def show_rules(screen, fonts):
 
 
 def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
+    '''Démarre une partie de Katarenga
+    args:
+        screen: l'écran Pygame sur lequel dessiner
+        fonts: un dictionnaire de polices de caractères
+        player1_name: le nom du joueur 1
+        player2_name: le nom du joueur 2
+        board: la configuration initiale du plateau de jeu
+        mode: le mode de jeu (local, bot, etc.)
+    '''
     bot_player = 2 if mode == "bot" else None
     screen_width = screen.get_width()
     screen_height = screen.get_height()
@@ -465,6 +474,10 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
 
 
 def bot_play(game_state):
+    '''Fonction pour jouer un coup pour le bot
+    args:
+        game_state: l'état actuel du jeu
+    '''
     valid_moves = game_state.valid_moves
 
     if not valid_moves:

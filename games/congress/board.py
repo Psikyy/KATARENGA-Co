@@ -306,6 +306,14 @@ def configure_board(screen, fonts):
         pygame.display.flip()
 
 def edit_board(screen, fonts, board):
+    '''foncrtion pour éditer le plateau de jeu
+    args:
+        screen: l'écran Pygame sur lequel dessiner
+        fonts: un dictionnaire de polices de caractères
+        board: le plateau de jeu à éditer (8x8)
+        Returns:
+        List[List[str]]: The edited board
+        '''
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     working_board = [row.copy() for row in board]
