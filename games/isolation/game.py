@@ -129,27 +129,10 @@ def show_rules(screen, fonts):
     while running:
         screen.fill(WHITE)
 
-        title_text = fonts['title'].render("Règles du jeu", True, BLACK)
+        title_text = fonts['title'].render(t("I's_rules"), True, BLACK)
         title_x = screen_width // 2 - title_text.get_width() // 2
         screen.blit(title_text, (title_x, 60))
-
-        rules = [
-            "Le plateau est initialement vide.",
-            "Le jeu se joue à deux joueurs.",
-            "",
-            "À tour de rôle, chaque joueur place un de ses pions sur une case vide du plateau.",
-            "Un pion ne peut être placé que s'il n'est pas en prise, c'est-à-dire :",
-            "  - Il ne doit pas pouvoir être capturé par un pion déjà présent sur le plateau",
-            "    (quelle que soit sa couleur), selon les règles de capture définies pour le jeu.",
-            "",
-            "Il n'y a aucun déplacement ni capture pendant la partie :",
-            "  - Les pions restent sur la case où ils ont été posés.",
-            "",
-            "Le jeu continue tant que les joueurs peuvent poser des pions selon la règle ci-dessus.",
-            "",
-            "Le vainqueur est le dernier joueur à avoir pu poser un pion."
-        ]
-
+        rules = t("I's_Rules")
         line_spacing = 28
         total_height = len(rules) * line_spacing
         start_y = max(130, (screen_height - total_height) // 2)
@@ -163,7 +146,7 @@ def show_rules(screen, fonts):
             y = start_y + i * line_spacing
             screen.blit(rendered_text, (x, y))
 
-        back_button = draw_button(screen, fonts, "Retour", screen_width // 2 - 50, screen_height - 70, 100, 40, BLUE, RED)
+        back_button = draw_button(screen, fonts, t("back"), screen_width // 2 - 50, screen_height - 70, 100, 40, BLUE, RED)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -213,19 +196,19 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
     board_x = (screen_width - board_width) // 2
     board_y = (screen_height - board_height) // 2
 
-    help_text = fonts['small'].render("Posez un pion sur une case non menacée", True, BLACK)
+    help_text = fonts['small'].render(t("I's_help"), True, BLACK)
     running = True
 
     while running:
         screen.fill(WHITE)
 
-        title_text = fonts['title'].render("Katarenga - Variante Pose", True, BLACK)
+        title_text = fonts['title'].render(t("isolation"), True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
 
 
 
         current_player_text = fonts['button'].render(
-            f"Tour de {player1_name}" if game_state.current_player == 1 else f"Tour de {player2_name}",
+            t("turn") + player1_name if game_state.current_player == 1 else t("turn") + player2_name,
             True,
             BLACK if game_state.current_player == 1 else BLACK
         )
@@ -248,18 +231,18 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
             pygame.draw.circle(preview_circle, color, (TILE_SIZE//2, TILE_SIZE//2), TILE_SIZE//4)
             screen.blit(preview_circle, (board_x + lx*TILE_SIZE, board_y + ly*TILE_SIZE))
 
-        back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BROWN, WHITE)
+        back_button = draw_button(screen, fonts, t("back"), 10, screen_height - 60, 100, 40, BROWN, WHITE)
 
         rules_button = draw_button(screen, fonts, t("rules"), screen_width - 110, screen_height - 60 , 100, 40, GREEN, HOVER_GREEN)
 
         if game_state.game_over:
             winner_name = player1_name if game_state.winner == 1 else player2_name
-            winner_text = fonts['title'].render(f"{winner_name} a gagné !", True, BLACK)
+            winner_text = fonts['title'].render(winner_name + t("win"), True, BLACK)
             overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
             overlay.fill((255, 255, 255, 200))
             screen.blit(overlay, (0, 0))
             screen.blit(winner_text, (screen_width // 2 - winner_text.get_width() // 2, screen_height // 2 - 50))
-            new_game_button = draw_button(screen, fonts, "Nouvelle Partie", screen_width // 2 - 100, screen_height // 2 + 50, 200, 50, GREEN, HOVER_GREEN)
+            new_game_button = draw_button(screen, fonts, t("new_game"), screen_width // 2 - 100, screen_height // 2 + 50, 200, 50, GREEN, HOVER_GREEN)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

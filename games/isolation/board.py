@@ -3,6 +3,7 @@ import random
 import sys
 import os
 from random import choice
+from menu.settings import t
 
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
@@ -233,9 +234,19 @@ def configure_board(screen, fonts):
 
     while running:
         screen.fill(WHITE)
+<<<<<<< Updated upstream
         title_text = fonts['title'].render("Configuration du plateau", True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
         instruction_text = fonts['small'].render("Cliquez sur un quadrant pour le faire pivoter", True, BLACK)
+=======
+
+        # Render title
+        title_text = fonts['title'].render(t("board_edit"), True, BLACK)
+        screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
+
+        # Render instructions
+        instruction_text = fonts['small'].render(t("help_text"), True, BLACK)
+>>>>>>> Stashed changes
         screen.blit(instruction_text, (screen_width // 2 - instruction_text.get_width() // 2, 90))
         board_y = 170
         board_x = screen_width // 2 - quadrant_size
@@ -268,8 +279,8 @@ def configure_board(screen, fonts):
         pygame.draw.rect(screen, GREEN, edit_button)
 
         # Button text
-        valid_text = fonts['small'].render("Valider", True, BLACK)
-        edit_text = fonts['small'].render("Éditer", True, BLACK)
+        valid_text = fonts['small'].render(t("validate"), True, BLACK)
+        edit_text = fonts['small'].render(t("edit"), True, BLACK)
         
         screen.blit(valid_text, (valid_button.x + (valid_button.width - valid_text.get_width()) // 2, 
                                   valid_button.y + (valid_button.height - valid_text.get_height()) // 2))
@@ -321,7 +332,13 @@ def edit_board(screen, fonts, board):
     running = True
     while running:
         screen.fill(WHITE)
+<<<<<<< Updated upstream
         title_text = fonts['title'].render("Édition du plateau", True, BLACK)
+=======
+
+        # Title
+        title_text = fonts['title'].render(t("board_edit"), True, BLACK)
+>>>>>>> Stashed changes
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
         board_x = screen_width // 2 - (8 * TILE_SIZE) // 2
         board_y = 100
@@ -343,7 +360,7 @@ def edit_board(screen, fonts, board):
         ), 3)
         confirm_button = pygame.Rect(screen_width // 2 - 100, screen_height - 80, 200, 50)
         pygame.draw.rect(screen, GREEN, confirm_button)
-        confirm_text = fonts['small'].render("Confirmer", True, BLACK)
+        confirm_text = fonts['small'].render(t("confirm"), True, BLACK)
         screen.blit(confirm_text, (
             confirm_button.x + (confirm_button.width - confirm_text.get_width()) // 2,
             confirm_button.y + (confirm_button.height - confirm_text.get_height()) // 2

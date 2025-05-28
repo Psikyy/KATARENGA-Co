@@ -116,32 +116,10 @@ def show_rules(screen, fonts):
     while running:
         screen.fill(WHITE)
 
-        title_text = fonts['title'].render("Règles du Katarenga", True, BLACK)
+        title_text = fonts['title'].render(t("C's_rules"), True, BLACK)
         title_x = screen_width // 2 - title_text.get_width() // 2
         screen.blit(title_text, (title_x, 50))
-
-        rules = [
-            "Congress est un jeu de stratégie pour deux joueurs.",
-            "Chaque joueur contrôle 8 pions qui se déplacent selon la case où ils se trouvent :",
-            "",
-            "Case Rouge : Mouvements orthogonaux (comme une tour aux échecs)",
-            "Case Jaune : Mouvements diagonaux (comme un fou aux échecs)",
-            "Case Vert : Mouvements en L (comme un cavalier aux échecs)",
-            "Case Bleu : Mouvements dans toutes directions (comme une dame aux échecs)",
-            "",
-            "À tour de rôle, chaque joueur déplace l'un de ses pions selon les règles de déplacement ci-dessus.",
-            "Les captures sont interdites.",
-            "",
-            "Le but du jeu est de réunir ses 8 pions sous la forme d'un bloc connecté.",
-            "Un bloc connecté est un ensemble de pions du même joueur,",
-            "où chaque pion est adjacent orthogonalement (haut, bas, gauche ou droite)",
-            "à au moins un autre pion du même joueur.",
-            "",
-            "Le premier joueur à réussir cette formation gagne la partie.",
-            "Si aucun joueur ne peut plus bouger et qu'aucun bloc connecté ne peut être formé,",
-            "la partie est nulle.",
-        ]
-
+        rules = t("C's_Rules")
         line_spacing = 30
         total_height = len(rules) * line_spacing
         start_y = (screen_height - total_height) // 2
@@ -152,7 +130,7 @@ def show_rules(screen, fonts):
             y = start_y + i * line_spacing
             screen.blit(text_surface, (x, y))
 
-        back_button = draw_button(screen, fonts, "Retour", screen_width // 2 - 50, screen_height - 80, 100, 40, BLUE, RED)
+        back_button = draw_button(screen, fonts, t("back"), screen_width // 2 - 50, screen_height - 80, 100, 40, BLUE, RED)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -189,23 +167,23 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
     board_y = (screen_height - board_height) // 2
 
     game_state.player1_pieces, game_state.player2_pieces = setup_initial_pieces()
-    help_text = fonts['small'].render("Formez un bloc connecté avec vos pièces !", True, BLACK)
+    help_text = fonts['small'].render(t("C's_help"), True, BLACK)
 
     running = True
     while running:
         screen.fill(WHITE)
 
-        title_text = fonts['title'].render("Congress", True, BLACK)
+        title_text = fonts['title'].render(t("congress"), True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
 
-        player1_text = fonts['small'].render(f"{player1_name} (Blanc)", True, BLACK)
-        player2_text = fonts['small'].render(f"{player2_name} (marron)", True, BLACK)
+        player1_text = fonts['small'].render(player1_name + t("white"), True, BLACK)
+        player2_text = fonts['small'].render(player2_name + t("brown"), True, BLACK)
         screen.blit(player1_text, (50, 100))
         screen.blit(player2_text, (screen_width - 50 - player2_text.get_width(), 100))
 
         current_color = BROWN if game_state.current_player == 2 else BLACK
         current_player_text = fonts['button'].render(
-            f"Tour de {player1_name}" if game_state.current_player == 1 else f"Tour de {player2_name}",
+            t("turn") + player1_name if game_state.current_player == 1 else t("turn") + player2_name,
             True, current_color)
         screen.blit(current_player_text, (screen_width // 2 - current_player_text.get_width() // 2, 100))
 
@@ -223,18 +201,18 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
         for move_x, move_y in game_state.valid_moves:
             pygame.draw.circle(screen, GREEN, (board_x + move_x * TILE_SIZE + TILE_SIZE // 2, board_y + move_y * TILE_SIZE + TILE_SIZE // 2), piece_radius // 2, 2)
 
-        back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, RED)
+        back_button = draw_button(screen, fonts, t("back"), 10, screen_height - 60, 100, 40, BLUE, RED)
 
         rules_button = draw_button(screen, fonts, t("rules"), screen_width - 110, screen_height - 60 , 100, 40, GREEN, HOVER_GREEN)
 
         if game_state.game_over:
             winner_name = player1_name if game_state.winner == 1 else player2_name
-            winner_text = fonts['title'].render(f"{winner_name} a gagné !", True, BROWN)
+            winner_text = fonts['title'].render(winner_name + t("win"), True, BROWN)
             overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
             overlay.fill((255, 255, 255, 200))
             screen.blit(overlay, (0, 0))
             screen.blit(winner_text, (screen_width // 2 - winner_text.get_width() // 2, screen_height // 2 - 50))
-            new_game_button = draw_button(screen, fonts, "Nouvelle Partie", screen_width // 2 - 100, screen_height // 2 + 50, 200, 50, GREEN, HOVER_GREEN)
+            new_game_button = draw_button(screen, fonts, t("new_game"), screen_width // 2 - 100, screen_height // 2 + 50, 200, 50, GREEN, HOVER_GREEN)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

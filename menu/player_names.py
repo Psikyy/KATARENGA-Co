@@ -4,6 +4,8 @@ from ui.colors import WHITE, BLACK, GREEN, GRAY, BLUE, RED, HOVER_GREEN
 from ui.buttons import draw_button, click_sound
 from ui.animations import loading_screen
 
+from menu.settings import t
+
 from games.katarenga.board import configure_board as configure_katarenga_board
 from games.isolation.board import configure_board as configure_isolation_board
 from games.congress.board import configure_board as configure_congress_board
@@ -40,7 +42,7 @@ def player_names(screen, fonts, game_name, mode=None):
         spacing_after_title = 20  
 
         instruction_text = fonts['small'].render(
-            "Entrez les noms des joueurs sans espaces ni caractères spéciaux.",
+            t("enter_names"),
             True, BLACK)
         instruction_x = screen_width // 2 - instruction_text.get_width() // 2
         instruction_y = title_y + title_text.get_height() + spacing_after_title
@@ -51,8 +53,8 @@ def player_names(screen, fonts, game_name, mode=None):
         pygame.draw.rect(screen, GREEN if input_active1 else GRAY, input_rect1, 2)
         pygame.draw.rect(screen, GREEN if input_active2 else GRAY, input_rect2, 2)
 
-        player1_label = fonts['small'].render("Joueur 1 (Rouge):", True, RED)
-        player2_label = fonts['small'].render("Joueur 2 (Bleu):", True, BLUE)
+        player1_label = fonts['small'].render(t("enter_player1"), True, RED)
+        player2_label = fonts['small'].render(t("enter_player2"), True, BLUE)
 
         vertical_spacing = 10
 
@@ -60,13 +62,19 @@ def player_names(screen, fonts, game_name, mode=None):
         screen.blit(player2_label, (input_rect2.x, input_rect2.y - player2_label.get_height() - vertical_spacing))
 
 
-        player1_display = fonts['button'].render(player1_name if player1_name else "Joueur 1", True, BLACK)
-        player2_display = fonts['button'].render(player2_name if player2_name else "Joueur 2", True, BLACK)
+        player1_display = fonts['button'].render(player1_name if player1_name else t("default_player1"), True, BLACK)
+        player2_display = fonts['button'].render(player2_name if player2_name else t("default_player2"), True, BLACK)
         screen.blit(player1_display, (input_rect1.x + 10, input_rect1.y + 15))
         screen.blit(player2_display, (input_rect2.x + 10, input_rect2.y + 15))
 
+<<<<<<< Updated upstream
         validate_button = draw_button(screen, fonts, "Valider", screen_width // 2 - 50, 400, 100, 50, GREEN, HOVER_GREEN)
         back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, RED)
+=======
+        # Boutons
+        validate_button = draw_button(screen, fonts, t("validate"), screen_width // 2 - 50, 400, 100, 50, GREEN, HOVER_GREEN)
+        back_button = draw_button(screen, fonts, t("back"), 10, screen_height - 60, 100, 40, BLUE, RED)
+>>>>>>> Stashed changes
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -88,16 +96,16 @@ def player_names(screen, fonts, game_name, mode=None):
                         click_sound.play()
 
                     if not player1_name:
-                        player1_name = "Joueur 1"
+                        player1_name = t("default_player1")
                     if not player2_name:
-                        player2_name = "Joueur 2"
+                        player2_name = t("default_player2")
                     if player1_name == player2_name:
                         player1_name += "(1)"
                         player2_name += "(2)"
 
-                    print(f"Jeu sélectionné : {game_name}")
-                    print(f"Joueur 1 : {player1_name}")
-                    print(f"Joueur 2 : {player2_name}")
+                    print(t("game_selected") + game_name)
+                    print(t("default_player1") + player1_name)
+                    print(t("default_player2") + player2_name)
 
                     if game_name == "Katarenga":
                         selected_quadrants = configure_katarenga_board(screen, fonts)
@@ -115,7 +123,7 @@ def player_names(screen, fonts, game_name, mode=None):
                 if back_button.collidepoint(event.pos):
                     if click_sound:
                         click_sound.play()
-                    loading_screen(screen, fonts, "Retour...")
+                    loading_screen(screen, fonts, t("back_loading"))
                     return
 
             if event.type == pygame.KEYDOWN:
@@ -132,16 +140,16 @@ def player_names(screen, fonts, game_name, mode=None):
                         player2_name = player2_name[:-1]
                     elif event.key == pygame.K_RETURN:
                         if not player1_name:
-                            player1_name = "Joueur 1"
+                            player1_name = t("default_player1")
                         if not player2_name:
-                            player2_name = "Joueur 2"
+                            player2_name = t("default_player2")
                         if player1_name == player2_name:
                             player1_name += "(1)"
                             player2_name += "(2)"
 
-                        print(f"Jeu sélectionné : {game_name}")
-                        print(f"Joueur 1 : {player1_name}")
-                        print(f"Joueur 2 : {player2_name}")
+                        print(t("game_selected") + game_name)
+                        print(t("default_player1") + player1_name)
+                        print(t("default_player2") + player2_name)
 
                         if game_name == "Katarenga":
                             selected_quadrants = configure_katarenga_board(screen, fonts)

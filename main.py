@@ -29,6 +29,6 @@ def main():
     intro_animation(screen)
     
     main_menu(screen)
-
+    
 if __name__ == "__main__":
     main()

@@ -47,7 +47,7 @@ def settings_menu(screen, fonts):
                     current_language = new_lang
 
                 if back_button.collidepoint(event.pos):
-                    loading_screen(screen, fonts, t("back") + "...")
+                    loading_screen(screen, fonts, t("back_loading"))
                     return
 
         pygame.display.flip()

@@ -1,7 +1,7 @@
 import pygame
 import random
 import sys
-from ui.colors import WHITE, BLACK, BLUE, RED, GREEN, HOVER_GREEN
+from ui.colors import WHITE, BLACK, BLUE, RED, GREEN, HOVER_GREEN, GRAY
 from ui.buttons import draw_button, click_sound
 from games.katarenga.board import BOARD_SIZE, TILE_SIZE, draw_board
 from menu.settings import t
@@ -188,30 +188,9 @@ def show_rules(screen, fonts):
     while running:
         screen.fill(WHITE)
         
-        title_text = fonts['title'].render("Règles du Katarenga", True, BLACK)
+        title_text = fonts['title'].render(t("K's_rules"), True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 50))
-        
-        rules = [
-            "Katarenga est un jeu de stratégie pour deux joueurs.",
-            "Chaque joueur contrôle 8 pions qui se déplacent selon la case où ils se trouvent:",
-            "",
-            "Case A (Gris clair): Mouvements orthogonaux (comme une tour aux échecs)",
-            "Case B (Marron): Mouvements diagonaux (comme un fou aux échecs)",
-            "Case C (Vert): Mouvements en L (comme un cavalier aux échecs)",
-            "Case D (Bleu acier): Mouvements dans toutes directions (comme une dame aux échecs)",
-            "",
-            "But du jeu: Occuper les deux camps adverses ou empêcher l'adversaire de jouer",
-            "en capturant suffisamment de ses pions.",
-            "",
-            "Pour occuper un camp adverse :",
-            "1. Amener d'abord un pion sur la ligne de base adverse",
-            "2. Puis déplacer ce pion dans un camp adverse (déplacement spécial)",
-            "3. Une fois dans un camp, le pion y reste jusqu'à la fin de la partie",
-            "",
-            "Les captures sont autorisées sauf lors du premier tour de jeu.",
-            "La capture se fait en déplaçant un de ses pions sur une case occupée par un pion adverse.",
-        ]
-
+        rules = t("K's_Rules")
         total_height = len(rules) * 30
         start_y = max(150, (screen_height - total_height) // 2 - 50)
         
@@ -219,7 +198,7 @@ def show_rules(screen, fonts):
             rule_text = fonts['small'].render(rule, True, BLACK)
             screen.blit(rule_text, (screen_width // 2 - rule_text.get_width() // 2, start_y + i * 30))
         
-        back_button = draw_button(screen, fonts, "Retour", screen_width // 2 - 50, screen_height - 100, 100, 40, BLUE, RED)
+        back_button = draw_button(screen, fonts, t("back"), screen_width // 2 - 50, screen_height - 100, 100, 40, BLUE, RED)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -260,7 +239,7 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
     
     game_state.valid_moves = get_valid_moves(game_state, game_state.board)
     
-    help_text = fonts['small'].render("Cliquez sur un de vos pions puis sur une case valide pour le déplacer", True, BLACK)
+    help_text = fonts['small'].render(t("K's_help"), True, BLACK)
     
     running = True
    
@@ -272,10 +251,10 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
 
         
         current_player_name = player1_name if game_state.current_player == 1 else player2_name
-        current_player_color = BLACK if game_state.current_player == 1 else WHITE
+        current_player_color = BLACK if game_state.current_player == 1 else GRAY
         
         turn_indicator = fonts['button'].render(
-            f"Au tour de: {current_player_name}",
+            t("turn") + current_player_name,
             True,
             current_player_color
         )
@@ -342,14 +321,14 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
                     board_y + move_y * TILE_SIZE + TILE_SIZE // 2
                 ), piece_radius // 2, 2)
         
-        back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, RED)
+        back_button = draw_button(screen, fonts, t("back"), 10, screen_height - 60, 100, 40, BLUE, RED)
         
         rules_button = draw_button(screen, fonts, t("rules"), screen_width - 110, screen_height - 60 , 100, 40, GREEN, HOVER_GREEN)
 
         
         if game_state.game_over:
             winner_name = player1_name if game_state.winner == 1 else player2_name
-            winner_text = fonts['title'].render(f"{winner_name} a gagné !", True, BLACK)
+            winner_text = fonts['title'].render(f"{winner_name}" + t("win"), True, BLACK)
             
             overlay = pygame.Surface((screen_width, screen_height), pygame.SRCALPHA)
             overlay.fill((255, 255, 255, 200))
@@ -357,7 +336,7 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
             
             screen.blit(winner_text, (screen_width // 2 - winner_text.get_width() // 2, screen_height // 2 - 50))
             
-            new_game_button = draw_button(screen, fonts, "Nouvelle Partie", screen_width // 2 - 100, screen_height // 2 + 50, 200, 50, GREEN, HOVER_GREEN)
+            new_game_button = draw_button(screen, fonts, t("new_game"), screen_width // 2 - 100, screen_height // 2 + 50, 200, 50, GREEN, HOVER_GREEN)
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
