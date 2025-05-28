@@ -4,24 +4,24 @@ import sys
 import os
 from random import choice
 
-# Assuming these are imported from your UI modules
 WHITE = (255, 255, 255)
 BLACK = (0, 0, 0)
 GREEN = (0, 255, 0)
 HOVER_GREEN = (0, 200, 0)
 RED = (255, 0, 0)
 
-# Constants
+
 BOARD_SIZE = 8
 TILE_SIZE = 55
-TILE_KEYS = ['A', 'B', 'C', 'D']
+TILE_KEYS = ['A', 'B', 'C', 'D','E', 'F']  
 
-# Load tile images (adjust path as needed)
 TILE_IMAGES = {
     'A': pygame.image.load(os.path.join("design_case", "rouge_sans_blanc.png")),
     'B': pygame.image.load(os.path.join("design_case", "jaune_sans_blanc.png")),
     'C': pygame.image.load(os.path.join("design_case", "vert_sans_blanc.png")),
     'D': pygame.image.load(os.path.join("design_case", "bleu_sans_blanc.png")),
+    'E': pygame.image.load(os.path.join("design_case", "coin.png")),
+    'F': pygame.image.load(os.path.join("design_case", "contour.png")),
 }
 
 CONTOUR_IMAGE = pygame.image.load(os.path.join("design_case", "contour.png"))
@@ -37,10 +37,8 @@ def validate_board(board):
     Returns:
         bool: True if board is valid, False otherwise
     """
-    # Split board into quadrants
     quadrants = split_board_into_quadrants(board)
     
-    # Check each quadrant has exactly 4 tiles of each color
     for quadrant in quadrants:
         if not is_valid_quadrant(quadrant):
             return False
@@ -213,7 +211,7 @@ def draw_board(screen, fonts, board, draw_pieces=True):
             # Ensure the tile type exists in TILE_IMAGES
             if tile_type not in TILE_IMAGES:
                 print(f"Warning: Unknown tile type {tile_type}. Using default.")
-                tile_type = 'A'  # Default fallback
+                tile_type = 'F'  # Default fallback
             
             tile_image = pygame.transform.scale(TILE_IMAGES[tile_type], (TILE_SIZE, TILE_SIZE))
             screen.blit(tile_image, tile_rect.topleft)
