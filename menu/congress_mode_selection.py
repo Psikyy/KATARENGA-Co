@@ -23,6 +23,7 @@ def congress_mode_selection(screen, fonts):
         screen.fill(WHITE)
         
 <<<<<<< Updated upstream
+<<<<<<< Updated upstream
         title_text = fonts['title'].render("Mode de jeu - Congress", True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 50))
         
@@ -42,6 +43,17 @@ def congress_mode_selection(screen, fonts):
         online_button = draw_button(screen, fonts, t("mode_online"), screen_width // 2 - 150, 250, 300, 60, GREY, GREY, disabled=True)
         bot_button = draw_button(screen, fonts, t("mode_bot"), screen_width // 2 - 150, 350, 300, 60, GREEN, HOVER_GREEN)
 
+=======
+        # Titre
+        title_text = fonts['title'].render(t("game_mode") + "Congress", True, BLACK)
+        screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 50))
+        
+        # Boutons des modes de jeu
+        local_button = draw_button(screen, fonts, t("mode_local"), screen_width // 2 - 150, 150, 300, 60, GREEN, HOVER_GREEN)
+        online_button = draw_button(screen, fonts, t("mode_online"), screen_width // 2 - 150, 250, 300, 60, GREY, GREY, disabled=True)
+        bot_button = draw_button(screen, fonts, t("mode_bot"), screen_width // 2 - 150, 350, 300, 60, GREEN, HOVER_GREEN)
+
+>>>>>>> Stashed changes
         # Bouton Retour
         back_button = draw_button(screen, fonts, t("back"), 10, screen_height - 60, 100, 40, BLUE, HOVER_BLUE)
         

@@ -244,6 +244,9 @@ def configure_board(screen, fonts):
 
         # Render instructions
         instruction_text = fonts['small'].render(t("help_text"), True, BLACK)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         screen.blit(instruction_text, (screen_width // 2 - instruction_text.get_width() // 2, 90))
         board_y = 170
@@ -329,6 +332,9 @@ def edit_board(screen, fonts, board):
 
         # Title
         title_text = fonts['title'].render(t("board_edit"), True, BLACK)
+<<<<<<< Updated upstream
+>>>>>>> Stashed changes
+=======
 >>>>>>> Stashed changes
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
         board_x = screen_width // 2 - (8 * TILE_SIZE) // 2
