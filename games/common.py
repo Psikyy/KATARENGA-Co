@@ -1,16 +1,8 @@
 import pygame
-<<<<<<< Updated upstream
-from ui.colors import BLACK, WHITE, RED, BLUE, GREEN, HOVER_GREEN, player_color
-from ui.buttons import draw_button, click_sound 
-
-=======
 from ui.colors import BLACK, WHITE, RED, BLUE, GREEN, HOVER_GREEN
 from ui.buttons import draw_button, click_sound
 from menu.settings import t
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
 
 # Fonction pour dessiner un texte centré
 def draw_centered_text(screen, font, text, y, color=BLACK):

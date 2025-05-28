@@ -22,34 +22,19 @@ def game_selection(screen, fonts):
     
     while running:
         screen.fill(WHITE)
-<<<<<<< Updated upstream
 
-        title_text = fonts['title'].render("Sélection du jeu", True, BLACK)
-=======
-        
         # Titre
         title_text = fonts['title'].render(t("select_game"), True, BLACK)
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 50))
 
         katarenga_button = draw_button(screen, fonts, "Katarenga", screen_width // 2 - 150, 150, 300, 60, GREEN, HOVER_GREEN)
         congress_button = draw_button(screen, fonts, "Congress", screen_width // 2 - 150, 250, 300, 60, GREEN, HOVER_GREEN)
         isolation_button = draw_button(screen, fonts, "Isolation", screen_width // 2 - 150, 350, 300, 60, GREEN, HOVER_GREEN)
         
-<<<<<<< Updated upstream
-<<<<<<< Updated upstream
-        back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, HOVER_BLUE)
-=======
         # Bouton Retour
         back_button = draw_button(screen, fonts, t("back"), 10, screen_height - 60, 100, 40, BLUE, HOVER_BLUE)
->>>>>>> Stashed changes
-=======
-        # Bouton Retour
-        back_button = draw_button(screen, fonts, t("back"), 10, screen_height - 60, 100, 40, BLUE, HOVER_BLUE)
->>>>>>> Stashed changes
+
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:

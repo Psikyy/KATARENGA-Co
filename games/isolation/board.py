@@ -234,11 +234,6 @@ def configure_board(screen, fonts):
 
     while running:
         screen.fill(WHITE)
-<<<<<<< Updated upstream
-        title_text = fonts['title'].render("Configuration du plateau", True, BLACK)
-        screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
-        instruction_text = fonts['small'].render("Cliquez sur un quadrant pour le faire pivoter", True, BLACK)
-=======
 
         # Render title
         title_text = fonts['title'].render(t("board_edit"), True, BLACK)
@@ -246,10 +241,7 @@ def configure_board(screen, fonts):
 
         # Render instructions
         instruction_text = fonts['small'].render(t("help_text"), True, BLACK)
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
         screen.blit(instruction_text, (screen_width // 2 - instruction_text.get_width() // 2, 90))
         board_y = 170
         board_x = screen_width // 2 - quadrant_size
@@ -335,16 +327,10 @@ def edit_board(screen, fonts, board):
     running = True
     while running:
         screen.fill(WHITE)
-<<<<<<< Updated upstream
-        title_text = fonts['title'].render("Édition du plateau", True, BLACK)
-=======
 
         # Title
         title_text = fonts['title'].render(t("board_edit"), True, BLACK)
-<<<<<<< Updated upstream
->>>>>>> Stashed changes
-=======
->>>>>>> Stashed changes
+
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
         board_x = screen_width // 2 - (8 * TILE_SIZE) // 2
         board_y = 100
