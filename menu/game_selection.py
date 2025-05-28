@@ -16,20 +16,16 @@ def game_selection(screen, fonts):
     
     while running:
         screen.fill(WHITE)
-        
-        # Titre
+
         title_text = fonts['title'].render("Sélection du jeu", True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 50))
-        
-        # Boutons des jeux
+
         katarenga_button = draw_button(screen, fonts, "Katarenga", screen_width // 2 - 150, 150, 300, 60, GREEN, HOVER_GREEN)
         congress_button = draw_button(screen, fonts, "Congress", screen_width // 2 - 150, 250, 300, 60, GREEN, HOVER_GREEN)
         isolation_button = draw_button(screen, fonts, "Isolation", screen_width // 2 - 150, 350, 300, 60, GREEN, HOVER_GREEN)
         
-        # Bouton Retour
         back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, HOVER_BLUE)
         
-        # Gérer les événements
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
