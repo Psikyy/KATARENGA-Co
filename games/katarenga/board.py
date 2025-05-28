@@ -13,15 +13,13 @@ RED = (255, 0, 0)
 
 BOARD_SIZE = 8
 TILE_SIZE = 55
-TILE_KEYS = ['A', 'B', 'C', 'D','E', 'F']  
+TILE_KEYS = ['A', 'B', 'C', 'D']  
 
 TILE_IMAGES = {
     'A': pygame.image.load(os.path.join("design_case", "rouge_sans_blanc.png")),
     'B': pygame.image.load(os.path.join("design_case", "jaune_sans_blanc.png")),
     'C': pygame.image.load(os.path.join("design_case", "vert_sans_blanc.png")),
     'D': pygame.image.load(os.path.join("design_case", "bleu_sans_blanc.png")),
-    'E': pygame.image.load(os.path.join("design_case", "coin.png")),
-    'F': pygame.image.load(os.path.join("design_case", "contour.png")),
 }
 
 CONTOUR_IMAGE = pygame.image.load(os.path.join("design_case", "contour.png"))
