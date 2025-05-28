@@ -257,8 +257,6 @@ class Init_Board_Pawn:
     Fin classe 'Init_Board_Pawn'
 """
 
-# Première version des fonctions de déplacement et de verrification de déplacement
-
 def movePawn(pawn : tuple, case : tuple, board_pawn : Init_Board_Pawn) -> None:
     """
         Déplace un pion 'pawn' sur une case 'case' dans un plateau de jeu 'board_pawn'
@@ -358,7 +356,6 @@ def checkRed(pawn : tuple, case : tuple, tab_R : list) -> bool:
             return False
     return True
 
-# Première version de la win condition
 
 def gameIsOver(board_pawn : Init_Board_Pawn) -> tuple:
     """
@@ -403,27 +400,27 @@ print("\n")
 board_Pawn = Init_Board_Pawn()
 board_Pawn.affichage_test()
 
-print(checkCanMove((1, 1), (1, 2), board_Pawn)) # Renvoie attendu : False
-print(checkCanMove((1, 1), (2, 0), board_Pawn)) # Renvoie attendu : False
-print(checkCanMove((1, 1), (0, 0), board_Pawn)) # Renvoie attendu : False
-print(checkCanMove((1, 1), (8, 1), board_Pawn)) # Renvoie attendu : False
+print(checkCanMove((1, 1), (1, 2), board_Pawn)) 
+print(checkCanMove((1, 1), (2, 0), board_Pawn)) 
+print(checkCanMove((1, 1), (0, 0), board_Pawn)) 
+print(checkCanMove((1, 1), (8, 1), board_Pawn)) 
 
-print(gameIsOver(board_Pawn)) # Renvoie attendu : False
+print(gameIsOver(board_Pawn)) 
 
-print(checkCanCapture((1, 1), (8, 5), board_Pawn)) # Renvoie attendu : True
+print(checkCanCapture((1, 1), (8, 5), board_Pawn)) 
 
 print(getYellowCases(board_Color))
 print(getRedCases(board_Color))
 
 board_Pawn.setPlayer1sPawn(1)
-print(gameIsOver(board_Pawn)) # Renvoie attendu : (2, True)
+print(gameIsOver(board_Pawn)) 
 board_Pawn.setPlayer1sPawn(8)
 board_Pawn.setPlayer2sPawn(1)
-print(gameIsOver(board_Pawn)) # Renvoie attendu : (1, True)
+print(gameIsOver(board_Pawn)) 
 
 board_Pawn.board[0][0], board_Pawn.board[0][9] = 1, 1
-print(gameIsOver(board_Pawn)) # Renvoie attendu : (1, True)
+print(gameIsOver(board_Pawn)) 
 
 board_Pawn.board[0][0], board_Pawn.board[0][9] = '2', '2'
 board_Pawn.board[9][0], board_Pawn.board[9][9] = 2, 2
-print(gameIsOver(board_Pawn)) # Renvoie attendu : (2, True)
+print(gameIsOver(board_Pawn)) 

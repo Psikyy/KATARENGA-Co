@@ -1,6 +1,4 @@
-# settings.py
 
-# Traductions
 translations = {
     "Français": {
         "settings": "Paramètres",
@@ -42,7 +40,6 @@ translations = {
     }
 }
 
-# Langue par défaut
 settings = {
     "language": "Français",
 }
@@ -56,11 +53,9 @@ def set_language(lang):
     save_settings(settings)
 
 def save_settings(updated_settings):
-    # Tu peux enregistrer dans un fichier .json si tu veux que ça persiste
     global settings, current_language
     settings.update(updated_settings)
     current_language = settings["language"]
 
-# Fonction de traduction
 def t(key):
     return translations.get(current_language, {}).get(key, key)
