@@ -31,9 +31,8 @@ def intro_animation(screen):
         pygame.display.flip()
         clock.tick(30)
 
-    time.sleep(1)  # Pause avant le menu
+    time.sleep(1) 
 
-# Animation de chargement
 def loading_screen(screen, fonts, message="Chargement..."):
     screen_width = screen.get_width()
     screen_height = screen.get_height()
@@ -48,7 +47,7 @@ def animate_rotation(quadrant, current_rotation, target_rotation):
     """
     Anime la rotation d'un quadrant de current_rotation à target_rotation.
     """
-    step = 9  # Rotation de 9° par étape
+    step = 9 
     if current_rotation < target_rotation:
         current_rotation += step
     elif current_rotation > target_rotation:

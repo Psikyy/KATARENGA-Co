@@ -25,7 +25,6 @@ def player_names(screen, fonts, game_name, mode=None):
     while running:
         screen.fill(WHITE)
 
-        # Titre
         title_text = fonts['title'].render(f"{game_name}", True, BLACK)
         title_x = screen_width // 2 - title_text.get_width() // 2
         title_y = 50
@@ -40,8 +39,6 @@ def player_names(screen, fonts, game_name, mode=None):
         instruction_y = title_y + title_text.get_height() + spacing_after_title
         screen.blit(instruction_text, (instruction_x, instruction_y))
 
-
-        # Zones de texte
         input_rect1 = pygame.Rect(250, 200, 300, 50)
         input_rect2 = pygame.Rect(250, 300, 300, 50)
         pygame.draw.rect(screen, GREEN if input_active1 else GRAY, input_rect1, 2)
@@ -61,7 +58,6 @@ def player_names(screen, fonts, game_name, mode=None):
         screen.blit(player1_display, (input_rect1.x + 10, input_rect1.y + 15))
         screen.blit(player2_display, (input_rect2.x + 10, input_rect2.y + 15))
 
-        # Boutons
         validate_button = draw_button(screen, fonts, "Valider", screen_width // 2 - 50, 400, 100, 50, GREEN, HOVER_GREEN)
         back_button = draw_button(screen, fonts, "Retour", 10, screen_height - 60, 100, 40, BLUE, RED)
 
