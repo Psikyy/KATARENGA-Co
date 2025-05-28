@@ -9,6 +9,11 @@ from menu.congress_mode_selection import congress_mode_selection
 from menu.isolation_mode_selection import isolation_mode_selection
 
 def game_selection(screen, fonts):
+    '''affiche le menu de sélection du jeu
+    args:
+        screen: l'écran Pygame sur lequel dessiner
+        fonts: un dictionnaire de polices de caractères
+    '''
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     

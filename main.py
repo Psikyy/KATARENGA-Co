@@ -5,6 +5,7 @@ from ui.animations import intro_animation
 from menu.main_menu import main_menu
 
 def main():
+    '''initialise le jeu et lance l'animation d'introduction puis le menu principal'''
     pygame.init()
     
     settings = load_settings()

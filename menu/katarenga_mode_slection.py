@@ -6,6 +6,11 @@ from ui.animations import loading_screen
 from menu.player_names import player_names
 
 def katarenga_mode_selection(screen, fonts):
+    '''affiche le menu de sélection du mode de jeu pour Katarenga
+    args:
+        screen: l'écran Pygame sur lequel dessiner
+        fonts: un dictionnaire de polices de caractères
+    '''
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     

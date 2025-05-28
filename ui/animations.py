@@ -4,6 +4,10 @@ from ui.colors import BLACK, WHITE, GRAY
 
 # Animation d'intro
 def intro_animation(screen):
+    '''Affiche une animation d'introduction avec le logo "Smart Games" qui s'affiche progressivement.
+    arg: 
+        screen: l'écran sur lequel l'animation sera affichée.
+    '''
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     

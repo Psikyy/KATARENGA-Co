@@ -7,6 +7,11 @@ from menu.settings import translations, settings, save_settings, t, current_lang
 
 
 def settings_menu(screen, fonts):
+    '''affiche le menu des paramètres du jeu
+    args:
+        screen: l'écran Pygame sur lequel dessiner
+        fonts: un dictionnaire de polices de caractères
+    '''
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     
