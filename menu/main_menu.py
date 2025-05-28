@@ -46,10 +46,34 @@ def main_menu(screen):
         # title_surface.set_alpha(title_alpha)  # Appliquer la transparence
         # screen.blit(title_surface, (screen_width // 2 - title_surface.get_width() // 2, 50))
 
-        # Boutons
-        start_button = draw_button(screen, fonts, t("start_game"), screen_width // 2 - 150, 250, 300, 60, GREEN, HOVER_GREEN)
-        settings_button = draw_button(screen, fonts, t("settings"), screen_width // 2 - 150, 350, 300, 60, BLUE, HOVER_BLUE)
-        quit_button = draw_button(screen, fonts, t("quit"), screen_width // 2 - 150, 450, 300, 60, RED, HOVER_RED)
+        button_width = 400
+        button_height = 80
+        button_spacing = 120
+        button_x = screen_width // 2 - button_width // 2
+        first_button_y = 200 + 60  # Décalage vers le bas
+
+        start_button = draw_button(
+            screen, fonts, t("start_game"),
+            button_x, first_button_y,
+            button_width, button_height,
+            GREEN, HOVER_GREEN
+        )
+
+        settings_button = draw_button(
+            screen, fonts, t("settings"),
+            button_x, first_button_y + button_spacing,
+            button_width, button_height,
+            BLUE, HOVER_BLUE
+        )
+
+        quit_button = draw_button(
+            screen, fonts, t("quit"),
+            button_x, first_button_y + button_spacing * 2,
+            button_width, button_height,
+            RED, HOVER_RED
+        )
+
+
 
         # Gérer les événements
         for event in pygame.event.get():
