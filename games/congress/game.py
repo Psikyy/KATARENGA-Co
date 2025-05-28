@@ -20,15 +20,15 @@ class GameState:
 def get_valid_moves_for_piece(pos, board, all_pieces):
     x, y = pos
     tile_type = board[y][x]
-    start_tile = tile_type  # couleur de départ
+    start_tile = tile_type
 
-    if tile_type == 'A':  # Rouge : orthogonal, arrêt à première case rouge
+    if tile_type == 'A':
         directions = [(0, 1), (0, -1), (1, 0), (-1, 0)]
         max_steps = BOARD_SIZE
-    elif tile_type == 'B':  # Jaune : diagonal, arrêt à première case jaune
+    elif tile_type == 'B':
         directions = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
         max_steps = BOARD_SIZE
-    elif tile_type == 'C':  # Vert : cavalier
+    elif tile_type == 'C':
         knight_moves = [
             (1, 2), (2, 1), (2, -1), (1, -2),
             (-1, -2), (-2, -1), (-2, 1), (-1, 2)
@@ -39,7 +39,7 @@ def get_valid_moves_for_piece(pos, board, all_pieces):
             if 0 <= x + dx < BOARD_SIZE and 0 <= y + dy < BOARD_SIZE
             and (x + dx, y + dy) not in all_pieces
         ]
-    elif tile_type == 'D':  # Bleu : roi, 1 seule case dans toutes les directions
+    elif tile_type == 'D':
         directions = [(0, 1), (0, -1), (1, 0), (-1, 0),
                       (1, 1), (1, -1), (-1, -1), (-1, 1)]
         moves = []
@@ -53,7 +53,6 @@ def get_valid_moves_for_piece(pos, board, all_pieces):
     else:
         return []
 
-    # Pour les tuiles A et B (déplacements limités par couleur)
     moves = []
     for dx, dy in directions:
         for step in range(1, max_steps):
@@ -63,12 +62,11 @@ def get_valid_moves_for_piece(pos, board, all_pieces):
                 break
 
             if (new_x, new_y) in all_pieces:
-                break  # bloqué par une pièce
+                break
 
             current_tile = board[new_y][new_x]
             moves.append((new_x, new_y))
 
-            # on s'arrête à la première case de même type
             if current_tile == start_tile:
                 break
     return moves
@@ -123,7 +121,7 @@ def show_rules(screen, fonts):
             "à au moins un autre pion du même joueur.",
             "",
             "Le premier joueur à réussir cette formation gagne la partie.",
-            "Si aucun joueur ne peut plus bouger et qu’aucun bloc connecté ne peut être formé,",
+            "Si aucun joueur ne peut plus bouger et qu'aucun bloc connecté ne peut être formé,",
             "la partie est nulle.",
         ]
 
@@ -256,9 +254,8 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
                                 game_state.winner = game_state.current_player
                             else:
                                 game_state.current_player = 3 - game_state.current_player
-                            # Si c'est au bot de jouer, il joue automatiquement
                             if bot_player is not None and game_state.current_player == bot_player and not game_state.game_over:
-                                pygame.time.wait(500)  # Petite pause pour voir l'action
+                                pygame.time.wait(500)
                                 bot_play(game_state)
 
 
@@ -266,7 +263,6 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
 
 
 def bot_play(game_state):
-    # Liste tous les pions du bot avec des mouvements valides
     pieces = game_state.player2_pieces if game_state.current_player == 2 else game_state.player1_pieces
     opponent_pieces = game_state.player1_pieces if game_state.current_player == 2 else game_state.player2_pieces
 
@@ -278,17 +274,14 @@ def bot_play(game_state):
             movable_pieces.append((piece, moves))
 
     if not movable_pieces:
-        return False  # Aucun coup possible
+        return False
 
-    # Choisir un pion et un mouvement au hasard
     selected_piece, moves = random.choice(movable_pieces)
     destination = random.choice(moves)
 
-    # Appliquer le mouvement
     pieces.remove(selected_piece)
     pieces.append(destination)
 
-    # Vérifier si le bot a gagné
     if are_pieces_connected(pieces):
         game_state.game_over = True
         game_state.winner = game_state.current_player

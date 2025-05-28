@@ -31,7 +31,7 @@ def is_under_threat(x, y, board, all_pieces):
     for px, py in all_pieces:
         tile_type = board[py][px]
 
-        if tile_type == 'A':  # Tour, arrêt sur première case rouge ou capture
+        if tile_type == 'A':
             directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
             for dx, dy in directions:
                 step = 1
@@ -43,7 +43,7 @@ def is_under_threat(x, y, board, all_pieces):
                         break
 
                     if (new_x, new_y) in all_pieces:
-                        break  # Bloqué
+                        break
 
                     if (new_x, new_y) == (x, y):
                         return True
@@ -53,7 +53,7 @@ def is_under_threat(x, y, board, all_pieces):
 
                     step += 1
 
-        elif tile_type == 'B':  # Diagonale, arrêt sur première case jaune ou capture
+        elif tile_type == 'B':
             directions = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
             for dx, dy in directions:
                 step = 1
@@ -75,14 +75,14 @@ def is_under_threat(x, y, board, all_pieces):
 
                     step += 1
 
-        elif tile_type == 'C':  # Cavalier
+        elif tile_type == 'C':
             directions = [(1, 2), (2, 1), (2, -1), (1, -2),
                           (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
             for dx, dy in directions:
                 if (px + dx, py + dy) == (x, y):
                     return True
 
-        elif tile_type == 'D':  # Toutes directions
+        elif tile_type == 'D':
             directions = [(0, 1), (1, 0), (0, -1), (-1, 0),
                           (1, 1), (1, -1), (-1, -1), (-1, 1)]
             for dx, dy in directions:
@@ -121,7 +121,7 @@ def show_rules(screen, fonts):
             "Le jeu se joue à deux joueurs.",
             "",
             "À tour de rôle, chaque joueur place un de ses pions sur une case vide du plateau.",
-            "Un pion ne peut être placé que s’il n’est pas en prise, c’est-à-dire :",
+            "Un pion ne peut être placé que s'il n'est pas en prise, c'est-à-dire :",
             "  - Il ne doit pas pouvoir être capturé par un pion déjà présent sur le plateau",
             "    (quelle que soit sa couleur), selon les règles de capture définies pour le jeu.",
             "",
@@ -201,7 +201,6 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
 
         draw_board(screen, fonts, selected_quadrants)
 
-        # Dessiner les pions
         for pos in game_state.player1_pieces:
             pygame.draw.circle(screen, WHITE, (board_x + pos[0]*TILE_SIZE + TILE_SIZE//2, board_y + pos[1]*TILE_SIZE + TILE_SIZE//2), TILE_SIZE//3)
         for pos in game_state.player2_pieces:
@@ -210,7 +209,6 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
         all_pieces = game_state.player1_pieces + game_state.player2_pieces
         legal_moves = get_legal_moves(game_state.board, all_pieces)
 
-        # Prévisualisation des coups possibles
         for (lx, ly) in legal_moves:
             color = (255, 100, 100, 100) if game_state.current_player == 1 else (100, 100, 255, 100)
             preview_circle = pygame.Surface((TILE_SIZE, TILE_SIZE), pygame.SRCALPHA)
@@ -276,7 +274,6 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
                         else:
                             game_state.player2_pieces.append(pos)
 
-                        # Vérifie si l’adversaire peut encore jouer
                         next_player = 3 - game_state.current_player
                         new_all_pieces = game_state.player1_pieces + game_state.player2_pieces
                         if get_legal_moves(game_state.board, new_all_pieces):
@@ -284,9 +281,9 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
                         else:
                             game_state.game_over = True
                             game_state.winner = next_player
-                        # Si c'est le tour du bot, il joue automatiquement
+
                         if bot_player is not None and game_state.current_player == bot_player and not game_state.game_over:
-                            pygame.time.wait(500)  # Petite pause pour voir le mouvement du bot
+                            pygame.time.wait(500)
                             all_pieces = game_state.player1_pieces + game_state.player2_pieces
                             legal = get_legal_moves(game_state.board, all_pieces)
 
@@ -314,4 +311,3 @@ def bot_play(game_state, legal_moves):
         game_state.player1_pieces.append(move)
 
     return True
-
