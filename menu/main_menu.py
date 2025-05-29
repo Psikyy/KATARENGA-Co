@@ -9,29 +9,48 @@ from menu.settings import t
 
 
 def main_menu(screen):
-    '''affiche le menu principal du jeu
-    args:
-        screen: l'écran Pygame sur lequel dessiner
-    '''
+    '''Affiche le menu principal du jeu.'''
     screen_width = screen.get_width()
     screen_height = screen.get_height()
 
     fonts = init_fonts()
 
     try:
-        background_image = pygame.image.load("img/Image_du_jeu.png")
-        background_image = pygame.transform.scale(background_image, (screen_width, screen_height))
+        background_image = pygame.image.load("img/image_du_jeu.png").convert()
+        # Adapter la taille sans déformer l’image
+        image_ratio = background_image.get_width() / background_image.get_height()
+        screen_ratio = screen_width / screen_height
+
+        if image_ratio > screen_ratio:
+            new_width = screen_width
+            new_height = int(screen_width / image_ratio)
+        else:
+            new_height = screen_height
+            new_width = int(screen_height * image_ratio)
+
+        background_image = pygame.transform.smoothscale(background_image, (new_width, new_height))
     except pygame.error:
         print("Image de fond non trouvée.")
         background_image = pygame.Surface((screen_width, screen_height))
         background_image.fill((0, 0, 0))
-    
+
     running = True
     title_alpha = 255
     fade_out = True  
 
+    button_width = 400
+    button_height = 80
+    button_spacing = 40
+    total_height = 3 * button_height + 2 * button_spacing
+    start_y = (screen_height - total_height) // 2
+
     while running:
-        screen.blit(background_image, (0, 0))  
+        screen.fill((0, 0, 0))
+        bg_x = (screen_width - background_image.get_width()) // 2
+        bg_y = (screen_height - background_image.get_height()) // 2
+        screen.blit(background_image, (bg_x, bg_y))
+
+        # Animation de l’opacité du titre (optionnelle si tu veux l’ajouter)
         if fade_out:
             title_alpha -= 3
             if title_alpha <= 100:
@@ -41,9 +60,20 @@ def main_menu(screen):
             if title_alpha >= 255:
                 fade_out = True
 
-        start_button = draw_button(screen, fonts, t("start_game"), screen_width // 2 - 150, 250, 300, 60, GREEN, HOVER_GREEN)
-        settings_button = draw_button(screen, fonts, t("settings"), screen_width // 2 - 150, 350, 300, 60, BLUE, HOVER_BLUE)
-        quit_button = draw_button(screen, fonts, t("quit"), screen_width // 2 - 150, 450, 300, 60, RED, HOVER_RED)
+        start_button = draw_button(screen, fonts, t("start_game"),
+                                   (screen_width - button_width) // 2,
+                                   start_y,
+                                   button_width, button_height, GREEN, HOVER_GREEN)
+
+        settings_button = draw_button(screen, fonts, t("settings"),
+                                      (screen_width - button_width) // 2,
+                                      start_y + button_height + button_spacing,
+                                      button_width, button_height, BLUE, HOVER_BLUE)
+
+        quit_button = draw_button(screen, fonts, t("quit"),
+                                  (screen_width - button_width) // 2,
+                                  start_y + 2 * (button_height + button_spacing),
+                                  button_width, button_height, RED, HOVER_RED)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
