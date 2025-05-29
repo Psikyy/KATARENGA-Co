@@ -7,15 +7,16 @@ from menu.player_names import player_names
 from menu.settings import t
 
 def katarenga_mode_selection(screen, fonts):
-    '''affiche le menu de sélection du mode de jeu pour Katarenga
-    args:
-        screen: l'écran Pygame sur lequel dessiner
-        fonts: un dictionnaire de polices de caractères
-    '''
+    '''affiche le menu de sélection du mode de jeu pour Katarenga'''
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     
     running = True
+
+    button_width = 350
+    button_height = 80
+    start_y = 200  
+    spacing = 100 
     
     while running:
         screen.fill(WHITE)
@@ -23,11 +24,33 @@ def katarenga_mode_selection(screen, fonts):
         title_text = fonts['title'].render(t("game_mode") + "Katarenga", True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 50))
         
-        local_button = draw_button(screen, fonts, t("mode_local"), screen_width // 2 - 150, 150, 300, 60, GREEN, HOVER_GREEN)
-        online_button = draw_button(screen, fonts, t("mode_online"), screen_width // 2 - 150, 250, 300, 60, GREY, GREY, disabled=True)
-        bot_button = draw_button(screen, fonts, t("mode_bot"), screen_width // 2 - 150, 350, 300, 60, GREEN, HOVER_GREEN)
+        local_button = draw_button(
+            screen, fonts, t("mode_local"),
+            screen_width // 2 - button_width // 2, start_y,
+            button_width, button_height,
+            GREEN, HOVER_GREEN
+        )
 
-        back_button = draw_button(screen, fonts, t("back"), 10, screen_height - 60, 100, 40, BLUE, HOVER_BLUE)
+        online_button = draw_button(
+            screen, fonts, t("mode_online"),
+            screen_width // 2 - button_width // 2, start_y + spacing,
+            button_width, button_height,
+            GREY, GREY, disabled=True
+        )
+
+        bot_button = draw_button(
+            screen, fonts, t("mode_bot"),
+            screen_width // 2 - button_width // 2, start_y + spacing * 2,
+            button_width, button_height,
+            GREEN, HOVER_GREEN
+        )
+
+        back_button = draw_button(
+            screen, fonts, t("back"),
+            10, screen_height - 60,
+            100, 40,
+            BLUE, HOVER_BLUE
+        )
         
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
