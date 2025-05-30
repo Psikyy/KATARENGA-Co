@@ -67,7 +67,6 @@ def player_names(screen, fonts, game_name, mode=None):
         screen.blit(player1_display, (input_rect1.x + 10, input_rect1.y + 15))
         screen.blit(player2_display, (input_rect2.x + 10, input_rect2.y + 15))
 
-        # Boutons
         validate_button = draw_button(screen, fonts, t("validate"), screen_width // 2 - 50, 400, 100, 50, GREEN, HOVER_GREEN)
         back_button = draw_button(screen, fonts, t("back"), 10, screen_height - 60, 100, 40, BLUE, RED)
 

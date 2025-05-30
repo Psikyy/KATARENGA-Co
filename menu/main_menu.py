@@ -17,7 +17,6 @@ def main_menu(screen):
 
     try:
         background_image = pygame.image.load("img/image_du_jeu.png").convert()
-        # Adapter la taille sans déformer l’image
         image_ratio = background_image.get_width() / background_image.get_height()
         screen_ratio = screen_width / screen_height
 
@@ -50,7 +49,6 @@ def main_menu(screen):
         bg_y = (screen_height - background_image.get_height()) // 2
         screen.blit(background_image, (bg_x, bg_y))
 
-        # Animation de l’opacité du titre (optionnelle si tu veux l’ajouter)
         if fade_out:
             title_alpha -= 3
             if title_alpha <= 100:

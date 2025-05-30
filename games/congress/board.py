@@ -329,7 +329,6 @@ def edit_board(screen, fonts, board):
     while running:
         screen.fill(WHITE)
 
-        # Title
         title_text = fonts['title'].render(t("board_edit"), True, BLACK)
 
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))

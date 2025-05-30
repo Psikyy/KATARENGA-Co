@@ -23,7 +23,6 @@ def game_selection(screen, fonts):
     while running:
         screen.fill(WHITE)
 
-        # Titre
         title_text = fonts['title'].render(t("select_game"), True, BLACK)
 
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 50))
@@ -32,7 +31,6 @@ def game_selection(screen, fonts):
         congress_button = draw_button(screen, fonts, "Congress", screen_width // 2 - 150, 250, 300, 60, GREEN, HOVER_GREEN)
         isolation_button = draw_button(screen, fonts, "Isolation", screen_width // 2 - 150, 350, 300, 60, GREEN, HOVER_GREEN)
         
-        # Bouton Retour
         back_button = draw_button(screen, fonts, t("back"), 10, screen_height - 60, 100, 40, BLUE, HOVER_BLUE)
 
         

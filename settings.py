@@ -1,7 +1,6 @@
 import json
 import os
 
-# Charger les traductions
 def load_translations():
     try:
         with open('translations.json', "r", encoding="utf-8") as file:
@@ -25,11 +24,9 @@ def load_settings():
         save_settings(default_settings)
         return default_settings
 
-# Variables globales
 translations = load_translations()
 settings = load_settings()
 current_language = settings["language"]
 
-# Fonction pour obtenir une traduction
 def t(key):
     return translations[current_language].get(key, key)

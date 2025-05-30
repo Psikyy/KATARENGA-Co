@@ -2,7 +2,6 @@ import pygame
 import time
 from ui.colors import BLACK, WHITE, GRAY
 
-# Animation d'intro
 def intro_animation(screen):
     '''Affiche une animation d'introduction avec le logo "Smart Games" qui s'affiche progressivement.
     arg: 
