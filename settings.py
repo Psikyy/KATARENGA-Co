@@ -9,12 +9,10 @@ def load_translations():
         print("Fichier de traductions non trouvé.")
         return {"Français": {}}
 
-# Sauvegarder les paramètres
 def save_settings(settings):
     with open('settings.json', 'w', encoding='utf-8') as file:
         json.dump(settings, file)
 
-# Charger les paramètres
 def load_settings():
     try:
         with open('settings.json', 'r', encoding='utf-8') as file:

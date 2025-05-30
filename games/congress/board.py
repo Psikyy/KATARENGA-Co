@@ -235,11 +235,9 @@ def configure_board(screen, fonts):
     while running:
         screen.fill(WHITE)
 
-        # Render title
         title_text = fonts['title'].render(t("board_edit"), True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 20))
 
-        # Render instructions
         instruction_text = fonts['small'].render(t("help_text"), True, BLACK)
 
         screen.blit(instruction_text, (screen_width // 2 - instruction_text.get_width() // 2, 90))
@@ -273,7 +271,6 @@ def configure_board(screen, fonts):
         pygame.draw.rect(screen, GREEN, valid_button)
         pygame.draw.rect(screen, GREEN, edit_button)
 
-        # Button text
         valid_text = fonts['small'].render(t("validate"), True, BLACK)
         edit_text = fonts['small'].render(t("edit"), True, BLACK)
         
