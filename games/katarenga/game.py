@@ -10,24 +10,24 @@ from menu.settings import t
 class GameState:
     def __init__(self):
         self.board = None
-        self.player1_pieces = [(i, 0, None) for i in range(8)] 
-        self.player2_pieces = [(i, 7, None) for i in range(8)]  
-        self.current_player = 1    
-        self.valid_moves = {}      
-        self.game_over = False    
-        self.winner = None        
-        self.turn_count = 0        
-        self.selected_piece_idx = None  
-        
-        self.camp1_positions = [(0, 0), (7, 0)]  
-        self.camp2_positions = [(0, 7), (7, 7)]  
-        self.base_line1 = [(i, 0) for i in range(8)]  
-        self.base_line2 = [(i, 7) for i in range(8)]  
+        self.player1_pieces = [(i, 1, None) for i in range(1, 9)]  
+        self.player2_pieces = [(i, 8, None) for i in range(1, 9)]  
+        self.current_player = 1
+        self.valid_moves = {}
+        self.game_over = False
+        self.winner = None
+        self.turn_count = 0
+        self.selected_piece_idx = None
+        self.camp1_positions = [(0, 0), (0, 9)]
+        self.camp2_positions = [(9, 0), (9, 9)]
+        self.base_line1 = [(i, 1) for i in range(1, 9)]
+        self.base_line2 = [(i, 8) for i in range(1, 9)]
+
 
 
 def get_valid_moves(game_state, board):
     valid_moves = {}
-    
+
     if game_state.current_player == 1:
         player_pieces = game_state.player1_pieces
         opponent_pieces = game_state.player2_pieces
@@ -38,29 +38,26 @@ def get_valid_moves(game_state, board):
         opponent_pieces = game_state.player1_pieces
         opponent_base_line = game_state.base_line1
         opponent_camps = game_state.camp1_positions
-    
+
     opponent_positions = [(x, y) for x, y, in_camp in opponent_pieces if in_camp is None]
-    
+
     for idx, (x, y, in_camp) in enumerate(player_pieces):
         if in_camp is not None:
-            continue  
-        
+            continue  # Déjà placé dans un camp, ne peut plus bouger
+
         piece_moves = []
-        
+
+        # Si sur la ligne de base adverse, possibilité d'aller dans un camp
         if (x, y) in opponent_base_line:
             for camp_x, camp_y in opponent_camps:
-                camp_occupied = False
-                for p_idx, (p_x, p_y, p_camp) in enumerate(player_pieces):
-                    if p_camp is not None and p_x == camp_x and p_y == camp_y:
-                        camp_occupied = True
-                        break
-                
+                camp_occupied = any(p_camp is not None and p_x == camp_x and p_y == camp_y for p_x, p_y, p_camp in player_pieces)
                 if not camp_occupied:
-                    piece_moves.append((camp_x, camp_y, True))  
-            
+                    piece_moves.append((camp_x, camp_y, True))  # True = c'est un mouvement "camp"
+
         tile_type = board[y][x]
-        
-        if tile_type == 'A':  
+        directions = []
+
+        if tile_type == 'A':
             directions = [(0, 1), (1, 0), (0, -1), (-1, 0)]
             for dx, dy in directions:
                 step = 1
@@ -68,26 +65,31 @@ def get_valid_moves(game_state, board):
                     new_x = x + dx * step
                     new_y = y + dy * step
                     if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
-                        break  
+                        break  # Hors plateau
+
+                    # Coins toujours autorisés pour un "camp_move", sinon non
+                    if (new_x, new_y) in [(0, 0), (0, 9), (9, 0), (9, 9)]:
+                        if not any((move_x, move_y, True) == (new_x, new_y, True) for move_x, move_y, _ in piece_moves):
+                            break
+                    else:
+                        if not (1 <= new_x <= 8 and 1 <= new_y <= 8):
+                            break  # Hors zone 8x8
 
                     if any(px == new_x and py == new_y and pcamp is None for px, py, pcamp in player_pieces):
-                        break  
+                        break  # Ami présent
 
                     is_capture = (new_x, new_y) in opponent_positions
                     if game_state.turn_count == 0 and is_capture:
-                        break  
+                        break  # Pas de capture au 1er tour
 
                     piece_moves.append((new_x, new_y, False))
 
-                    if board[new_y][new_x] == 'A':
-                        break
-
-                    if is_capture:
+                    if board[new_y][new_x] == 'A' or is_capture:
                         break
 
                     step += 1
 
-        elif tile_type == 'B':  
+        elif tile_type == 'B':
             directions = [(1, 1), (1, -1), (-1, -1), (-1, 1)]
             for dx, dy in directions:
                 step = 1
@@ -95,50 +97,63 @@ def get_valid_moves(game_state, board):
                     new_x = x + dx * step
                     new_y = y + dy * step
                     if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
-                        break  
+                        break
+
+                    if (new_x, new_y) in [(0, 0), (0, 9), (9, 0), (9, 9)]:
+                        if not any((move_x, move_y, True) == (new_x, new_y, True) for move_x, move_y, _ in piece_moves):
+                            break
+                    else:
+                        if not (1 <= new_x <= 8 and 1 <= new_y <= 8):
+                            break
 
                     if any(px == new_x and py == new_y and pcamp is None for px, py, pcamp in player_pieces):
-                        break  
+                        break
 
                     is_capture = (new_x, new_y) in opponent_positions
                     if game_state.turn_count == 0 and is_capture:
-                        break  
+                        break
 
                     piece_moves.append((new_x, new_y, False))
 
-                    if board[new_y][new_x] == 'B':
-                        break
-
-                    if is_capture:
+                    if board[new_y][new_x] == 'B' or is_capture:
                         break
 
                     step += 1
-        elif tile_type == 'C':  
-            directions = [(1, 2), (2, 1), (2, -1), (1, -2), (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
-        elif tile_type == 'D':  
-            directions = [(0, 1), (1, 0), (0, -1), (-1, 0), (1, 1), (1, -1), (-1, -1), (-1, 1)]
-        
+
+        elif tile_type == 'C':
+            directions = [(1, 2), (2, 1), (2, -1), (1, -2),
+                          (-1, -2), (-2, -1), (-2, 1), (-1, 2)]
+
+        elif tile_type == 'D':
+            directions = [(0, 1), (1, 0), (0, -1), (-1, 0),
+                          (1, 1), (1, -1), (-1, -1), (-1, 1)]
+
+        else:
+            continue  # Non jouable
+
         for dx, dy in directions:
             new_x, new_y = x + dx, y + dy
-            
-            if 0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE:
-                occupied_by_friend = False
-                for p_x, p_y, p_camp in player_pieces:
-                    if p_camp is None and (p_x, p_y) == (new_x, new_y):
-                        occupied_by_friend = True
-                        break
-                
-                if not occupied_by_friend:
-                    is_capture = (new_x, new_y) in opponent_positions
-                    
-                    if game_state.turn_count == 0 and is_capture:
-                        continue
-                    
-                    piece_moves.append((new_x, new_y, False))  
-        
+            if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
+                continue
+
+            # Vérifier la zone 8x8 ou coins
+            if (new_x, new_y) in [(0, 0), (0, 9), (9, 0), (9, 9)]:
+                pass  # coins = OK pour placement final
+            elif not (1 <= new_x <= 8 and 1 <= new_y <= 8):
+                continue
+
+            if any(p_x == new_x and p_y == new_y and p_camp is None for p_x, p_y, p_camp in player_pieces):
+                continue  # Ami présent
+
+            is_capture = (new_x, new_y) in opponent_positions
+            if game_state.turn_count == 0 and is_capture:
+                continue
+
+            piece_moves.append((new_x, new_y, False))
+
         if piece_moves:
             valid_moves[idx] = piece_moves
-    
+
     return valid_moves
 
 
