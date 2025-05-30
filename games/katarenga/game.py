@@ -18,11 +18,11 @@ class GameState:
         self.winner = None
         self.turn_count = 0
         self.selected_piece_idx = None
-        self.camp1_positions = [(0, 0), (0, 9)]
-        self.camp2_positions = [(9, 0), (9, 9)]
+        # Coins pour chaque joueur - joueur 1 doit aller aux coins du haut, joueur 2 aux coins du bas
+        self.player1_target_camps = [(0, 0), (9, 0)]  # Coins du haut pour joueur 1
+        self.player2_target_camps = [(0, 9), (9, 9)]  # Coins du bas pour joueur 2
         self.base_line1 = [(i, 1) for i in range(1, 9)]
         self.base_line2 = [(i, 8) for i in range(1, 9)]
-
 
 
 def get_valid_moves(game_state, board):
@@ -32,12 +32,12 @@ def get_valid_moves(game_state, board):
         player_pieces = game_state.player1_pieces
         opponent_pieces = game_state.player2_pieces
         opponent_base_line = game_state.base_line2
-        opponent_camps = game_state.camp2_positions
+        target_camps = game_state.player1_target_camps  # Joueur 1 vise les coins du haut
     else:
         player_pieces = game_state.player2_pieces
         opponent_pieces = game_state.player1_pieces
         opponent_base_line = game_state.base_line1
-        opponent_camps = game_state.camp1_positions
+        target_camps = game_state.player2_target_camps  # Joueur 2 vise les coins du bas
 
     opponent_positions = [(x, y) for x, y, in_camp in opponent_pieces if in_camp is None]
 
@@ -47,9 +47,9 @@ def get_valid_moves(game_state, board):
 
         piece_moves = []
 
-        # Si sur la ligne de base adverse, possibilité d'aller dans un camp
+        # Si sur la ligne de base adverse, possibilité d'aller dans un camp (seulement les camps cibles)
         if (x, y) in opponent_base_line:
-            for camp_x, camp_y in opponent_camps:
+            for camp_x, camp_y in target_camps:
                 camp_occupied = any(p_camp is not None and p_x == camp_x and p_y == camp_y for p_x, p_y, p_camp in player_pieces)
                 if not camp_occupied:
                     piece_moves.append((camp_x, camp_y, True))  # True = c'est un mouvement "camp"
@@ -67,10 +67,14 @@ def get_valid_moves(game_state, board):
                     if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
                         break  # Hors plateau
 
-                    # Coins toujours autorisés pour un "camp_move", sinon non
+                    # Vérifier si c'est un coin
                     if (new_x, new_y) in [(0, 0), (0, 9), (9, 0), (9, 9)]:
-                        if not any((move_x, move_y, True) == (new_x, new_y, True) for move_x, move_y, _ in piece_moves):
-                            break
+                        # Seuls les coins cibles sont autorisés, et seulement si on est sur la ligne de base adverse
+                        if (new_x, new_y) in target_camps and (x, y) in opponent_base_line:
+                            camp_occupied = any(p_camp is not None and p_x == new_x and p_y == new_y for p_x, p_y, p_camp in player_pieces)
+                            if not camp_occupied:
+                                piece_moves.append((new_x, new_y, True))
+                        break  # Arrêter le mouvement dans tous les cas
                     else:
                         if not (1 <= new_x <= 8 and 1 <= new_y <= 8):
                             break  # Hors zone 8x8
@@ -99,9 +103,14 @@ def get_valid_moves(game_state, board):
                     if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
                         break
 
+                    # Vérifier si c'est un coin
                     if (new_x, new_y) in [(0, 0), (0, 9), (9, 0), (9, 9)]:
-                        if not any((move_x, move_y, True) == (new_x, new_y, True) for move_x, move_y, _ in piece_moves):
-                            break
+                        # Seuls les coins cibles sont autorisés, et seulement si on est sur la ligne de base adverse
+                        if (new_x, new_y) in target_camps and (x, y) in opponent_base_line:
+                            camp_occupied = any(p_camp is not None and p_x == new_x and p_y == new_y for p_x, p_y, p_camp in player_pieces)
+                            if not camp_occupied:
+                                piece_moves.append((new_x, new_y, True))
+                        break  # Arrêter le mouvement dans tous les cas
                     else:
                         if not (1 <= new_x <= 8 and 1 <= new_y <= 8):
                             break
@@ -131,25 +140,32 @@ def get_valid_moves(game_state, board):
         else:
             continue  # Non jouable
 
-        for dx, dy in directions:
-            new_x, new_y = x + dx, y + dy
-            if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
-                continue
+        # Pour les mouvements C et D
+        if tile_type in ['C', 'D']:
+            for dx, dy in directions:
+                new_x, new_y = x + dx, y + dy
+                if not (0 <= new_x < BOARD_SIZE and 0 <= new_y < BOARD_SIZE):
+                    continue
 
-            # Vérifier la zone 8x8 ou coins
-            if (new_x, new_y) in [(0, 0), (0, 9), (9, 0), (9, 9)]:
-                pass  # coins = OK pour placement final
-            elif not (1 <= new_x <= 8 and 1 <= new_y <= 8):
-                continue
+                # Vérifier si c'est un coin
+                if (new_x, new_y) in [(0, 0), (0, 9), (9, 0), (9, 9)]:
+                    # Seuls les coins cibles sont autorisés, et seulement si on est sur la ligne de base adverse
+                    if (new_x, new_y) in target_camps and (x, y) in opponent_base_line:
+                        camp_occupied = any(p_camp is not None and p_x == new_x and p_y == new_y for p_x, p_y, p_camp in player_pieces)
+                        if not camp_occupied:
+                            piece_moves.append((new_x, new_y, True))
+                    continue  # Ne pas ajouter comme mouvement normal
+                elif not (1 <= new_x <= 8 and 1 <= new_y <= 8):
+                    continue
 
-            if any(p_x == new_x and p_y == new_y and p_camp is None for p_x, p_y, p_camp in player_pieces):
-                continue  # Ami présent
+                if any(p_x == new_x and p_y == new_y and p_camp is None for p_x, p_y, p_camp in player_pieces):
+                    continue  # Ami présent
 
-            is_capture = (new_x, new_y) in opponent_positions
-            if game_state.turn_count == 0 and is_capture:
-                continue
+                is_capture = (new_x, new_y) in opponent_positions
+                if game_state.turn_count == 0 and is_capture:
+                    continue
 
-            piece_moves.append((new_x, new_y, False))
+                piece_moves.append((new_x, new_y, False))
 
         if piece_moves:
             valid_moves[idx] = piece_moves
@@ -158,36 +174,41 @@ def get_valid_moves(game_state, board):
 
 
 def check_win(game_state):
-    camps1_occupied = 0
-    camps2_occupied = 0
+    # Compter les pièces dans les camps cibles
+    player1_in_target_camps = 0
+    player2_in_target_camps = 0
     
     for _, _, in_camp in game_state.player1_pieces:
         if in_camp is not None:
-            camps2_occupied += 1
+            player1_in_target_camps += 1
     
     for _, _, in_camp in game_state.player2_pieces:
         if in_camp is not None:
-            camps1_occupied += 1
+            player2_in_target_camps += 1
     
-    if camps2_occupied == 2:
+    # Victoire si 2 pièces dans les camps cibles
+    if player1_in_target_camps == 2:
         game_state.winner = 1
         return True
     
-    if camps1_occupied == 2:
+    if player2_in_target_camps == 2:
         game_state.winner = 2
         return True
     
+    # Compter les pièces restantes sur le plateau
     remaining_pieces1 = sum(1 for x, y, in_camp in game_state.player1_pieces if in_camp is None)
     remaining_pieces2 = sum(1 for x, y, in_camp in game_state.player2_pieces if in_camp is None)
     
-    if remaining_pieces1 == 0 or (remaining_pieces1 < 2 and camps2_occupied < 2):
+    # Victoire par élimination
+    if remaining_pieces1 == 0 or (remaining_pieces1 < 2 and player1_in_target_camps < 2):
         game_state.winner = 2
         return True
     
-    if remaining_pieces2 == 0 or (remaining_pieces2 < 2 and camps1_occupied < 2):
+    if remaining_pieces2 == 0 or (remaining_pieces2 < 2 and player2_in_target_camps < 2):
         game_state.winner = 1
         return True
     
+    # Victoire si l'adversaire n'a plus de mouvements
     if len(game_state.valid_moves) == 0:
         game_state.winner = 3 - game_state.current_player  
         return True
@@ -282,6 +303,7 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
         
         piece_radius = TILE_SIZE // 3
         
+        # Dessiner les pièces du joueur 1
         for idx, (x, y, in_camp) in enumerate(game_state.player1_pieces):
             if in_camp is None:  
                 pygame.draw.circle(screen, BLACK, (
@@ -289,12 +311,14 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
                     board_y + y * TILE_SIZE + TILE_SIZE // 2
                 ), piece_radius)
             else:  
-                camp_x, camp_y = game_state.camp2_positions[in_camp - 1]
+                # Pièce dans un camp cible
+                camp_x, camp_y = game_state.player1_target_camps[in_camp - 1]
                 pygame.draw.circle(screen, BLACK, (
                     board_x + camp_x * TILE_SIZE + TILE_SIZE // 2,
                     board_y + camp_y * TILE_SIZE + TILE_SIZE // 2
                 ), piece_radius)
         
+        # Dessiner les pièces du joueur 2
         for idx, (x, y, in_camp) in enumerate(game_state.player2_pieces):
             if in_camp is None:  
                 pygame.draw.circle(screen, WHITE, (
@@ -306,7 +330,8 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
                     board_y + y * TILE_SIZE + TILE_SIZE // 2
                 ), piece_radius, 1)
             else:  
-                camp_x, camp_y = game_state.camp1_positions[in_camp - 1]
+                # Pièce dans un camp cible
+                camp_x, camp_y = game_state.player2_target_camps[in_camp - 1]
                 pygame.draw.circle(screen, WHITE, (
                     board_x + camp_x * TILE_SIZE + TILE_SIZE // 2,
                     board_y + camp_y * TILE_SIZE + TILE_SIZE // 2
@@ -316,6 +341,7 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
                     board_y + camp_y * TILE_SIZE + TILE_SIZE // 2
                 ), piece_radius, 1)
         
+        # Surligner la pièce sélectionnée
         if game_state.selected_piece_idx is not None:
             if game_state.current_player == 1:
                 selected_piece = game_state.player1_pieces[game_state.selected_piece_idx]
@@ -329,6 +355,7 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
                     board_y + y * TILE_SIZE + TILE_SIZE // 2
                 ), piece_radius + 3, 2)
         
+        # Afficher les mouvements possibles
         if game_state.selected_piece_idx is not None and game_state.selected_piece_idx in game_state.valid_moves:
             for move_x, move_y, is_camp_move in game_state.valid_moves[game_state.selected_piece_idx]:
                 pygame.draw.circle(screen, GREEN, (
@@ -391,28 +418,28 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
                                             click_sound.play()
                                         
                                         if game_state.current_player == 1:
+                                            # Supprimer la pièce adverse capturée
                                             for idx, (p_x, p_y, p_camp) in enumerate(game_state.player2_pieces):
                                                 if p_camp is None and (p_x, p_y) == (tile_x, tile_y):
                                                     game_state.player2_pieces.pop(idx)
                                                     break
                                             
-                                            x, y, _ = game_state.player1_pieces[game_state.selected_piece_idx]
-                                            
+                                            # Déplacer la pièce
                                             if is_camp_move:
-                                                camp_idx = 1 if (tile_x, tile_y) == game_state.camp2_positions[0] else 2
+                                                camp_idx = 1 if (tile_x, tile_y) == game_state.player1_target_camps[0] else 2
                                                 game_state.player1_pieces[game_state.selected_piece_idx] = (tile_x, tile_y, camp_idx)
                                             else:
                                                 game_state.player1_pieces[game_state.selected_piece_idx] = (tile_x, tile_y, None)
                                         else:
+                                            # Supprimer la pièce adverse capturée
                                             for idx, (p_x, p_y, p_camp) in enumerate(game_state.player1_pieces):
                                                 if p_camp is None and (p_x, p_y) == (tile_x, tile_y):
                                                     game_state.player1_pieces.pop(idx)
                                                     break
                                             
-                                            x, y, _ = game_state.player2_pieces[game_state.selected_piece_idx]
-                                            
+                                            # Déplacer la pièce
                                             if is_camp_move:
-                                                camp_idx = 1 if (tile_x, tile_y) == game_state.camp1_positions[0] else 2
+                                                camp_idx = 1 if (tile_x, tile_y) == game_state.player2_target_camps[0] else 2
                                                 game_state.player2_pieces[game_state.selected_piece_idx] = (tile_x, tile_y, camp_idx)
                                             else:
                                                 game_state.player2_pieces[game_state.selected_piece_idx] = (tile_x, tile_y, None)
@@ -449,6 +476,7 @@ def start_game(screen, fonts, player1_name, player2_name, board, mode='local'):
                             else:
                                 game_state.selected_piece_idx = None
                         else:
+                            # Sélection d'une pièce
                             if game_state.current_player == 1:
                                 for idx, (p_x, p_y, p_camp) in enumerate(game_state.player1_pieces):
                                     if p_camp is None and (p_x, p_y) == (tile_x, tile_y):
@@ -482,14 +510,15 @@ def bot_play(game_state):
     move_x, move_y, is_camp_move = random.choice(valid_moves[piece_idx])
 
     if game_state.current_player == 2:
+        # Supprimer la pièce adverse capturée
         for idx, (p_x, p_y, p_camp) in enumerate(game_state.player1_pieces):
             if p_camp is None and (p_x, p_y) == (move_x, move_y):
                 game_state.player1_pieces.pop(idx)
                 break
 
-        x, y, _ = game_state.player2_pieces[piece_idx]
+        # Déplacer la pièce du bot
         if is_camp_move:
-            camp_idx = 1 if (move_x, move_y) == game_state.camp1_positions[0] else 2
+            camp_idx = 1 if (move_x, move_y) == game_state.player2_target_camps[0] else 2
             game_state.player2_pieces[piece_idx] = (move_x, move_y, camp_idx)
         else:
             game_state.player2_pieces[piece_idx] = (move_x, move_y, None)
