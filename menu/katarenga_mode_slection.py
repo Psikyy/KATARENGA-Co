@@ -36,7 +36,7 @@ def katarenga_mode_selection(screen, fonts):
             screen, fonts, t("mode_online"),
             screen_width // 2 - button_width // 2, start_y + spacing,
             button_width, button_height,
-            GREEN, HOVER_BLUE 
+            GREEN, HOVER_GREEN 
         )
 
         bot_button = draw_button(
@@ -66,7 +66,6 @@ def katarenga_mode_selection(screen, fonts):
                     player_names(screen, fonts, "Katarenga", mode="local")
                     return
 
-                # Nouveau gestionnaire pour le bouton Online
                 if online_button.collidepoint(event.pos):
                     if click_sound:
                         click_sound.play()
