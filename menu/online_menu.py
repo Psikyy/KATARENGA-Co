@@ -364,7 +364,7 @@ def katarenga_online_menu(screen, fonts):
                 
                 room_name_rect = draw_text_input(
                     screen, fonts, room_name_input or "Entrez le nom de la room",
-                    50, 310, 300, 40, room_name_active
+                    50, 310, 310, 40, room_name_active
                 )
                 
                 confirm_create_button = draw_button(
