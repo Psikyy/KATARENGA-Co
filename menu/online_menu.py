@@ -226,9 +226,6 @@ def draw_room_waiting_screen(screen, fonts, online_manager):
         player_text = fonts['medium'].render(f"• {player_name}", True, color)
         screen.blit(player_text, (screen_width // 2 - player_text.get_width() // 2, y_offset + i * 40))
     
-    # Debug info
-    debug_text = fonts['small'].render(f"Debug: Room ID: {online_manager.current_room}, Player ID: {online_manager.player_id[:8] if online_manager.player_id else 'None'}...", True, GREY)
-    screen.blit(debug_text, (10, screen_height - 100))
     
     button_y = screen_height - 150
     
