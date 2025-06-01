@@ -84,7 +84,7 @@ Les déplacements des pions dépendent de la couleur de la case sur laquelle ils
 ### Prérequis techniques
 
 - Python 3.11 ou version ultérieure
-- Pygame (installation automatique via requirements.txt)
+- Pygame
 
 ### Procédure d'installation
 
@@ -94,9 +94,9 @@ Les déplacements des pions dépendent de la couleur de la case sur laquelle ils
    cd katarenga-co
    ```
 
-2. **Installation des dépendances**
+2. **Installation de Pygame**
    ```bash
-   pip install -r requirements.txt
+   pip install pygame
    ```
 
 3. **Lancement du jeu**
