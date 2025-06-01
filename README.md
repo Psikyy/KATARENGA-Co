@@ -1,115 +1,241 @@
-
 # Katarenga&Co
 
-## 🎮 Présentation
+## Table des matières
 
-Katarenga&Co est une adaptation numérique de trois jeux de stratégie abstraite : **Katarenga**, **Congress** et **Isolation**. Il s'agit d'une application multiplateforme (Windows, macOS, Linux) développée en Python avec Pygame, qui vous permet de jouer seul contre une IA ou à deux en local.
-
----
-
-## 🧩 Règles rapides
-
-### 🟥 Types de cases (communs aux 3 jeux)
-
-Le plateau est une grille de 10x10 cases, divisée en quadrants de différentes couleurs :
-
-- 🔴 Rouge : déplacements orthogonaux (haut, bas, gauche, droite)
-- 🟡 Jaune : déplacements en diagonale
-- 🟢 Vert : déplacements en L (comme un cavalier aux échecs)
-- 🔵 Bleu : déplacements dans toutes les directions mais d’une seule case (comme un roi)
+1. [Présentation générale](#présentation-générale)
+2. [Matériel et plateau de jeu](#matériel-et-plateau-de-jeu)
+3. [Règles des jeux](#règles-des-jeux)
+4. [Installation](#installation)
+5. [Guide d'utilisation](#guide-dutilisation)
+6. [Fonctionnalités](#fonctionnalités)
+7. [Structure du projet](#structure-du-projet)
+8. [Équipe de développement](#équipe-de-développement)
 
 ---
 
-### 1. **Katarenga**
-- Chaque joueur a 8 pions.
-- Les pions se déplacent en fonction de la couleur de la case où ils arrivent.
-- Objectif : capturer les deux coins adverses **ou** éliminer tous les pions de l’adversaire.
+## Présentation générale
 
-### 2. **Congress**
-- Objectif : rassembler tous ses pions en un bloc connecté orthogonalement.
-- Pas de captures.
-- Jeu de regroupement pur.
+Katarenga&Co est une adaptation numérique de trois jeux de stratégie abstraite développée dans le cadre d'un projet académique à SUPINFO Lille. Cette application multiplateforme (Windows, macOS, Linux) permet de jouer à **Katarenga**, **Congress** et **Isolation** en mode local ou contre une intelligence artificielle.
 
-### 3. **Isolation**
-- Les joueurs placent leurs pions à tour de rôle.
-- Un pion ne peut pas être placé sur une case occupée.
-- Le dernier à pouvoir jouer gagne.
+Le projet répond à une simulation d'appel à candidatures de la société fictive Smart Games, spécialisée dans l'édition de jeux de plateau de stratégie abstraite souhaitant se diversifier dans le jeu vidéo.
 
 ---
 
-## 🚀 Installation et lancement
+## Matériel et plateau de jeu
 
-### Prérequis
-- Python 3.11 ou plus
-- Pygame (`pip install pygame`)
+### Configuration du plateau
 
-### Étapes
+Le plateau de jeu est identique pour les trois jeux :
+- Grille de 10x10 cases
+- 4 quadrants de 4x4 cases chacun
+- 4 cases utilisables dans les coins du plateau
+- Chaque joueur dispose de 8 pions
 
-1. **Cloner le dépôt** ou **télécharger l'archive ZIP** :
-```bash
-git clone https://github.com/votre-repo/katarenga-co.git
+### Types de cases et déplacements
+
+Les déplacements des pions dépendent de la couleur de la case sur laquelle ils se trouvent :
+
+**Case rouge** : Mouvements orthogonaux (haut, bas, gauche, droite) - inspirés de la tour aux échecs
+
+**Case jaune** : Mouvements en diagonale - inspirés du fou aux échecs
+
+**Case verte** : Mouvements en L - inspirés du cavalier aux échecs
+
+**Case bleue** : Mouvements dans toutes les directions d'une distance d'une case - inspirés du roi aux échecs
+
+---
+
+## Règles des jeux
+
+### Katarenga
+
+**Objectif** : Être le premier à capturer les deux camps adverses situés dans les coins du plateau, ou éliminer suffisamment de pions adverses (il ne doit rester qu'un pion ou moins à l'adversaire).
+
+**Déroulement** :
+- Chaque joueur place ses 8 pions sur le plateau
+- Les pions se déplacent selon la couleur de leur case de destination
+- Un pion peut capturer un pion adverse en se déplaçant sur sa case
+- La partie se termine par la conquête des camps ou l'élimination des pions
+
+### Congress
+
+**Objectif** : Rassembler tous ses pions en un bloc orthogonalement connecté.
+
+**Particularités** :
+- Aucune capture possible
+- Aucune occupation de camps
+- Jeu purement tactique de regroupement
+- La victoire est obtenue dès que tous les pions du joueur forment un groupe connecté
+
+### Isolation
+
+**Objectif** : Être le dernier joueur capable de placer un pion sur le plateau.
+
+**Déroulement** :
+- Les joueurs placent leurs pions à tour de rôle sur un plateau initialement vide
+- Aucun pion ne peut être capturé lors de son placement
+- La partie se termine quand un joueur ne peut plus effectuer de placement légal
+- Le dernier joueur à pouvoir jouer remporte la partie
+
+---
+
+## Installation
+
+### Prérequis techniques
+
+- Python 3.11 ou version ultérieure
+- Pygame (installation automatique via requirements.txt)
+
+### Procédure d'installation
+
+1. **Récupération du code source**
+   ```bash
+   git clone https://github.com/votre-repo/katarenga-co.git
+   cd katarenga-co
+   ```
+
+2. **Installation des dépendances**
+   ```bash
+   pip install -r requirements.txt
+   ```
+
+3. **Lancement du jeu**
+   ```bash
+   python main.py
+   ```
+
+---
+
+## Guide d'utilisation
+
+### Menu principal
+
+Au lancement, vous accédez au menu principal proposant :
+- **Lancer le jeu** : accès à la sélection des jeux
+- **Paramètres** : configuration de la langue (français/anglais)
+- **Quitter** : fermeture de l'application
+
+### Sélection du jeu
+
+Choisissez parmi les trois jeux disponibles :
+- Katarenga
+- Congress  
+- Isolation
+
+### Modes de jeu
+
+Pour chaque jeu, trois modes sont proposés :
+- **Mode local (2 joueurs)** : jeu sur la même machine
+- **Mode en ligne (2 joueurs)** : fonctionnalité en développement
+- **Jouer contre un robot** : adversaire IA avec coups aléatoires
+
+### Configuration de partie
+
+1. **Saisie des noms** : personnalisez les pseudonymes des joueurs
+2. **Modification du plateau** : rotation des quadrants par clic (rotation de 90°)
+3. **Éditeur avancé** : personnalisation complète des quadrants
+4. **Validation** : lancement de la partie
+
+### Interface de jeu
+
+- Les pions noirs commencent toujours la partie
+- Cliquez sur un pion pour afficher ses déplacements possibles
+- Bouton "Règles" disponible pour consulter les règles en cours de partie
+- Détection automatique des conditions de victoire
+
+---
+
+## Fonctionnalités
+
+### Modes de jeu
+- Joueur contre joueur local
+- Joueur contre intelligence artificielle
+
+### Jeux disponibles
+- Katarenga : conquête stratégique
+- Congress : connexion tactique
+- Isolation : placement optimisé
+
+### Personnalisation
+- Éditeur de quadrants avec interface graphique
+- Choix des couleurs par case
+- Sauvegarde et chargement des créations personnalisées
+- Configuration multilingue (français/anglais)
+
+### Interface utilisateur
+- Menus intuitifs et navigables
+- Mise en évidence des coups légaux
+- Messages de victoire automatiques
+- Gestion des paramètres audio et visuels
+
+---
+
+## Structure du projet
+
+```
+Katarenga-Co/
+├── main.py              # Point d'entrée principal
+├── server.py            # Gestion réseau (en développement)
+├── menu/                # Système de menus
+├── games/               # Logique des trois jeux
+│   ├── katarenga/
+│   ├── congress/
+│   ├── isolation/
+│   └── common.py
+├── ui/                  # Interface utilisateur
+│   ├── animation.py
+│   ├── buttons.py
+│   ├── colors.py
+│   └── fonts.py
+├── design_case/         # Éditeur de quadrants
+├── img/                 # Ressources graphiques
+├── musique/             # Ressources audio
+└── dev/                 # Scripts de développement
 ```
 
-2. **Installer les dépendances** :
-```bash
-pip install -r requirements.txt
-```
+### Architecture technique
 
-3. **Lancer le jeu** :
-```bash
-python main.py
-```
+**Langage** : Python (multiplateforme, développement rapide, riche bibliothèque)
 
----
+**Librairie graphique** : Pygame (gestion complète des événements et rendu 2D)
 
-## 🕹️ Utilisation
+**Communication réseau** : Socket TCP intégré à Python
 
-- **Menu principal** : choisissez entre les 3 jeux.
-- **Modes de jeu** :
-  - Joueur vs Joueur (local)
-  - Joueur vs IA (bot aléatoire)
-- **Éditeur de plateau** : personnalisez les quadrants utilisés dans les parties.
-- **Musique et sons** : activables/désactivables depuis les options.
+**Modèle orienté objet** :
+- Game : gestion du déroulement des parties
+- Player : données utilisateur et pions
+- Board : cases et logique de déplacement  
+- Piece : couleur, position et règles de mouvement
 
 ---
 
-## 📸 Captures d'écran
+## Équipe de développement
 
-*(à ajouter dans le README du dépôt GitHub ou dans un dossier /screenshots)*
+**Projet réalisé par les étudiants de première année SUPINFO Lille :**
 
----
-
-## 💡 Astuces
-
-- Cliquez sur un pion pour voir ses déplacements possibles.
-- Utilisez l’éditeur pour créer des plateaux uniques et les tester.
-- Le jeu sauvegarde vos configurations temporairement, mais pas les parties.
-
----
-
-## 📦 Dossier du projet
-
-Voici les fichiers importants :
-```
-main.py         → Lance le jeu
-menu/           → Menus du jeu
-games/          → Logique des jeux Katarenga, Congress, Isolation
-ui/             → Graphisme et boutons
-design_case/    → Éditeur de quadrants
-```
-
----
-
-## 🤝 Auteurs
-
-- Berteloot Tom  
+- Berteloot Tom
 - Martin Thomas  
-- Mennechet Simon  
-- Omar Arthur  
-(SUPINFO Lille, 1ère année)
+- Mennechet Simon
+- Omar Arthur
+
+**Date de réalisation** : 01/06/2025
 
 ---
 
-## 📜 Licence
+## Notes techniques
 
-Ce projet a été réalisé dans un cadre académique. Toute réutilisation extérieure nécessite autorisation.
+### Limitations actuelles
+- Mode en ligne en cours de développement (création de salles fonctionnelle)
+- IA basique avec coups aléatoires
+- Sauvegarde temporaire uniquement
+
+### Améliorations prévues
+- Finalisation du mode multijoueur en ligne
+- Amélioration de l'intelligence artificielle
+- Système de sauvegarde des parties
+- Animations visuelles enrichies
+- Éditeur de thèmes graphiques
+
+---
+
+**Licence** : Projet académique - Toute réutilisation extérieure nécessite autorisation.
