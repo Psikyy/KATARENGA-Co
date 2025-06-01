@@ -53,36 +53,79 @@ class OnlineManager:
     def handle_server_message(self, message):
         """Traite les messages reçus du serveur"""
         msg_type = message.get('type')
+        print(f"[CLIENT] Message reçu: {msg_type} - {message}")
         
-        if msg_type == 'room_list':
+        if msg_type == 'player_id':
+            self.player_id = message.get('id')
+            print(f"[CLIENT] Mon ID reçu: {self.player_id}")
+            
+        elif msg_type == 'room_list':
             self.rooms = message.get('rooms', [])
+            print(f"[CLIENT] Liste des rooms reçue: {len(self.rooms)} rooms")
+            
         elif msg_type == 'room_created':
             self.current_room = message.get('room_id')
             self.current_room_name = message.get('room_name')
             self.is_room_creator = True
-            self.players_in_room = [{'id': self.player_id, 'name': 'Vous'}]
+            # Initialiser avec vous-même
+            self.players_in_room = [{'id': self.player_id, 'name': 'Vous (Créateur)'}]
+            print(f"[CLIENT] Room créée: {self.current_room_name} - Joueurs: {len(self.players_in_room)}")
+            
         elif msg_type == 'room_joined':
             self.current_room = message.get('room_id')
             self.current_room_name = message.get('room_name')
             self.is_room_creator = False
-            self.players_in_room = message.get('players', [])
-        elif msg_type == 'player_id':
-            self.player_id = message.get('id')
+            # Initialiser avec vous-même
+            self.players_in_room = [{'id': self.player_id, 'name': 'Vous'}]
+            print(f"[CLIENT] Room rejointe: {self.current_room_name}")
+            
+        elif msg_type == 'room_players':
+            # Liste des autres joueurs déjà dans la room (quand vous rejoignez)
+            other_players = message.get('players', [])
+            print(f"[CLIENT] ⭐ Autres joueurs dans la room: {other_players}")
+            
+            # Ajouter les autres joueurs à votre liste
+            for player_id in other_players:
+                if player_id != self.player_id:
+                    self.players_in_room.append({
+                        'id': player_id, 
+                        'name': f'Joueur {player_id[:8]}...'
+                    })
+            print(f"[CLIENT] Tous les joueurs maintenant: {len(self.players_in_room)}")
+            
         elif msg_type == 'player_joined':
-            player_info = message.get('player')
-            if player_info and player_info not in self.players_in_room:
-                self.players_in_room.append(player_info)
+            # Un nouveau joueur rejoint la room
+            new_player_id = message.get('player_id')
+            print(f"[CLIENT] ⭐ NOUVEAU JOUEUR REJOINT: {new_player_id}")
+            
+            # Vérifier qu'il n'est pas déjà dans la liste
+            if not any(p['id'] == new_player_id for p in self.players_in_room):
+                self.players_in_room.append({
+                    'id': new_player_id,
+                    'name': f'Joueur {new_player_id[:8]}...'
+                })
+                print(f"[CLIENT] Joueur ajouté! Total: {len(self.players_in_room)}")
+            else:
+                print(f"[CLIENT] Joueur déjà dans la liste")
+                
         elif msg_type == 'player_left':
             player_id = message.get('player_id')
             self.players_in_room = [p for p in self.players_in_room if p.get('id') != player_id]
+            print(f"[CLIENT] Joueur parti: {player_id} - Restants: {len(self.players_in_room)}")
+            
         elif msg_type == 'game_start':
-            pass
+            print("[CLIENT] Jeu démarré!")
+            
+        elif msg_type == 'error':
+            error_msg = message.get('message', 'Erreur inconnue')
+            print(f"[CLIENT] Erreur du serveur: {error_msg}")
 
     def send_message(self, message):
         """Envoie un message au serveur"""
         if self.connected and self.socket:
             try:
                 self.socket.send(json.dumps(message).encode('utf-8'))
+                print(f"[CLIENT] Message envoyé: {message.get('type')}")
             except Exception as e:
                 print(f"Erreur lors de l'envoi du message: {e}")
 
@@ -165,17 +208,27 @@ def draw_room_waiting_screen(screen, fonts, online_manager):
     
     screen.blit(status_text, (screen_width // 2 - status_text.get_width() // 2, 120))
     
-    players_title = fonts['large'].render("Joueurs connectés:", True, BLACK)
+    # Affichage détaillé des joueurs
+    players_title = fonts['large'].render(f"Joueurs connectés ({len(online_manager.players_in_room)}/2):", True, BLACK)
     screen.blit(players_title, (screen_width // 2 - players_title.get_width() // 2, 180))
     
     y_offset = 220
     for i, player in enumerate(online_manager.players_in_room):
-        player_name = player.get('name', f"Joueur {player.get('id', 'Inconnu')}")
-        if player.get('id') == online_manager.player_id:
-            player_name += " (Vous)"
+        player_name = player.get('name', f"Joueur {player.get('id', 'Inconnu')[:8]}...")
         
-        player_text = fonts['medium'].render(f"• {player_name}", True, BLACK)
-        screen.blit(player_text, (screen_width // 2 - player_text.get_width() // 2, y_offset + i * 30))
+        # Couleur différente pour vous vs autres joueurs
+        if player.get('id') == online_manager.player_id:
+            color = GREEN
+            player_name += " ⭐"
+        else:
+            color = BLUE
+        
+        player_text = fonts['medium'].render(f"• {player_name}", True, color)
+        screen.blit(player_text, (screen_width // 2 - player_text.get_width() // 2, y_offset + i * 40))
+    
+    # Debug info
+    debug_text = fonts['small'].render(f"Debug: Room ID: {online_manager.current_room}, Player ID: {online_manager.player_id[:8] if online_manager.player_id else 'None'}...", True, GREY)
+    screen.blit(debug_text, (10, screen_height - 100))
     
     button_y = screen_height - 150
     
@@ -316,7 +369,7 @@ def katarenga_online_menu(screen, fonts):
             for i, room in enumerate(online_manager.rooms[:5]):  # Limiter à 5 rooms
                 room_name = room.get('name', 'Sans nom')
                 room_id = room.get('id', 'N/A')
-                players_count = room.get('players_count', 0)
+                players_count = room.get('players', 0)
                 max_players = room.get('max_players', 2)
                 
                 room_text = fonts['small'].render(f"{room_name} ({players_count}/{max_players})", True, BLACK)
