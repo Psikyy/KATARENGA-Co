@@ -52,33 +52,27 @@ class OnlineManager:
     def handle_server_message(self, message):
         """Traite les messages reçus du serveur"""
         msg_type = message.get('type')
-        print(f"[CLIENT] Message reçu: {msg_type} - {message}")
         
         if msg_type == 'player_id':
             self.player_id = message.get('id')
-            print(f"[CLIENT] Mon ID reçu: {self.player_id}")
             
         elif msg_type == 'room_list':
             self.rooms = message.get('rooms', [])
-            print(f"[CLIENT] Liste des rooms reçue: {len(self.rooms)} rooms")
             
         elif msg_type == 'room_created':
             self.current_room = message.get('room_id')
             self.current_room_name = message.get('room_name')
             self.is_room_creator = True
             self.players_in_room = [{'id': self.player_id, 'name': 'Vous (Créateur)'}]
-            print(f"[CLIENT] Room créée: {self.current_room_name} - Joueurs: {len(self.players_in_room)}")
             
         elif msg_type == 'room_joined':
             self.current_room = message.get('room_id')
             self.current_room_name = message.get('room_name')
             self.is_room_creator = False
             self.players_in_room = [{'id': self.player_id, 'name': 'Vous'}]
-            print(f"[CLIENT] Room rejointe: {self.current_room_name}")
             
         elif msg_type == 'room_players':
             other_players = message.get('players', [])
-            print(f"[CLIENT] Autres joueurs dans la room: {other_players}")
             
             for player_id in other_players:
                 if player_id != self.player_id:
@@ -86,39 +80,32 @@ class OnlineManager:
                         'id': player_id, 
                         'name': f'Joueur {player_id[:8]}...'
                     })
-            print(f"[CLIENT] Tous les joueurs maintenant: {len(self.players_in_room)}")
             
         elif msg_type == 'player_joined':
             new_player_id = message.get('player_id')
-            print(f"[CLIENT] NOUVEAU JOUEUR REJOINT: {new_player_id}")
             
             if not any(p['id'] == new_player_id for p in self.players_in_room):
                 self.players_in_room.append({
                     'id': new_player_id,
                     'name': f'Joueur {new_player_id[:8]}...'
                 })
-                print(f"[CLIENT] Joueur ajouté! Total: {len(self.players_in_room)}")
-            else:
-                print(f"[CLIENT] Joueur déjà dans la liste")
                 
         elif msg_type == 'player_left':
             player_id = message.get('player_id')
             self.players_in_room = [p for p in self.players_in_room if p.get('id') != player_id]
-            print(f"[CLIENT] Joueur parti: {player_id} - Restants: {len(self.players_in_room)}")
             
         elif msg_type == 'game_start':
-            print("[CLIENT] Jeu démarré!")
+            print("Jeu démarré!")
             
         elif msg_type == 'error':
             error_msg = message.get('message', 'Erreur inconnue')
-            print(f"[CLIENT] Erreur du serveur: {error_msg}")
+            print(f"Erreur du serveur: {error_msg}")
 
     def send_message(self, message):
         """Envoie un message au serveur"""
         if self.connected and self.socket:
             try:
                 self.socket.send(json.dumps(message).encode('utf-8'))
-                print(f"[CLIENT] Message envoyé: {message.get('type')}")
             except Exception as e:
                 print(f"Erreur lors de l'envoi du message: {e}")
 
@@ -211,7 +198,6 @@ def draw_room_waiting_screen(screen, fonts, online_manager):
         
         player_text = fonts['medium'].render(f"• {player_name}", True, color)
         screen.blit(player_text, (screen_width // 2 - player_text.get_width() // 2, y_offset + i * 40))
-    
     
     button_y = screen_height - 150
     
