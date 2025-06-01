@@ -18,13 +18,12 @@ class GameState:
         self.winner = None
 
 def get_valid_moves_for_piece(pos, board, all_pieces):
-    """Retourne les mouvements valides pour une pièce à la position donnée.
-    Args:
-        pos (tuple): Position de la pièce sous forme de tuple (x, y).
-        board (list): Représentation du plateau de jeu.
-        all_pieces (list): Liste de toutes les pièces sur le plateau.
-        Returns:
-        list: Liste des positions valides où la pièce peut se déplacer."""
+    """
+        Retourne les mouvements valides pour une pièce à la position donnée.
+    : pos (tuple): Position de la pièce sous forme de tuple (x, y).
+    : board (list): Représentation du plateau de jeu.
+    : all_pieces (list): Liste de toutes les pièces sur le plateau.
+    """
     x, y = pos
     tile_type = board[y][x]
     start_tile = tile_type
@@ -79,11 +78,10 @@ def get_valid_moves_for_piece(pos, board, all_pieces):
     return moves
 
 def are_pieces_connected(pieces):
-    """Vérifie si les pièces d'un joueur forment un bloc connecté.
-    Args:
-        pieces (list): Liste des positions des pièces du joueur sous forme de tuples (x, y).
-    Returns:
-        bool: True si les pièces forment un bloc connecté, False sinon."""
+    """
+        Vérifie si les pièces d'un joueur forment un bloc connecté.
+    : pieces (list) : Liste des positions des pièces du joueur sous forme de tuples (x, y).
+    """
     if not pieces:
         return False
     visited = set()
@@ -104,10 +102,11 @@ def setup_initial_pieces():
     return p1, p2
 
 def show_rules(screen, fonts):
-    """Affiche les règles du jeu Congress.
-    Args:
-        screen (pygame.Surface): L'écran Pygame sur lequel dessiner.
-        fonts (dict): Un dictionnaire de polices de caractères pour le texte."""
+    """
+        Affiche les règles du jeu Congress.
+    : screen (pygame.Surface) : L'écran Pygame sur lequel dessiner.
+    : fonts (dict) : Un dictionnaire de polices de caractères pour le texte.
+    """
 
     screen_width = screen.get_width()
     screen_height = screen.get_height()
@@ -146,14 +145,15 @@ def show_rules(screen, fonts):
 
 
 def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mode="local"):
-    """Démarre une partie de Congress.
-    Args:
-        screen (pygame.Surface): L'écran Pygame sur lequel dessiner.
-        fonts (dict): Un dictionnaire de polices de caractères pour le texte.
-        player1_name (str): Le nom du joueur 1.
-        player2_name (str): Le nom du joueur 2.
-        selected_quadrants (list): Les quadrants sélectionnés pour le jeu.
-        mode (str): Le mode de jeu ("local", "bot")."""
+    """
+        Démarre une partie de Congress.
+    : screen (pygame.Surface): L'écran Pygame sur lequel dessiner.
+    : fonts (dict) : Un dictionnaire de polices de caractères pour le texte.
+    : player1_name (str) : Le nom du joueur 1.
+    : player2_name (str) : Le nom du joueur 2.
+    : selected_quadrants (list) : Les quadrants sélectionnés pour le jeu.
+    : mode (str) : Le mode de jeu ("local", "bot").
+    """
     
     bot_player = 2 if mode == "bot" else None
     screen_width = screen.get_width()
@@ -267,11 +267,10 @@ def start_game(screen, fonts, player1_name, player2_name, selected_quadrants, mo
 
 
 def bot_play(game_state):
-    """Fait jouer le bot en choisissant aléatoirement une pièce et un mouvement valide.
-    Args:
-        game_state (GameState): L'état actuel du jeu.
-    Returns:
-        bool: True si le bot a joué, False si aucune pièce n'est jouable."""
+    """
+        Fait jouer le bot en choisissant aléatoirement une pièce et un mouvement valide.
+    : game_state (GameState) : L'état actuel du jeu.
+    """
     pieces = game_state.player2_pieces if game_state.current_player == 2 else game_state.player1_pieces
     opponent_pieces = game_state.player1_pieces if game_state.current_player == 2 else game_state.player2_pieces
 

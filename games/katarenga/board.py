@@ -288,7 +288,10 @@ def configure_board(screen, fonts):
 
 def edit_board(screen, fonts, board):
     """
-    Edit board interface for 10x10 board with corners
+        Fonction pour éditer le plateau de jeu
+    : screen : l'écran Pygame sur lequel dessiner
+    : fonts : un dictionnaire de polices de caractères
+    : board : le plateau de jeu à éditer (8x8)
     """
     screen_width = screen.get_width()
     screen_height = screen.get_height()
