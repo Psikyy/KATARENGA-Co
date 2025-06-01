@@ -14,7 +14,10 @@ class OnlineManager:
         self.connected = False
         self.rooms = []
         self.current_room = None
+        self.current_room_name = None
         self.player_id = None
+        self.players_in_room = []
+        self.is_room_creator = False
         self.server_host = "localhost"
         self.server_port = 12345
 
@@ -56,10 +59,26 @@ class OnlineManager:
             self.rooms = message.get('rooms', [])
         elif msg_type == 'room_created':
             self.current_room = message.get('room_id')
+            self.current_room_name = message.get('room_name')
+            self.is_room_creator = True
+            self.players_in_room = [{'id': self.player_id, 'name': 'Vous'}]
         elif msg_type == 'room_joined':
             self.current_room = message.get('room_id')
+            self.current_room_name = message.get('room_name')
+            self.is_room_creator = False
+            self.players_in_room = message.get('players', [])
         elif msg_type == 'player_id':
             self.player_id = message.get('id')
+        elif msg_type == 'player_joined':
+            player_info = message.get('player')
+            if player_info and player_info not in self.players_in_room:
+                self.players_in_room.append(player_info)
+        elif msg_type == 'player_left':
+            player_id = message.get('player_id')
+            self.players_in_room = [p for p in self.players_in_room if p.get('id') != player_id]
+        elif msg_type == 'game_start':
+            # Le jeu commence
+            pass
 
     def send_message(self, message):
         """Envoie un message au serveur"""
@@ -85,6 +104,28 @@ class OnlineManager:
         }
         self.send_message(message)
 
+    def leave_room(self):
+        """Quitte la room actuelle"""
+        if self.current_room:
+            message = {
+                'type': 'leave_room',
+                'room_id': self.current_room
+            }
+            self.send_message(message)
+            self.current_room = None
+            self.current_room_name = None
+            self.players_in_room = []
+            self.is_room_creator = False
+
+    def start_game(self):
+        """Démarre le jeu (seulement pour le créateur)"""
+        if self.is_room_creator and self.current_room:
+            message = {
+                'type': 'start_game',
+                'room_id': self.current_room
+            }
+            self.send_message(message)
+
     def get_rooms(self):
         """Demande la liste des rooms disponibles"""
         message = {'type': 'get_rooms'}
@@ -92,6 +133,8 @@ class OnlineManager:
 
     def disconnect(self):
         """Se déconnecte du serveur"""
+        if self.current_room:
+            self.leave_room()
         if self.socket:
             self.socket.close()
         self.connected = False
@@ -107,6 +150,63 @@ def draw_text_input(screen, fonts, text, x, y, width, height, active=False):
     
     return pygame.Rect(x, y, width, height)
 
+def draw_room_waiting_screen(screen, fonts, online_manager):
+    """Affiche l'écran d'attente dans une room"""
+    screen_width = screen.get_width()
+    screen_height = screen.get_height()
+    
+    screen.fill(WHITE)
+    
+    # Titre
+    title_text = fonts['title'].render(f"Room: {online_manager.current_room_name}", True, BLACK)
+    screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 50))
+    
+    # Statut
+    if online_manager.is_room_creator:
+        status_text = fonts['large'].render("Vous êtes l'hôte - En attente de joueurs...", True, GREEN)
+    else:
+        status_text = fonts['large'].render("En attente du début de partie...", True, BLUE)
+    
+    screen.blit(status_text, (screen_width // 2 - status_text.get_width() // 2, 120))
+    
+    # Liste des joueurs
+    players_title = fonts['large'].render("Joueurs connectés:", True, BLACK)
+    screen.blit(players_title, (screen_width // 2 - players_title.get_width() // 2, 180))
+    
+    y_offset = 220
+    for i, player in enumerate(online_manager.players_in_room):
+        player_name = player.get('name', f"Joueur {player.get('id', 'Inconnu')}")
+        if player.get('id') == online_manager.player_id:
+            player_name += " (Vous)"
+        
+        player_text = fonts['medium'].render(f"• {player_name}", True, BLACK)
+        screen.blit(player_text, (screen_width // 2 - player_text.get_width() // 2, y_offset + i * 30))
+    
+    # Boutons
+    button_y = screen_height - 150
+    
+    if online_manager.is_room_creator and len(online_manager.players_in_room) >= 2:
+        start_button = draw_button(
+            screen, fonts, "Démarrer la partie",
+            screen_width // 2 - 150, button_y,
+            300, 50,
+            GREEN, HOVER_GREEN
+        )
+    else:
+        start_button = None
+        if online_manager.is_room_creator:
+            waiting_text = fonts['medium'].render("En attente d'au moins 2 joueurs pour démarrer", True, GREY)
+            screen.blit(waiting_text, (screen_width // 2 - waiting_text.get_width() // 2, button_y + 10))
+    
+    leave_button = draw_button(
+        screen, fonts, "Quitter la room",
+        screen_width // 2 - 100, button_y + 70,
+        200, 40,
+        RED, HOVER_RED
+    )
+    
+    return start_button, leave_button
+
 def katarenga_online_menu(screen, fonts):
     """Menu principal du mode en ligne"""
     screen_width = screen.get_width()
@@ -121,19 +221,49 @@ def katarenga_online_menu(screen, fonts):
     room_name_active = False
     show_create_room = False
     
-    # Variables pour rejoindre une room
-    room_id_input = ""
-    room_id_active = False
-    
     button_width = 300
     button_height = 60
     
     while running:
         screen.fill(WHITE)
         
-        # Titre
+        # Si on est dans une room, afficher l'écran d'attente
+        if online_manager.current_room:
+            start_button, leave_button = draw_room_waiting_screen(screen, fonts, online_manager)
+            
+            # Gestion des événements pour l'écran d'attente
+            for event in pygame.event.get():
+                if event.type == pygame.QUIT:
+                    online_manager.disconnect()
+                    pygame.quit()
+                    sys.exit()
+                    
+                if event.type == pygame.MOUSEBUTTONDOWN:
+                    if leave_button.collidepoint(event.pos):
+                        if click_sound:
+                            click_sound.play()
+                        online_manager.leave_room()
+                    elif start_button and start_button.collidepoint(event.pos):
+                        if click_sound:
+                            click_sound.play()
+                        online_manager.start_game()
+                        # Ici, vous pourriez lancer le jeu
+                        print("Démarrage du jeu!")
+            
+            pygame.display.flip()
+            continue
+        
+        # Menu principal
         title_text = fonts['title'].render("Mode En Ligne - Katarenga", True, BLACK)
         screen.blit(title_text, (screen_width // 2 - title_text.get_width() // 2, 30))
+        
+        # Initialiser les variables de rect à None
+        room_name_rect = None
+        create_room_button = None
+        confirm_create_button = None
+        cancel_create_button = None
+        refresh_button = None
+        connect_button = None
         
         if not online_manager.connected and not connecting:
             # Écran de connexion
@@ -157,32 +287,13 @@ def katarenga_online_menu(screen, fonts):
             status_text = fonts['medium'].render("Connecté au serveur", True, GREEN)
             screen.blit(status_text, (screen_width // 2 - status_text.get_width() // 2, 100))
             
-            # Section rejoindre une room
-            join_title = fonts['large'].render("Rejoindre une Room", True, BLACK)
-            screen.blit(join_title, (50, 150))
-            
-            # Champ pour l'ID de la room
-            room_id_label = fonts['medium'].render("ID de la Room:", True, BLACK)
-            screen.blit(room_id_label, (50, 200))
-            
-            room_id_rect = draw_text_input(
-                screen, fonts, room_id_input or "Entrez l'ID de la room",
-                50, 230, 300, 40, room_id_active
-            )
-            
-            join_button = draw_button(
-                screen, fonts, "Rejoindre",
-                370, 230, 120, 40,
-                BLUE, HOVER_BLUE
-            )
-            
             # Section créer une room
             create_title = fonts['large'].render("Créer une Room", True, BLACK)
-            screen.blit(create_title, (50, 320))
+            screen.blit(create_title, (50, 150))
             
             create_room_button = draw_button(
                 screen, fonts, "Créer une nouvelle room",
-                50, 360, button_width, button_height,
+                50, 190, button_width, button_height,
                 GREEN, HOVER_GREEN
             )
             
@@ -190,22 +301,22 @@ def katarenga_online_menu(screen, fonts):
             if show_create_room:
                 # Champ pour le nom de la room
                 room_name_label = fonts['medium'].render("Nom de la Room:", True, BLACK)
-                screen.blit(room_name_label, (50, 450))
+                screen.blit(room_name_label, (50, 280))
                 
                 room_name_rect = draw_text_input(
                     screen, fonts, room_name_input or "Entrez le nom de la room",
-                    50, 480, 300, 40, room_name_active
+                    50, 310, 300, 40, room_name_active
                 )
                 
                 confirm_create_button = draw_button(
                     screen, fonts, "Créer",
-                    370, 480, 120, 40,
+                    370, 310, 120, 40,
                     GREEN, HOVER_GREEN
                 )
                 
                 cancel_create_button = draw_button(
                     screen, fonts, "Annuler",
-                    500, 480, 120, 40,
+                    500, 310, 120, 40,
                     RED, HOVER_RED
                 )
             
@@ -220,11 +331,31 @@ def katarenga_online_menu(screen, fonts):
                 BLUE, HOVER_BLUE
             )
             
-            # Afficher les rooms
+            # Afficher les rooms avec boutons pour rejoindre
             y_offset = 220
+            room_buttons = []
             for i, room in enumerate(online_manager.rooms[:5]):  # Limiter à 5 rooms
-                room_text = fonts['small'].render(f"Room: {room.get('name', 'Sans nom')} (ID: {room.get('id', 'N/A')})", True, BLACK)
-                screen.blit(room_text, (screen_width - 400, y_offset + i * 30))
+                room_name = room.get('name', 'Sans nom')
+                room_id = room.get('id', 'N/A')
+                players_count = room.get('players_count', 0)
+                max_players = room.get('max_players', 2)
+                
+                # Texte de la room
+                room_text = fonts['small'].render(f"{room_name} ({players_count}/{max_players})", True, BLACK)
+                screen.blit(room_text, (screen_width - 400, y_offset + i * 60))
+                
+                # Bouton rejoindre
+                if players_count < max_players:
+                    join_room_button = draw_button(
+                        screen, fonts, "Rejoindre",
+                        screen_width - 400, y_offset + i * 60 + 20, 100, 30,
+                        BLUE, HOVER_BLUE
+                    )
+                    room_buttons.append((join_room_button, room_id))
+                else:
+                    # Room pleine
+                    full_text = fonts['small'].render("Pleine", True, RED)
+                    screen.blit(full_text, (screen_width - 400, y_offset + i * 60 + 25))
         
         # Bouton retour
         back_button = draw_button(
@@ -249,7 +380,7 @@ def katarenga_online_menu(screen, fonts):
                     return
                 
                 if not online_manager.connected and not connecting:
-                    if connect_button.collidepoint(event.pos):
+                    if connect_button and connect_button.collidepoint(event.pos):
                         if click_sound:
                             click_sound.play()
                         connecting = True
@@ -265,53 +396,49 @@ def katarenga_online_menu(screen, fonts):
                         connect_thread.start()
                 
                 elif online_manager.connected:
-                    # Gestion des clics dans le menu en ligne
-                    if room_id_rect.collidepoint(event.pos):
-                        room_id_active = True
-                        room_name_active = False
-                    elif join_button.collidepoint(event.pos) and room_id_input.strip():
-                        if click_sound:
-                            click_sound.play()
-                        online_manager.join_room(room_id_input.strip())
-                    elif create_room_button.collidepoint(event.pos):
+                    # Gestion des clics pour rejoindre des rooms
+                    for button, room_id in room_buttons:
+                        if button.collidepoint(event.pos):
+                            if click_sound:
+                                click_sound.play()
+                            online_manager.join_room(room_id)
+                            break
+                    
+                    # Gestion des autres boutons
+                    if create_room_button and create_room_button.collidepoint(event.pos):
                         if click_sound:
                             click_sound.play()
                         show_create_room = not show_create_room
                         room_name_input = ""
-                    elif refresh_button.collidepoint(event.pos):
+                        room_name_active = False
+                    elif refresh_button and refresh_button.collidepoint(event.pos):
                         if click_sound:
                             click_sound.play()
                         online_manager.get_rooms()
                     
                     if show_create_room:
-                        if room_name_rect.collidepoint(event.pos):
+                        if room_name_rect and room_name_rect.collidepoint(event.pos):
                             room_name_active = True
-                            room_id_active = False
-                        elif confirm_create_button.collidepoint(event.pos) and room_name_input.strip():
+                        elif confirm_create_button and confirm_create_button.collidepoint(event.pos) and room_name_input.strip():
                             if click_sound:
                                 click_sound.play()
                             online_manager.create_room(room_name_input.strip())
                             show_create_room = False
                             room_name_input = ""
-                        elif cancel_create_button.collidepoint(event.pos):
+                            room_name_active = False
+                        elif cancel_create_button and cancel_create_button.collidepoint(event.pos):
                             if click_sound:
                                 click_sound.play()
                             show_create_room = False
                             room_name_input = ""
+                            room_name_active = False
                     else:
-                        room_name_active = False
+                        # Si on n'est pas en train de créer une room, désactiver l'input du nom
+                        if room_name_active:
+                            room_name_active = False
             
             if event.type == pygame.KEYDOWN:
-                if room_id_active:
-                    if event.key == pygame.K_BACKSPACE:
-                        room_id_input = room_id_input[:-1]
-                    elif event.key == pygame.K_RETURN:
-                        if room_id_input.strip():
-                            online_manager.join_room(room_id_input.strip())
-                    else:
-                        room_id_input += event.unicode
-                
-                elif room_name_active:
+                if room_name_active:
                     if event.key == pygame.K_BACKSPACE:
                         room_name_input = room_name_input[:-1]
                     elif event.key == pygame.K_RETURN:
@@ -319,6 +446,7 @@ def katarenga_online_menu(screen, fonts):
                             online_manager.create_room(room_name_input.strip())
                             show_create_room = False
                             room_name_input = ""
+                            room_name_active = False
                     else:
                         room_name_input += event.unicode
 
