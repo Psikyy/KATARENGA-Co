@@ -26,7 +26,7 @@ Le projet répond à une simulation d'appel à candidatures de la société fict
 ### Configuration du plateau
 
 Le plateau de jeu est identique pour les trois jeux :
-- Grille de 10x10 cases
+- Grille de 10x10 cases dans la quelle on a placé notre plateau de 8x8
 - 4 quadrants de 4x4 cases chacun
 - 4 cases utilisables dans les coins du plateau
 - Chaque joueur dispose de 8 pions
@@ -149,6 +149,7 @@ Pour chaque jeu, trois modes sont proposés :
 
 ### Modes de jeu
 - Joueur contre joueur local
+- Joueur contre joueur en ligne (en dévellopement)
 - Joueur contre intelligence artificielle
 
 ### Jeux disponibles
