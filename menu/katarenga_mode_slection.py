@@ -70,7 +70,7 @@ def katarenga_mode_selection(screen, fonts):
                     if click_sound:
                         click_sound.play()
                     loading_screen(screen, fonts, t("mode_online_loading"))
-                    katarenga_online_menu(screen, fonts)  # Appel du nouveau menu
+                    katarenga_online_menu(screen, fonts)  
                     return
 
                 if bot_button.collidepoint(event.pos):
