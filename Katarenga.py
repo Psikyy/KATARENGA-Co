@@ -70,6 +70,28 @@ class Case:
     Cette classe initialise le plateau de jeu avec les 4 quadrants.
 """
 class Init_Board_Color:
+
+    @staticmethod
+    def rotate_quadrant(quadrant, rotation) -> list:
+        """
+            Applique une rotation à un quadrant.
+            :param quadrant: Le quadrant à tourner.
+            :param rotation: 0 (0°), 1 (90°), 2 (180°), 3 (270°), 4 en mirroir (ou symétrie axiale).
+            :return: Le quadrant tourné.
+        """
+        if rotation == 0:
+            return quadrant
+        elif rotation == 1:
+            return [list(row) for row in zip(*quadrant[::-1])]  # 90°
+        elif rotation == 2:
+            return [row[::-1] for row in quadrant[::-1]]  # 180°
+        elif rotation == 3:
+            return [list(row) for row in zip(*quadrant)][::-1]  # 270°
+        elif rotation == 4:
+            return [row[::-1] for row in quadrant] # Mirroir horizontal
+        else:
+            raise ValueError("Rotation invalide. Doit être 0, 1, 2 ou 3.")
+
     def __init__(self, quart_1: list, quart_2: list, quart_3: list, quart_4: list):
         self.q1 = quart_1
         self.q2 = quart_2
@@ -92,26 +114,6 @@ class Init_Board_Color:
     def getBoard(self) -> list:
         return self.board
 
-    @staticmethod
-    def rotate_quadrant(quadrant, rotation) -> list:
-        """
-            Applique une rotation à un quadrant.
-            :param quadrant: Le quadrant à tourner.
-            :param rotation: 0 (0°), 1 (90°), 2 (180°), 3 (270°), 4 en mirroir (ou symétrie axiale).
-            :return: Le quadrant tourné.
-        """
-        if rotation == 0:
-            return quadrant
-        elif rotation == 1:
-            return [list(row) for row in zip(*quadrant[::-1])]  # 90°
-        elif rotation == 2:
-            return [row[::-1] for row in quadrant[::-1]]  # 180°
-        elif rotation == 3:
-            return [list(row) for row in zip(*quadrant)][::-1]  # 270°
-        elif rotation == 4:
-            return [row[::-1] for row in quadrant] # Mirroir horizontal
-        else:
-            raise ValueError("Rotation invalide. Doit être 0, 1, 2 ou 3.")
 
     def create_board(self) -> list:
         """

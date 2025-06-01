@@ -14,7 +14,9 @@ except ImportError:
     print("Module serveur non trouvé - mode serveur désactivé")
 
 def start_server_if_needed():
-    """Démarre le serveur si aucun serveur n'est déjà en cours d'exécution"""
+    """
+        Démarre le serveur si aucun serveur n'est déjà en cours d'exécution
+    """
     if not SERVER_AVAILABLE:
         return False
     

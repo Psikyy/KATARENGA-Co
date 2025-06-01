@@ -9,7 +9,10 @@ from menu.settings import t
 
 
 def main_menu(screen):
-    '''Affiche le menu principal du jeu.'''
+    """
+        Affiche le menu principal du jeu.
+    : screen : l'écran Pygame sur lequel dessiner
+    """
     screen_width = screen.get_width()
     screen_height = screen.get_height()
 

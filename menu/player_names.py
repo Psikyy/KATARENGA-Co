@@ -15,13 +15,13 @@ from games.congress.game import start_game as start_congress_game
 
 
 def player_names(screen, fonts, game_name, mode=None):
-    '''Affiche le menu de saisie des noms des joueurs.
-    args:
-        screen: l'écran Pygame sur lequel dessiner
-        fonts: un dictionnaire de polices de caractères
-        game_name: le nom du jeu sélectionné
-        mode: le mode de jeu (local, bot, etc.)
-    '''
+    """
+        Affiche le menu de saisie des noms des joueurs.
+    : screen : l'écran Pygame sur lequel dessiner
+    : fonts : un dictionnaire de polices de caractères
+    : game_name : le nom du jeu sélectionné
+    : mode : le mode de jeu (local, bot, etc.)
+    """
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     

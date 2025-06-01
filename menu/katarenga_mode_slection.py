@@ -8,7 +8,11 @@ from menu.settings import t
 from menu.online_menu import katarenga_online_menu  
 
 def katarenga_mode_selection(screen, fonts):
-    '''affiche le menu de sélection du mode de jeu pour Katarenga'''
+    """
+        Affiche le menu de sélection du mode de jeu pour Katarenga
+    : screen : l'écran Pygame sur lequel dessiner
+    : fonts : un dictionnaire de polices de caractères
+    """
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     

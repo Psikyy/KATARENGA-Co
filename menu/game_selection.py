@@ -10,11 +10,11 @@ from menu.isolation_mode_selection import isolation_mode_selection
 from menu.settings import t
 
 def game_selection(screen, fonts):
-    '''affiche le menu de sélection du jeu
-    args:
-        screen: l'écran Pygame sur lequel dessiner
-        fonts: un dictionnaire de polices de caractères
-    '''
+    """
+        Affiche le menu de sélection du jeu
+    : screen : l'écran Pygame sur lequel dessiner
+    : fonts : un dictionnaire de polices de caractères
+    """
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     
