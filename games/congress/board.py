@@ -27,13 +27,8 @@ COIN_IMAGE = pygame.image.load(os.path.join("design_case", "coin.png"))
 
 def validate_board(board):
     """
-    Validate that the board meets Katarenga's color distribution rules
-    
-    Args:
-        board (List[List[str]]): 8x8 board of tile types
-    
-    Returns:
-        bool: True if board is valid, False otherwise
+        Validate that the board meets Katarenga's color distribution rules
+    : board (List[List[str]]) : 10x10 board with corners and 8x8 game area
     """
 
     quadrants = split_board_into_quadrants(board)
@@ -45,13 +40,8 @@ def validate_board(board):
 
 def split_board_into_quadrants(board_8x8):
     """
-    Split an 8x8 board into 4 quadrants
-    
-    Args:
-        board_8x8 (List[List[str]]): 8x8 board
-    
-    Returns:
-        List[List[List[str]]]: 4 quadrants of 4x4 tiles
+        Split an 8x8 board into 4 quadrants
+    : board_8x8 (List[List[str]]) : 8x8 board
     """
     quadrants = []
     for i in range(2):
@@ -62,23 +52,15 @@ def split_board_into_quadrants(board_8x8):
 
 def is_valid_quadrant(quadrant):
     """
-    Check if a quadrant has exactly 4 tiles of each color
-    
-    Args:
-        quadrant (List[List[str]]): 4x4 quadrant of tiles
-    
-    Returns:
-        bool: True if quadrant is valid, False otherwise
+        Check if a quadrant has exactly 4 tiles of each color
+    : quadrant (List[List[str]]) : 4x4 quadrant of tiles
     """
     flat = [cell for row in quadrant for cell in row]
     return all(flat.count(color) == 4 for color in TILE_KEYS)
 
 def generate_random_quadrant():
     """
-    Generate a random valid 4x4 quadrant
-    
-    Returns:
-        List[List[str]]: A 4x4 quadrant with balanced color distribution
+        Generate a random valid 4x4 quadrant
     """
     tiles = ['A'] * 4 + ['B'] * 4 + ['C'] * 4 + ['D'] * 4
     random.shuffle(tiles)
@@ -86,13 +68,8 @@ def generate_random_quadrant():
 
 def generate_board_from_quadrants(quadrants):
     """
-    Generate an 8x8 board from 4 quadrants
-    
-    Args:
-        quadrants (List[List[List[str]]]): 4 quadrants to combine
-    
-    Returns:
-        List[List[str]]: 8x8 board
+        Generate a 10x10 board from 4 quadrants, including corners and borders
+    : quadrants (List[List[List[str]]]) : 4 quadrants to combine
     """
     board = [[None for _ in range(BOARD_SIZE)] for _ in range(BOARD_SIZE)]
     for i in range(2):
@@ -105,14 +82,9 @@ def generate_board_from_quadrants(quadrants):
 
 def rotate_quadrant(quadrant, rotations=1):
     """
-    Rotate a quadrant 90 degrees clockwise
-    
-    Args:
-        quadrant (List[List[str]]): 4x4 quadrant to rotate
-        rotations (int): Number of 90-degree rotations
-    
-    Returns:
-        List[List[str]]: Rotated quadrant
+        Rotate a quadrant 90 degrees clockwise
+    : quadrant (List[List[str]]) : 4x4 quadrant to rotate
+    : rotations (int) : Number of 90-degree rotations
     """
     for _ in range(rotations):
         quadrant = [list(row) for row in zip(*quadrant[::-1])]
@@ -120,14 +92,9 @@ def rotate_quadrant(quadrant, rotations=1):
 
 def create_random_board(rows=8, cols=8):
     """
-    Create a completely random board
-    
-    Args:
-        rows (int): Number of rows
-        cols (int): Number of columns
-    
-    Returns:
-        List[List[str]]: Randomly generated board
+        Create a completely random board with corners
+    : rows (int) : Number of rows (default 10)
+    : cols (int) : Number of columns (default 10)
     """
     possible_tiles = ['A', 'B', 'C', 'D']
     while True:
@@ -137,14 +104,12 @@ def create_random_board(rows=8, cols=8):
 
 def draw_borders_and_corners(screen, board_x, board_y, board_width, board_height):
     """
-    Draw decorative borders and corners around the board
-    
-    Args:
-        screen (pygame.Surface): Surface to draw on
-        board_x (int): X coordinate of board's top-left corner
-        board_y (int): Y coordinate of board's top-left corner
-        board_width (int): Width of the board
-        board_height (int): Height of the board
+        Draw decorative borders and corners around the board
+    : screen (pygame.Surface) : Surface to draw on
+    : board_x (int) : X coordinate of board's top-left corner
+    : board_y (int) : Y coordinate of board's top-left corner
+    : board_width (int) : Width of the board
+    : board_height (int) : Height of the board
     """
     contour_scaled_h = pygame.transform.scale(CONTOUR_IMAGE, (TILE_SIZE, TILE_SIZE))
     contour_scaled_v = pygame.transform.rotate(contour_scaled_h, 90)
@@ -165,16 +130,11 @@ def draw_borders_and_corners(screen, board_x, board_y, board_width, board_height
 
 def draw_board(screen, fonts, board, draw_pieces=True):
     """
-    Draw the game board on the screen
-    
-    Args:
-        screen (pygame.Surface): Surface to draw on
-        fonts (dict): Dictionary of fonts
-        board (List[List[str]]): 8x8 board to draw
-        draw_pieces (bool): Whether to draw game pieces (default True)
-    
-    Returns:
-        List[List[str]]: The drawn board (for consistency)
+        Draw the game board on the screen
+    : screen (pygame.Surface) : Surface to draw on
+    : fonts (dict) : Dictionary of fonts
+    : board (List[List[str]]) : 10x10 board to draw
+    : draw_pieces (bool) : Whether to draw game pieces (default True)
     """
     if not board or not isinstance(board, list) or len(board) != BOARD_SIZE:
         raise ValueError(f"Invalid board: must be an {BOARD_SIZE}x{BOARD_SIZE} list of tile types")
@@ -211,14 +171,9 @@ def draw_board(screen, fonts, board, draw_pieces=True):
 
 def configure_board(screen, fonts):
     """
-    Interactive board configuration interface
-    
-    Args:
-        screen (pygame.Surface): Screen to draw on
-        fonts (dict): Dictionary of fonts
-    
-    Returns:
-        List[List[str]]: Configured board
+        Interactive board configuration interface with clickable corners
+    : screen (pygame.Surface) : Screen to draw on
+    : fonts (dict) : Dictionary of fonts
     """
     screen_width = screen.get_width()
     screen_height = screen.get_height()
@@ -309,14 +264,12 @@ def configure_board(screen, fonts):
         pygame.display.flip()
 
 def edit_board(screen, fonts, board):
-    '''foncrtion pour éditer le plateau de jeu
-    args:
-        screen: l'écran Pygame sur lequel dessiner
-        fonts: un dictionnaire de polices de caractères
-        board: le plateau de jeu à éditer (8x8)
-        Returns:
-        List[List[str]]: The edited board
-        '''
+    """
+        Fonction pour éditer le plateau de jeu
+    : screen : l'écran Pygame sur lequel dessiner
+    : fonts : un dictionnaire de polices de caractères
+    : board : le plateau de jeu à éditer (8x8)
+    """
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     working_board = [row.copy() for row in board]
@@ -393,23 +346,16 @@ def edit_board(screen, fonts, board):
     return board
 def print_board(board):
     """
-    Print a text representation of the board for debugging
-    
-    Args:
-        board (List[List[str]]): Board to print
+        Print a text representation of the board for debugging
+    : board (List[List[str]]) : Board to print
     """
     for row in board:
         print(' '.join(row))
 
 def board_to_quadrants(board):
     """
-    Convert a full board back to quadrants
-    
-    Args:
-        board (List[List[str]]): 8x8 board
-    
-    Returns:
-        List[List[List[str]]]: 4 quadrants
+        Convert a full 10x10 board back to 8x8 inner board and then to quadrants
+    : board (List[List[str]]) : 10x10 board
     """
     return split_board_into_quadrants(board)
 __all__ = [
