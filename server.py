@@ -101,9 +101,10 @@ class GameServer:
         self.send_to_client(client_id, {
             'type': 'room_created',
             'room_id': room_id,
-            'room_name': room_name
+            'room_name': room_name,
+            'players_in_room': 1
         })
-        print(f"Room '{room_name}' créée avec l'ID: {room_id}")
+        print(f"Room '{room_name}' créée avec l'ID: {room_id} par le joueur {client_id}")
 
     def join_room(self, client_id, room_id):
         if room_id not in self.rooms:
@@ -121,22 +122,39 @@ class GameServer:
             })
             return
         
+        # Ajouter le joueur seulement s'il n'est pas déjà dans la room
         if client_id not in room['players']:
             room['players'].append(client_id)
         
         self.clients[client_id]['room_id'] = room_id
+        
+        # Confirmer au joueur qu'il a rejoint la room
         self.send_to_client(client_id, {
             'type': 'room_joined',
             'room_id': room_id,
-            'room_name': room['name']
+            'room_name': room['name'],
+            'players_in_room': len(room['players'])
         })
+        
+        print(f"Joueur {client_id} a rejoint la room {room_id}. Joueurs dans la room: {len(room['players'])}")
 
+        # Notifier TOUS les autres joueurs dans la room
         for player_id in room['players']:
-            if player_id != client_id:
+            if player_id != client_id and player_id in self.clients:
                 self.send_to_client(player_id, {
                     'type': 'player_joined',
-                    'player_id': client_id
+                    'player_id': client_id,
+                    'total_players': len(room['players'])
                 })
+                print(f"Notification envoyée à {player_id} que {client_id} a rejoint")
+        
+        # Envoyer la liste des joueurs actuels au nouveau joueur
+        other_players = [p for p in room['players'] if p != client_id]
+        if other_players:
+            self.send_to_client(client_id, {
+                'type': 'room_players',
+                'players': other_players
+            })
 
     def send_room_list(self, client_id):
         available_rooms = []
@@ -166,11 +184,13 @@ class GameServer:
     def send_to_client(self, client_id, message):
         if client_id in self.clients:
             try:
-                self.clients[client_id]['socket'].send(
-                    json.dumps(message).encode('utf-8')
-                )
+                message_str = json.dumps(message).encode('utf-8')
+                self.clients[client_id]['socket'].send(message_str)
+                print(f"Message envoyé à {client_id}: {message.get('type', 'unknown')}")
             except Exception as e:
                 print(f"Erreur envoi message à {client_id}: {e}")
+                # Si l'envoi échoue, déconnecter le client
+                self.disconnect_client(client_id)
 
     def disconnect_client(self, client_id):
         if client_id not in self.clients:
