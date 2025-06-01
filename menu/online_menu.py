@@ -22,7 +22,7 @@ class OnlineManager:
         self.server_port = 12345
 
     def connect_to_server(self):
-        """Se connecte au serveur de jeu"""
+        """Connection au serv"""
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect((self.server_host, self.server_port))
@@ -38,7 +38,6 @@ class OnlineManager:
             return False
 
     def listen_server(self):
-        """Écoute les messages du serveur"""
         while self.connected:
             try:
                 data = self.socket.recv(1024).decode('utf-8')
@@ -67,7 +66,6 @@ class OnlineManager:
             self.current_room = message.get('room_id')
             self.current_room_name = message.get('room_name')
             self.is_room_creator = True
-            # Initialiser avec vous-même
             self.players_in_room = [{'id': self.player_id, 'name': 'Vous (Créateur)'}]
             print(f"[CLIENT] Room créée: {self.current_room_name} - Joueurs: {len(self.players_in_room)}")
             
@@ -75,16 +73,13 @@ class OnlineManager:
             self.current_room = message.get('room_id')
             self.current_room_name = message.get('room_name')
             self.is_room_creator = False
-            # Initialiser avec vous-même
             self.players_in_room = [{'id': self.player_id, 'name': 'Vous'}]
             print(f"[CLIENT] Room rejointe: {self.current_room_name}")
             
         elif msg_type == 'room_players':
-            # Liste des autres joueurs déjà dans la room (quand vous rejoignez)
             other_players = message.get('players', [])
-            print(f"[CLIENT] ⭐ Autres joueurs dans la room: {other_players}")
+            print(f"[CLIENT] Autres joueurs dans la room: {other_players}")
             
-            # Ajouter les autres joueurs à votre liste
             for player_id in other_players:
                 if player_id != self.player_id:
                     self.players_in_room.append({
@@ -94,11 +89,9 @@ class OnlineManager:
             print(f"[CLIENT] Tous les joueurs maintenant: {len(self.players_in_room)}")
             
         elif msg_type == 'player_joined':
-            # Un nouveau joueur rejoint la room
             new_player_id = message.get('player_id')
-            print(f"[CLIENT] ⭐ NOUVEAU JOUEUR REJOINT: {new_player_id}")
+            print(f"[CLIENT] NOUVEAU JOUEUR REJOINT: {new_player_id}")
             
-            # Vérifier qu'il n'est pas déjà dans la liste
             if not any(p['id'] == new_player_id for p in self.players_in_room):
                 self.players_in_room.append({
                     'id': new_player_id,
@@ -208,20 +201,13 @@ def draw_room_waiting_screen(screen, fonts, online_manager):
     
     screen.blit(status_text, (screen_width // 2 - status_text.get_width() // 2, 120))
     
-    # Affichage détaillé des joueurs
     players_title = fonts['large'].render(f"Joueurs connectés ({len(online_manager.players_in_room)}/2):", True, BLACK)
     screen.blit(players_title, (screen_width // 2 - players_title.get_width() // 2, 180))
     
     y_offset = 220
     for i, player in enumerate(online_manager.players_in_room):
         player_name = player.get('name', f"Joueur {player.get('id', 'Inconnu')[:8]}...")
-        
-        # Couleur différente pour vous vs autres joueurs
-        if player.get('id') == online_manager.player_id:
-            color = GREEN
-            player_name += " ⭐"
-        else:
-            color = BLUE
+        color = GREEN  
         
         player_text = fonts['medium'].render(f"• {player_name}", True, color)
         screen.blit(player_text, (screen_width // 2 - player_text.get_width() // 2, y_offset + i * 40))
@@ -363,7 +349,7 @@ def katarenga_online_menu(screen, fonts):
             
             y_offset = 220
             room_buttons = []
-            for i, room in enumerate(online_manager.rooms[:5]):  # Limiter à 5 rooms
+            for i, room in enumerate(online_manager.rooms[:5]):  
                 room_name = room.get('name', 'Sans nom')
                 room_id = room.get('id', 'N/A')
                 players_count = room.get('players', 0)
