@@ -20,9 +20,42 @@ class OnlineManager:
         self.is_room_creator = False
         self.server_host = "localhost"
         self.server_port = 12345
+    
+    def getSocket(self):
+        return self.socket
+    
+    def getPlayerId(self):
+        return self.player_id
+    
+    def getCurrentRoom(self):
+        return self.current_room
+    
+    def getCurrentRoomName(self):
+        return self.current_room_name
+    
+    def getPlayersInRoom(self):
+        return self.players_in_room
+    
+    def GetisRoomCreator(self):
+        return self.is_room_creator
+    
+    def setServerHost(self, host):
+        self.server_host = host
+    
+    def setServerPort(self, port):
+        self.server_port = port
+    
+    def getServerHost(self):
+        return self.server_host
+    
+    def getServerPort(self):
+        return self.server_port
+    
 
     def connect_to_server(self):
-        """Connection au serv"""
+        """
+            Connection au serv
+        """
         try:
             self.socket = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
             self.socket.connect((self.server_host, self.server_port))
@@ -50,7 +83,9 @@ class OnlineManager:
                 break
 
     def handle_server_message(self, message):
-        """Traite les messages reçus du serveur"""
+        """
+            Traite les messages reçus du serveur
+        """
         msg_type = message.get('type')
         
         if msg_type == 'player_id':
@@ -102,7 +137,9 @@ class OnlineManager:
             print(f"Erreur du serveur: {error_msg}")
 
     def send_message(self, message):
-        """Envoie un message au serveur"""
+        """
+            Envoie un message au serveur
+        """
         if self.connected and self.socket:
             try:
                 self.socket.send(json.dumps(message).encode('utf-8'))
@@ -110,7 +147,9 @@ class OnlineManager:
                 print(f"Erreur lors de l'envoi du message: {e}")
 
     def create_room(self, room_name):
-        """Crée une nouvelle room"""
+        """
+            Crée une nouvelle room
+        """
         message = {
             'type': 'create_room',
             'room_name': room_name
@@ -118,7 +157,9 @@ class OnlineManager:
         self.send_message(message)
 
     def join_room(self, room_id):
-        """Rejoint une room existante"""
+        """
+            Rejoint une room existante
+        """
         message = {
             'type': 'join_room',
             'room_id': room_id
@@ -126,7 +167,9 @@ class OnlineManager:
         self.send_message(message)
 
     def leave_room(self):
-        """Quitte la room actuelle"""
+        """
+            Quitte la room actuelle
+        """
         if self.current_room:
             message = {
                 'type': 'leave_room',
@@ -139,7 +182,9 @@ class OnlineManager:
             self.is_room_creator = False
 
     def start_game(self):
-        """Démarre le jeu (seulement pour le créateur)"""
+        """
+            Démarre le jeu (seulement pour le créateur)
+        """
         if self.is_room_creator and self.current_room:
             message = {
                 'type': 'start_game',
@@ -148,12 +193,16 @@ class OnlineManager:
             self.send_message(message)
 
     def get_rooms(self):
-        """Demande la liste des rooms disponibles"""
+        """
+            Demande la liste des rooms disponibles
+        """
         message = {'type': 'get_rooms'}
         self.send_message(message)
 
     def disconnect(self):
-        """Se déconnecte du serveur"""
+        """
+            Se déconnecte du serveur
+        """
         if self.current_room:
             self.leave_room()
         if self.socket:
@@ -161,7 +210,9 @@ class OnlineManager:
         self.connected = False
 
 def draw_text_input(screen, fonts, text, x, y, width, height, active=False):
-    """Dessine un champ de saisie de texte"""
+    """
+        Dessine un champ de saisie de texte
+    """
     color = BLUE if active else GREY
     pygame.draw.rect(screen, WHITE, (x, y, width, height))
     pygame.draw.rect(screen, color, (x, y, width, height), 2)
@@ -172,7 +223,9 @@ def draw_text_input(screen, fonts, text, x, y, width, height, active=False):
     return pygame.Rect(x, y, width, height)
 
 def draw_room_waiting_screen(screen, fonts, online_manager):
-    """Affiche l'écran d'attente dans une room"""
+    """
+        Affiche l'écran d'attente dans une room
+    """
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     
@@ -224,7 +277,9 @@ def draw_room_waiting_screen(screen, fonts, online_manager):
     return start_button, leave_button
 
 def katarenga_online_menu(screen, fonts):
-    """Menu principal du mode en ligne"""
+    """
+        Menu principal du mode en ligne
+    """
     screen_width = screen.get_width()
     screen_height = screen.get_height()
     
