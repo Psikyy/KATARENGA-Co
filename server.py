@@ -17,13 +17,9 @@ class GameServer:
         self.socket.bind((self.host, self.port))
         self.socket.listen(5)
         
-        local_ip = self.get_local_ip()
-        print(f"Serveur démarré sur {self.host}:{self.port}")
-        print(f"Votre ami peut se connecter à : {local_ip}:{self.port}")
         
         while True:
             client_socket, addr = self.socket.accept()
-            print(f"Nouvelle connexion de {addr}")
             
             client_id = str(uuid.uuid4())
             self.clients[client_id] = {
@@ -141,7 +137,6 @@ class GameServer:
                     'player_id': client_id,
                     'total_players': len(room['players'])
                 })
-                print(f"Notification envoyée à {player_id} que {client_id} a rejoint")
         
         other_players = [p for p in room['players'] if p != client_id]
         if other_players:
@@ -180,9 +175,7 @@ class GameServer:
             try:
                 message_str = json.dumps(message).encode('utf-8')
                 self.clients[client_id]['socket'].send(message_str)
-                print(f"Message envoyé à {client_id}: {message.get('type', 'unknown')}")
             except Exception as e:
-                print(f"Erreur envoi message à {client_id}: {e}")
                 self.disconnect_client(client_id)
 
     def disconnect_client(self, client_id):

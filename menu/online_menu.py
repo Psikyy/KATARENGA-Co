@@ -78,7 +78,6 @@ class OnlineManager:
                     message = json.loads(data)
                     self.handle_server_message(message)
             except Exception as e:
-                print(f"Erreur lors de l'écoute du serveur: {e}")
                 self.connected = False
                 break
 
